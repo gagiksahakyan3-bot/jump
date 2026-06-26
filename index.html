@@ -64,6 +64,213 @@
       z-index: 10;
     }
     #bfullscreen:active { background: rgba(242,239,231,0.92); }
+    #bqr {
+      position: fixed; top: 105px; right: 14px;
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(242,239,231,0.72);
+      border: 1.5px solid rgba(28,25,21,0.35);
+      border-radius: 8px;
+      font-size: 18px;
+      cursor: pointer;
+      user-select: none; -webkit-user-select: none;
+      touch-action: manipulation;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 10;
+    }
+    #bqr:active { background: rgba(242,239,231,0.92); }
+    #bmkt {
+      position: fixed; top: 150px; right: 14px;
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(242,239,231,0.72);
+      border: 1.5px solid rgba(122,56,8,0.5);
+      border-radius: 8px;
+      font-size: 17px;
+      cursor: pointer;
+      user-select: none; -webkit-user-select: none;
+      touch-action: manipulation;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 10;
+    }
+    #bmkt:active { background: rgba(242,239,231,0.92); }
+    #bskins {
+      position: fixed; top: 195px; right: 14px;
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(242,239,231,0.72);
+      border: 1.5px solid rgba(28,25,21,0.35);
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      user-select: none; -webkit-user-select: none;
+      touch-action: manipulation;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 10;
+    }
+    #bskins:active { background: rgba(242,239,231,0.92); }
+    #skinsmodal {
+      display: none; position: fixed; inset: 0;
+      background: rgba(28,25,21,0.82);
+      z-index: 200;
+      align-items: center; justify-content: center;
+    }
+    #skinsmodal.open { display: flex; }
+    #skinsbox {
+      background: #F2EFE7;
+      border-radius: 18px;
+      padding: 18px 18px 14px;
+      width: min(340px, 94vw);
+      max-height: 88vh;
+      overflow-y: auto;
+      font-family: 'Chalkboard SE','Comic Sans MS',cursive;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.55);
+    }
+    #skinsbox h2 { font-size: 19px; color: #1C1915; text-align: center; margin-bottom: 12px; }
+    .skin-card {
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(28,25,21,0.06);
+      border: 1.5px solid rgba(28,25,21,0.12);
+      border-radius: 12px;
+      padding: 9px 11px;
+      margin-bottom: 8px;
+    }
+    .skin-card.active-skin { border-color: rgba(122,56,8,0.6); background: rgba(122,56,8,0.08); }
+    .skin-preview {
+      width: 36px; height: 44px; border-radius: 8px;
+      position: relative; flex-shrink: 0;
+      overflow: hidden;
+      border: 1px solid rgba(0,0,0,0.25);
+      display: flex; align-items: flex-end; justify-content: center;
+    }
+    .skin-face {
+      width: 20px; height: 24px; border-radius: 50% 50% 40% 40%;
+      margin-bottom: 2px;
+      border: 1px solid rgba(0,0,0,0.2);
+    }
+    .skin-info { flex: 1; }
+    .skin-name { font-size: 14px; font-weight: bold; color: #1C1915; }
+    .skin-cost { font-size: 11px; color: #7A6848; margin-top: 1px; }
+    .skin-action {
+      flex-shrink: 0;
+      padding: 6px 11px;
+      font: bold 11px 'Chalkboard SE','Comic Sans MS',cursive;
+      border-radius: 16px; cursor: pointer; border: 1.5px solid;
+    }
+    .skin-action.equipped { background: rgba(40,120,40,0.12); border-color: rgba(40,120,40,0.4); color: #2A6020; cursor: default; }
+    .skin-action.equip    { background: rgba(28,25,21,0.08);  border-color: rgba(28,25,21,0.3);  color: #1C1915; }
+    .skin-action.equip:active { opacity: 0.6; }
+    .skin-action.buy      { background: rgba(122,56,8,0.10);  border-color: rgba(122,56,8,0.5);  color: #7A3808; }
+    .skin-action.buy:active { opacity: 0.6; }
+    .skin-action.broke    { background: rgba(180,40,20,0.07); border-color: rgba(180,40,20,0.3); color: #B02818; cursor: default; opacity: 0.6; }
+    #skinsclose {
+      display: block; width: 100%; margin-top: 4px;
+      padding: 7px;
+      font: bold 13px 'Chalkboard SE','Comic Sans MS',cursive;
+      background: rgba(214,72,50,0.10);
+      border: 1.5px solid rgba(214,72,50,0.45);
+      border-radius: 20px; color: #D64832; cursor: pointer;
+    }
+    #mktmodal {
+      display: none; position: fixed; inset: 0;
+      background: rgba(28,25,21,0.80);
+      z-index: 200;
+      align-items: center; justify-content: center;
+    }
+    #mktmodal.open { display: flex; }
+    #mktbox {
+      background: #F2EFE7;
+      border-radius: 18px;
+      padding: 18px 18px 14px;
+      width: min(340px, 94vw);
+      max-height: 90vh;
+      overflow-y: auto;
+      font-family: 'Chalkboard SE','Comic Sans MS',cursive;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.55);
+    }
+    #mktbox h2 {
+      font-size: 20px; color: #1C1915; text-align: center;
+      margin-bottom: 4px;
+    }
+    #mktbalance {
+      text-align: center; font-size: 13px; color: #7A3808;
+      margin-bottom: 14px;
+    }
+    .mkt-item {
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(28,25,21,0.06);
+      border: 1.5px solid rgba(28,25,21,0.12);
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-bottom: 9px;
+    }
+    .mkt-item .mkt-icon { font-size: 22px; flex-shrink: 0; }
+    .mkt-item .mkt-info { flex: 1; }
+    .mkt-item .mkt-name { font-size: 14px; font-weight: bold; color: #1C1915; }
+    .mkt-item .mkt-desc { font-size: 11px; color: #7A6848; margin-top: 1px; }
+    .mkt-item .mkt-btn {
+      flex-shrink: 0;
+      padding: 6px 12px;
+      font: bold 12px 'Chalkboard SE','Comic Sans MS',cursive;
+      border-radius: 16px;
+      cursor: pointer;
+      border: 1.5px solid;
+      transition: opacity 0.15s;
+    }
+    .mkt-btn.buy {
+      background: rgba(122,56,8,0.12);
+      border-color: rgba(122,56,8,0.55);
+      color: #7A3808;
+    }
+    .mkt-btn.buy:active { opacity: 0.6; }
+    .mkt-btn.owned {
+      background: rgba(40,120,40,0.12);
+      border-color: rgba(40,120,40,0.4);
+      color: #2A6020;
+      cursor: default;
+    }
+    .mkt-btn.broke {
+      background: rgba(180,40,20,0.08);
+      border-color: rgba(180,40,20,0.3);
+      color: #B02818;
+      cursor: default; opacity: 0.65;
+    }
+    #mktclose {
+      display: block; width: 100%; margin-top: 4px;
+      padding: 7px;
+      font: bold 13px 'Chalkboard SE','Comic Sans MS',cursive;
+      background: rgba(214,72,50,0.10);
+      border: 1.5px solid rgba(214,72,50,0.45);
+      border-radius: 20px; color: #D64832; cursor: pointer;
+    }
+    #qrmodal {
+      display: none; position: fixed; inset: 0;
+      background: rgba(28,25,21,0.78);
+      z-index: 200;
+      align-items: center; justify-content: center;
+    }
+    #qrmodal.open { display: flex; }
+    #qrbox {
+      background: #F2EFE7; border-radius: 16px; padding: 22px 24px;
+      text-align: center; box-shadow: 0 8px 40px rgba(0,0,0,0.55);
+      font-family: 'Chalkboard SE','Comic Sans MS',cursive;
+    }
+    #qrbox p { font: bold 15px inherit; color: #5A4828; margin-bottom: 14px; }
+    #qrbox small {
+      display: block; font: 11px inherit; color: #8A7858;
+      margin-top: 10px; max-width: 220px; word-break: break-all;
+    }
+    #qrcode { display: inline-block; }
+    #qrcode canvas, #qrcode img { border-radius: 6px; }
+    #qrclose {
+      margin-top: 14px; padding: 6px 20px;
+      font: bold 13px inherit;
+      background: rgba(214,72,50,0.12); border: 1.5px solid rgba(214,72,50,0.5);
+      border-radius: 20px; color: #D64832; cursor: pointer;
+    }
     #jumpctrl {
       position: fixed; top: 62px; left: 10px;
       display: flex; align-items: center; gap: 5px;
@@ -127,6 +334,66 @@
   <button id="bjump"  class="ctrl-btn">▲</button>
   <button id="btakeout" onclick="takeOut()">¢<span id="bankdisp">0</span></button>
   <button id="bfullscreen" title="Fullscreen">⛶</button>
+  <button id="bqr" title="QR Code — play on mobile">📱</button>
+  <button id="bmkt" title="Market">🛒</button>
+  <button id="bskins" title="Skins">🎨</button>
+  <div id="skinsmodal">
+    <div id="skinsbox">
+      <h2>🎨 Skins</h2>
+      <div id="skinslist"></div>
+      <button id="skinsclose">Close</button>
+    </div>
+  </div>
+  <div id="mktmodal">
+    <div id="mktbox">
+      <h2>🛒 Market</h2>
+      <div id="mktbalance"></div>
+      <div class="mkt-item">
+        <span class="mkt-icon">💨</span>
+        <div class="mkt-info">
+          <div class="mkt-name">Speed Boost</div>
+          <div class="mkt-desc">Run 25% faster</div>
+        </div>
+        <button class="mkt-btn" data-id="speed" data-cost="4">4¢</button>
+      </div>
+      <div class="mkt-item">
+        <span class="mkt-icon">⬆️</span>
+        <div class="mkt-info">
+          <div class="mkt-name">Triple Jump</div>
+          <div class="mkt-desc">3 jumps instead of 2</div>
+        </div>
+        <button class="mkt-btn" data-id="triple" data-cost="8">8¢</button>
+      </div>
+      <div class="mkt-item">
+        <span class="mkt-icon">🛡️</span>
+        <div class="mkt-info">
+          <div class="mkt-name">Shield</div>
+          <div class="mkt-desc">Survive one star hit per run</div>
+        </div>
+        <button class="mkt-btn" data-id="shield" data-cost="12">12¢</button>
+      </div>
+      <div class="mkt-item">
+        <span class="mkt-icon">🧲</span>
+        <div class="mkt-info">
+          <div class="mkt-name">Coin Magnet</div>
+          <div class="mkt-desc">Attract coins from farther away</div>
+        </div>
+        <button class="mkt-btn" data-id="magnet" data-cost="6">6¢</button>
+      </div>
+      <div style="margin:12px 0 8px;border-top:1.5px solid rgba(28,25,21,0.15);padding-top:10px;font:bold 13px 'Chalkboard SE','Comic Sans MS',cursive;color:#5A4828;">🎭 Operator Skins</div>
+      <div id="mkt-skins-list"></div>
+      <button id="mktclose">Close</button>
+    </div>
+  </div>
+  <div id="qrmodal">
+    <div id="qrbox">
+      <p>Scan to play on mobile</p>
+      <div id="qrcode"></div>
+      <small id="qrurl"></small>
+      <br>
+      <button id="qrclose">Close</button>
+    </div>
+  </div>
   <button id="p2btn" title="Add AI player">🤖</button>
   <div id="jumpctrl">
     <span>↑</span>
@@ -143,6 +410,83 @@
   var ctx  = cvs.getContext('2d');
   var W = window.innerWidth, H = window.innerHeight;
   cvs.width = W; cvs.height = H;
+  // ── CoD operator skins ────────────────────────────────────────────
+  var SKINS = {
+    // ── Ghost (Task Force 141) ──────────────────────────────────────
+    ghost:             {name:'Ghost',  subname:'Default',      icon:'💀',cost:0,  headType:'skull',
+      helmet:'#111110',mask:'#BFBCB0',socket:'#0C0A08',vest:'#0F0F0E',scarf:'#1C1C1C',rifle:'#1A1A14',pant:'#0E0E0C',boot:'#0A0806',stripes:'rgba(225,222,210,0.90)',cheek:'#7A7868'},
+    ghost_hazel:       {name:'Ghost',  subname:'Hazel',        icon:'💀',cost:6,  headType:'skull',
+      helmet:'#1E2A10',mask:'#D8D4B0',socket:'#080C04',vest:'#1E2A10',scarf:'#182010',rifle:'#1A2210',pant:'#182008',boot:'#0E140A',stripes:'rgba(175,210,115,0.88)',cheek:'#7A8850'},
+    ghost_spectral:    {name:'Ghost',  subname:'Spectral',     icon:'💀',cost:8,  headType:'skull',
+      helmet:'#C8C6C0',mask:'#EEECEA',socket:'#282828',vest:'#C0BEB8',scarf:'#B0AEA8',rifle:'#B8B6B0',pant:'#B8B6B0',boot:'#A0A09A',stripes:'rgba(210,215,255,0.92)',cheek:'#989890'},
+    ghost_killswitch:  {name:'Ghost',  subname:'Killswitch',   icon:'💀',cost:8,  headType:'skull',
+      helmet:'#100808',mask:'#C0B8B0',socket:'#0A0404',vest:'#180808',scarf:'#120606',rifle:'#180808',pant:'#100606',boot:'#080404',stripes:'rgba(200,25,15,0.92)',cheek:'#7A5050'},
+    ghost_d_day:       {name:'Ghost',  subname:'D-Day',        icon:'💀',cost:8,  headType:'skull',
+      helmet:'#3A3020',mask:'#BFBCB0',socket:'#0C0A08',vest:'#3A3020',scarf:'#2A2218',rifle:'#2A2418',pant:'#302818',boot:'#181408',stripes:'rgba(200,190,150,0.88)',cheek:'#8A8060'},
+    ghost_carbon:      {name:'Ghost',  subname:'Carbon',       icon:'💀',cost:10, headType:'skull',
+      helmet:'#0A0A0A',mask:'#909090',socket:'#060606',vest:'#0C0C0C',scarf:'#0A0A0A',rifle:'#0A0A0A',pant:'#080808',boot:'#060606',stripes:'rgba(100,100,100,0.88)',cheek:'#606060'},
+
+    // ── König (KorTac) ──────────────────────────────────────────────
+    koenig:            {name:'König',  subname:'Default',      icon:'🎭',cost:10, headType:'hood',
+      helmet:'#1C2212',mask:'#1C2212',socket:'#080C04',vest:'#1A2010',scarf:'#141808',rifle:'#161C0C',pant:'#141810',boot:'#0C100A',stripes:'rgba(90,130,50,0.80)',cheek:'#607040',hoodCol:'#1C2212',eyeSlitCol:'#2E3C1A'},
+    koenig_obsidian:   {name:'König',  subname:'Obsidian',     icon:'🎭',cost:6,  headType:'hood',
+      helmet:'#080808',mask:'#080808',socket:'#040404',vest:'#0A0A0A',scarf:'#080808',rifle:'#0A0A08',pant:'#060606',boot:'#040404',stripes:'rgba(55,55,55,0.72)',cheek:'#282828',hoodCol:'#0A0A0A',eyeSlitCol:'#181818'},
+    koenig_desert:     {name:'König',  subname:'Desert',       icon:'🎭',cost:7,  headType:'hood',
+      helmet:'#C8A870',mask:'#C8A870',socket:'#3A2810',vest:'#B89858',scarf:'#A08040',rifle:'#907838',pant:'#A08850',boot:'#705A30',stripes:'rgba(200,168,75,0.84)',cheek:'#9A7840',hoodCol:'#C0A068',eyeSlitCol:'#D4B880'},
+    koenig_urban:      {name:'König',  subname:'Urban',        icon:'🎭',cost:7,  headType:'hood',
+      helmet:'#282828',mask:'#282828',socket:'#101010',vest:'#222222',scarf:'#1A1A1A',rifle:'#202020',pant:'#1C1C1C',boot:'#101010',stripes:'rgba(80,80,80,0.75)',cheek:'#404040',hoodCol:'#282828',eyeSlitCol:'#383838'},
+    koenig_arctic:     {name:'König',  subname:'Arctic',       icon:'🎭',cost:9,  headType:'hood',
+      helmet:'#D8DCE0',mask:'#D8DCE0',socket:'#1A1E22',vest:'#CCD0D4',scarf:'#C0C4C8',rifle:'#B8BCC0',pant:'#C0C4C8',boot:'#909498',stripes:'rgba(180,210,255,0.88)',cheek:'#909898',hoodCol:'#D0D4D8',eyeSlitCol:'#E4E8EC'},
+
+    // ── Price (SAS) ────────────────────────────────────────────────
+    price:             {name:'Price',  subname:'Gunslinger',   icon:'🪖',cost:12, headType:'beret',
+      helmet:'#3A3010',mask:'#D4A870',socket:'#2A1808',vest:'#484030',scarf:'#382E18',rifle:'#2A2418',pant:'#3A3820',boot:'#1A1810',stripes:'rgba(80,70,30,0.80)',cheek:'#8A6840',beretCol:'#383010',faceCol:'#D4A870',mustCol:'#28180A'},
+    price_multicam:    {name:'Price',  subname:'Multicam',     icon:'🪖',cost:7,  headType:'beret',
+      helmet:'#3A4020',mask:'#D4A870',socket:'#2A1808',vest:'#384028',scarf:'#283018',rifle:'#283018',pant:'#303820',boot:'#181C10',stripes:'rgba(100,120,55,0.82)',cheek:'#8A6840',beretCol:'#404828',faceCol:'#D4A870',mustCol:'#28180A'},
+    price_sas_classic: {name:'Price',  subname:'SAS Classic',  icon:'🪖',cost:7,  headType:'beret',
+      helmet:'#101828',mask:'#D4A870',socket:'#2A1808',vest:'#181C28',scarf:'#101420',rifle:'#181C28',pant:'#141820',boot:'#0C1018',stripes:'rgba(55,80,145,0.84)',cheek:'#8A6840',beretCol:'#0E1420',faceCol:'#D4A870',mustCol:'#28180A'},
+    price_winter:      {name:'Price',  subname:'Winter Ops',   icon:'🪖',cost:8,  headType:'beret',
+      helmet:'#D0D4D8',mask:'#D8C8A8',socket:'#2A1808',vest:'#C8CCD0',scarf:'#B8BCC0',rifle:'#B0B4B8',pant:'#C0C4C8',boot:'#888C90',stripes:'rgba(200,220,255,0.88)',cheek:'#9A8868',beretCol:'#C8CCD0',faceCol:'#D4A870',mustCol:'#28180A'},
+    price_navy:        {name:'Price',  subname:'Navy',         icon:'🪖',cost:8,  headType:'beret',
+      helmet:'#0A1428',mask:'#D4A870',socket:'#2A1808',vest:'#0C1630',scarf:'#0A1020',rifle:'#0A1428',pant:'#0A1020',boot:'#060C14',stripes:'rgba(100,140,220,0.84)',cheek:'#8A6840',beretCol:'#0A1428',faceCol:'#D4A870',mustCol:'#28180A'},
+
+    // ── Soap (Task Force 141) ──────────────────────────────────────
+    soap:              {name:'Soap',   subname:'Bravo Six',    icon:'🪒',cost:15, headType:'mohawk',
+      helmet:'#202838',mask:'#C89868',socket:'#0A1018',vest:'#202838',scarf:'#182030',rifle:'#182030',pant:'#1A2030',boot:'#101420',stripes:'rgba(80,140,200,0.80)',cheek:'#7A6040',hairCol:'#181818',faceCol:'#C89868',paintCol:'#1A3060'},
+    soap_urban:        {name:'Soap',   subname:'Urban',        icon:'🪒',cost:7,  headType:'mohawk',
+      helmet:'#282828',mask:'#C89868',socket:'#0A0A0A',vest:'#222222',scarf:'#1A1A1A',rifle:'#202020',pant:'#1A1A1A',boot:'#101010',stripes:'rgba(185,35,25,0.84)',cheek:'#7A6040',hairCol:'#1A1010',faceCol:'#C89868',paintCol:'#8A1818'},
+    soap_highland:     {name:'Soap',   subname:'Highland',     icon:'🪒',cost:7,  headType:'mohawk',
+      helmet:'#384030',mask:'#D0A878',socket:'#101808',vest:'#384030',scarf:'#283020',rifle:'#283028',pant:'#303828',boot:'#181C14',stripes:'rgba(120,165,75,0.82)',cheek:'#887848',hairCol:'#4A3820',faceCol:'#D0A878',paintCol:'#384828'},
+    soap_blackout:     {name:'Soap',   subname:'Blackout',     icon:'🪒',cost:8,  headType:'mohawk',
+      helmet:'#0A0A0A',mask:'#A07850',socket:'#080808',vest:'#0C0C0C',scarf:'#0A0A0A',rifle:'#0A0A0A',pant:'#080808',boot:'#060606',stripes:'rgba(40,40,40,0.70)',cheek:'#604830',hairCol:'#080808',faceCol:'#A07850',paintCol:'#080808'},
+    soap_orbital:      {name:'Soap',   subname:'Orbital',      icon:'🪒',cost:10, headType:'mohawk',
+      helmet:'#101830',mask:'#C0C8E0',socket:'#080C18',vest:'#101830',scarf:'#0C1428',rifle:'#101830',pant:'#0C1428',boot:'#080C18',stripes:'rgba(80,160,255,0.88)',cheek:'#8090A8',hairCol:'#101830',faceCol:'#C0C8E0',paintCol:'#203080'},
+
+    // ── Graves (Shadow Company) ────────────────────────────────────
+    graves:            {name:'Graves', subname:'Warlord',      icon:'⚔️',cost:18, headType:'skull',
+      helmet:'#18140E',mask:'#CEB870',socket:'#0C0A04',vest:'#181410',scarf:'#181410',rifle:'#1A1610',pant:'#141210',boot:'#0C0A08',stripes:'rgba(210,155,30,0.92)',cheek:'#8A7040'},
+    graves_shadow:     {name:'Graves', subname:'Shadow',       icon:'⚔️',cost:8,  headType:'skull',
+      helmet:'#0E0808',mask:'#C0A8A0',socket:'#060404',vest:'#120808',scarf:'#0E0606',rifle:'#120808',pant:'#0E0606',boot:'#080404',stripes:'rgba(165,20,10,0.90)',cheek:'#7A5050'},
+    graves_executive:  {name:'Graves', subname:'Executive',    icon:'⚔️',cost:10, headType:'skull',
+      helmet:'#282828',mask:'#E8E4D8',socket:'#181818',vest:'#222222',scarf:'#202020',rifle:'#202020',pant:'#1A1A1A',boot:'#101010',stripes:'rgba(222,222,222,0.92)',cheek:'#909090'},
+    graves_inferno:    {name:'Graves', subname:'Inferno',      icon:'⚔️',cost:10, headType:'skull',
+      helmet:'#1A0808',mask:'#E8C0A0',socket:'#0A0404',vest:'#200C08',scarf:'#180808',rifle:'#200C08',pant:'#160808',boot:'#0C0404',stripes:'rgba(255,80,20,0.92)',cheek:'#A06040'},
+    graves_mercury:    {name:'Graves', subname:'Mercury',      icon:'⚔️',cost:12, headType:'skull',
+      helmet:'#5A6068',mask:'#D0D8E0',socket:'#202428',vest:'#505860',scarf:'#484E58',rifle:'#505860',pant:'#484E58',boot:'#303840',stripes:'rgba(160,200,240,0.92)',cheek:'#8898A8'},
+  };
+
+  var SKIN_GROUPS = [
+    {label:'💀 Ghost',  ids:['ghost','ghost_hazel','ghost_spectral','ghost_killswitch','ghost_d_day','ghost_carbon']},
+    {label:'🎭 König',  ids:['koenig','koenig_obsidian','koenig_desert','koenig_urban','koenig_arctic']},
+    {label:'🪖 Price',  ids:['price','price_multicam','price_sas_classic','price_winter','price_navy']},
+    {label:'🪒 Soap',   ids:['soap','soap_urban','soap_highland','soap_blackout','soap_orbital']},
+    {label:'⚔️ Graves', ids:['graves','graves_shadow','graves_executive','graves_inferno','graves_mercury']},
+  ];
+
+  var currentSkin = localStorage.getItem('current_skin') || 'ghost';
+  function skinOwned(id) { return id==='ghost' || +localStorage.getItem('skin_'+id)===1; }
+  function setSkin(id) { currentSkin=id; localStorage.setItem('current_skin',id); }
+
   var GRAV = 0.52, SPD = 4.5;
   var JVY_LEVELS = [-13, -16, -20, -24, -28];
   var jumpLvl = +localStorage.getItem('jump_lvl') || 2;
@@ -954,8 +1298,8 @@
     ctx.save();
     ctx.lineCap='round'; ctx.lineJoin='round';
 
-    var hoodC='#8A1818', bodyC='#A82020', pantC='#3A1010', bootC='#1A0808';
-    var faceC='#E8D0C0', eyeC='rgba(255,120,30,0.9)', outC='#0C0808';
+    var hoodC='#111110', bodyC='#0F0F0E', pantC='#0E0E0C', bootC='#0A0806';
+    var faceC='#BFBCB0', eyeC='rgba(110,105,88,0.3)', outC='#050504';
 
     var ph2=Math.floor(p2frame/7)%2;
     var fast2=Math.abs(p2vx)>0.6;
@@ -997,7 +1341,7 @@
     ctx.lineTo(x+10,hipY);   ctx.lineTo(x-10,hipY);
     ctx.closePath(); ctx.fill(); ctx.stroke();
     // chest detail
-    ctx.strokeStyle='rgba(200,60,40,0.35)'; ctx.lineWidth=0.8;
+    ctx.strokeStyle='rgba(30,30,28,0.35)'; ctx.lineWidth=0.8;
     sLine(x-8,shldrY+4,x-8,hipY-3,0.15); sLine(x+8,shldrY+4,x+8,hipY-3,0.15);
 
     // arms (swing opposite legs)
@@ -1009,49 +1353,54 @@
     ctx.beginPath(); ctx.arc(x+16+aswg2*0.12,shldrY+17-aswg2*0.2,3.5,0,Math.PI*2); ctx.fill(); ctx.stroke();
     ctx.beginPath(); ctx.arc(x-16-aswg2*0.12,shldrY+17+aswg2*0.2,3.5,0,Math.PI*2); ctx.fill(); ctx.stroke();
 
-    // hood
-    ctx.fillStyle=hoodC; ctx.strokeStyle=outC; ctx.lineWidth=2.2;
+    // helmet dome
+    ctx.fillStyle=hoodC; ctx.strokeStyle=outC; ctx.lineWidth=1.8;
     ctx.beginPath();
-    for(var i=0;i<=20;i++){
-      var a=i/20*Math.PI*2;
-      var rx=13+r(0.4),ry=12+r(0.4);
-      i?ctx.lineTo(x+rx*Math.cos(a),headY+ry*Math.sin(a))
-       :ctx.moveTo(x+rx*Math.cos(a),headY+ry*Math.sin(a));
-    }
+    ctx.arc(x, headY-2, 14+r(0.3), Math.PI, 0);
+    ctx.lineTo(x+16, headY+6); ctx.lineTo(x-16, headY+6);
     ctx.closePath(); ctx.fill(); ctx.stroke();
-    // shadow rim
-    ctx.fillStyle='#1A0808'; ctx.strokeStyle=outC; ctx.lineWidth=1.5;
-    ctx.beginPath();
-    ctx.arc(x,headY,10,Math.PI*0.88,Math.PI*0.12,false);
-    ctx.quadraticCurveTo(x+12,headY+5,x+8,headY+10);
-    ctx.quadraticCurveTo(x,headY+12,x-8,headY+10);
-    ctx.quadraticCurveTo(x-12,headY+5,x-10,headY);
-    ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.fillStyle='#080808'; ctx.strokeStyle=outC; ctx.lineWidth=1.0;
+    ctx.fillRect(x-16, headY+4, 32, 4); ctx.strokeRect(x-16, headY+4, 32, 4);
+    // headset band
+    ctx.strokeStyle='#181816'; ctx.lineWidth=2.8; ctx.lineCap='round';
+    ctx.beginPath(); ctx.arc(x, headY-2, 17, Math.PI*1.08, Math.PI*1.92); ctx.stroke();
+    // ear cups
+    ctx.fillStyle='#0C0C0A'; ctx.strokeStyle=outC; ctx.lineWidth=1.2;
+    ctx.beginPath(); ctx.ellipse(x-19,headY+1,5,6,0,0,Math.PI*2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle='#1A1A18'; ctx.beginPath(); ctx.ellipse(x-19,headY+1,3,4,0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#0C0C0A'; ctx.strokeStyle=outC; ctx.lineWidth=1.2;
+    ctx.beginPath(); ctx.ellipse(x+19,headY+1,5,6,0,0,Math.PI*2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle='#1A1A18'; ctx.beginPath(); ctx.ellipse(x+19,headY+1,3,4,0,0,Math.PI*2); ctx.fill();
+    // Ghost two white stripes
+    ctx.strokeStyle='rgba(225,222,210,0.90)'; ctx.lineWidth=1.8; ctx.lineCap='round';
+    sLine(x-3,headY-14,x-3,headY-5,0.2);
+    sLine(x+3,headY-14,x+3,headY-5,0.2);
 
-    // face
+    // skull mask
     ctx.fillStyle=faceC; ctx.strokeStyle=outC; ctx.lineWidth=1.4;
-    ctx.beginPath(); ctx.ellipse(x,headY+1,7.5,9,0,0,Math.PI*2); ctx.fill(); ctx.stroke();
-    // glowing orange eyes
-    ctx.fillStyle='#1A0808';
-    ctx.beginPath(); ctx.ellipse(x-4,headY-2,3.2,3,0,0,Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(x+4,headY-2,3.2,3,0,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(x,headY+5,10,12,0,0,Math.PI*2); ctx.fill(); ctx.stroke();
+    // cheekbones
+    ctx.strokeStyle='#7A7868'; ctx.lineWidth=1.0;
+    sLine(x-9,headY+2,x-5,headY+6,0.2); sLine(x+9,headY+2,x+5,headY+6,0.2);
+    sLine(x-8,headY-2,x+8,headY-2,0.15);
+    // eye sockets
+    ctx.fillStyle='#0C0A08';
+    ctx.beginPath(); ctx.ellipse(x-4,headY+3,3.5,3.0,0,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(x+4,headY+3,3.5,3.0,0,0,Math.PI*2); ctx.fill();
     ctx.fillStyle=eyeC;
-    ctx.beginPath(); ctx.arc(x-4,headY-2,1.6,0,Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.arc(x+4,headY-2,1.6,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle='rgba(255,220,160,0.9)';
-    ctx.beginPath(); ctx.arc(x-4,headY-2.4,0.7,0,Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.arc(x+4,headY-2.4,0.7,0,Math.PI*2); ctx.fill();
-    // nose + teeth same style
-    ctx.fillStyle='#1A0808';
-    ctx.beginPath(); ctx.moveTo(x,headY+2); ctx.lineTo(x-2,headY+5); ctx.lineTo(x+2,headY+5); ctx.closePath(); ctx.fill();
-    ctx.strokeStyle='#1A0808'; ctx.lineWidth=0.8;
+    ctx.beginPath(); ctx.arc(x-4,headY+2.5,1.1,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x+4,headY+2.5,1.1,0,Math.PI*2); ctx.fill();
+    // nose + teeth
+    ctx.fillStyle='rgba(0,0,0,0.28)';
+    ctx.beginPath(); ctx.moveTo(x,headY+6); ctx.lineTo(x-2,headY+9); ctx.lineTo(x+2,headY+9); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle='rgba(80,78,65,0.5)'; ctx.lineWidth=0.8;
     for(var t2=-2;t2<=2;t2++){
-      ctx.fillStyle=faceC;
-      ctx.fillRect(x+t2*2.8-1.2,headY+6,2.3,3.5);
-      ctx.strokeRect(x+t2*2.8-1.2,headY+6,2.3,3.5);
+      ctx.fillStyle = t2%2===0 ? 'rgba(198,195,182,0.95)' : 'rgba(25,22,16,0.75)';
+      ctx.fillRect(x+t2*2.8-1.2,headY+10,2.3,3.5);
+      ctx.strokeRect(x+t2*2.8-1.2,headY+10,2.3,3.5);
     }
-    ctx.strokeStyle=outC; ctx.lineWidth=1.2;
-    sLine(x-6,headY+6,x+6,headY+6,0.2);
+    ctx.strokeStyle=outC; ctx.lineWidth=1.1;
+    sLine(x-7,headY+10,x+7,headY+10,0.2);
 
     // "AI" tag above head
     ctx.fillStyle='rgba(200,40,20,0.82)';
@@ -1127,7 +1476,7 @@
     if(goLeft())       pvx -= 0.9;
     else if(goRight()) pvx += 0.9;
     else               pvx *= 0.74;
-    pvx = Math.max(-SPD, Math.min(SPD, pvx));
+    pvx = Math.max(-effectiveSpd(), Math.min(effectiveSpd(), pvx));
     px += pvx;
     if(px < -20)  px = W+20;
     if(px > W+20) px = -20;
@@ -1143,7 +1492,7 @@
       for(var i=0; i<plats.length; i++) {
         var p = plats[i];
         if((px+10 >= p.x1 && px-10 <= p.x2) && prevPy <= p.wy && py >= p.wy-1) {
-          py=p.wy; pvy=0; onG=true; jLeft=2; break;
+          py=p.wy; pvy=0; onG=true; jLeft=maxJumps(); break;
         }
       }
     }
@@ -1152,7 +1501,7 @@
     for(var j=coins.length-1; j>=0; j--) {
       var cn=coins[j];
       var cdx=px-cn.wx, cdy=(py-25)-cn.wy;
-      if(cdx*cdx+cdy*cdy < 40*40) {
+      if(cdx*cdx+cdy*cdy < coinRadius()) {
         coinCount++;
         popups.push({wx:cn.wx, wy:cn.wy, life:1.0, text:'+1', col:'#9A7808'});
         playCoinSFX();
@@ -1186,7 +1535,10 @@
       var s = stars[j];
       var ssx = s.wx + Math.sin(frame*s.spd + s.phase)*s.amp;
       var dx = px - ssx, dy = (py-26) - s.wy;
-      if(dx*dx + dy*dy < 20*20) { playDeathSFX(); dead=true; return; }
+      if(dx*dx + dy*dy < 20*20) {
+        if(shieldActive) { shieldActive=false; continue; }
+        playDeathSFX(); dead=true; return;
+      }
     }
 
     // Score
@@ -1267,15 +1619,16 @@
     ctx.save();
     ctx.lineCap='round'; ctx.lineJoin='round';
 
-    var hoodCol   = dead ? '#4A2820' : '#222222';
-    var skullCol  = dead ? '#C8A898' : '#DDD9C8';
-    var socketCol = dead ? '#7A3028' : '#141414';
-    var vestCol   = dead ? '#5A3A28' : '#384028';
-    var scarfCol  = dead ? '#907848' : '#A89060';
-    var rifleCol  = dead ? '#6A3828' : '#242418';
-    var pantCol   = dead ? '#4A3018' : '#2C2E1C';
-    var bootCol   = dead ? '#381808' : '#181410';
-    var outlineCol= '#0C0C08';
+    var sk = SKINS[currentSkin] || SKINS.ghost;
+    var hoodCol   = dead ? '#2C2C2A' : sk.helmet;
+    var skullCol  = dead ? '#6A6858' : sk.mask;
+    var socketCol = dead ? '#3A3828' : sk.socket;
+    var vestCol   = dead ? '#1C1C1A' : sk.vest;
+    var scarfCol  = dead ? '#1C1C1A' : sk.scarf;
+    var rifleCol  = dead ? '#2C2C28' : sk.rifle;
+    var pantCol   = dead ? '#181614' : sk.pant;
+    var bootCol   = dead ? '#0E0C0A' : sk.boot;
+    var outlineCol= '#050504';
 
     var ph   = Math.floor(frame/7)%2;
     var fast = Math.abs(pvx)>0.6;
@@ -1389,14 +1742,14 @@
     ctx.lineTo(x+10,hipY);   ctx.lineTo(x-10,hipY);
     ctx.closePath(); ctx.fill(); ctx.stroke();
     // MOLLE pouches
-    ctx.fillStyle='#2A3018'; ctx.strokeStyle=outlineCol; ctx.lineWidth=1;
+    ctx.fillStyle='#0C0C0A'; ctx.strokeStyle=outlineCol; ctx.lineWidth=1;
     ctx.fillRect(x-10,shldrY+3,6,6);  ctx.strokeRect(x-10,shldrY+3,6,6);
     ctx.fillRect(x+4, shldrY+3,6,6);  ctx.strokeRect(x+4, shldrY+3,6,6);
     ctx.fillRect(x-5, hipY-8, 10,6);  ctx.strokeRect(x-5, hipY-8, 10,6);
     // buckle
-    ctx.fillStyle='#5A5040'; ctx.fillRect(x-2,shldrY+7,4,3); ctx.strokeRect(x-2,shldrY+7,4,3);
+    ctx.fillStyle='#3A3830'; ctx.fillRect(x-2,shldrY+7,4,3); ctx.strokeRect(x-2,shldrY+7,4,3);
     // chest strap lines
-    ctx.strokeStyle='rgba(50,58,30,0.35)'; ctx.lineWidth=0.7;
+    ctx.strokeStyle='rgba(30,30,28,0.35)'; ctx.lineWidth=0.7;
     sLine(x-8,shldrY+4,x-8,hipY-2,0.15);
     sLine(x+8,shldrY+4,x+8,hipY-2,0.15);
 
@@ -1437,8 +1790,8 @@
     ctx.quadraticCurveTo(x,shldrY+16, x+8,shldrY+13);
     ctx.quadraticCurveTo(x+13,shldrY+7, x+10,shldrY+2);
     ctx.closePath(); ctx.fill(); ctx.stroke();
-    // scarf weave lines
-    ctx.strokeStyle='rgba(60,44,16,0.28)'; ctx.lineWidth=0.8;
+    // shemagh weave lines
+    ctx.strokeStyle='rgba(35,35,33,0.5)'; ctx.lineWidth=0.8;
     sLine(x-7,shldrY+6, x+7,shldrY+6,0.2);
     sLine(x-6,shldrY+10,x+6,shldrY+10,0.2);
 
@@ -1476,71 +1829,193 @@
       ctx.beginPath(); ctx.arc(x+22,shldrY+22,3.2,0,Math.PI*2); ctx.fill(); ctx.stroke();
     }
 
-    // ── hood (outer dark shape) ───────────────────────────────────
-    ctx.fillStyle=hoodCol; ctx.strokeStyle=outlineCol; ctx.lineWidth=2.2;
-    ctx.beginPath();
-    for(var i=0;i<=20;i++){
-      var a=i/20*Math.PI*2;
-      var rx=13+r(0.5), ry=12.5+r(0.5);
-      if(i) ctx.lineTo(x+rx*Math.cos(a), headY+ry*Math.sin(a));
-      else  ctx.moveTo(x+rx*Math.cos(a), headY+ry*Math.sin(a));
-    }
-    ctx.closePath(); ctx.fill(); ctx.stroke();
-    // hood shadow inner rim
-    ctx.fillStyle='#111111'; ctx.strokeStyle=outlineCol; ctx.lineWidth=1.6;
-    ctx.beginPath();
-    ctx.arc(x,headY,10,Math.PI*0.88,Math.PI*0.12,false);
-    ctx.quadraticCurveTo(x+13,headY+5, x+9,headY+10);
-    ctx.quadraticCurveTo(x+5,headY+13, x,headY+12);
-    ctx.quadraticCurveTo(x-5,headY+13,x-9,headY+10);
-    ctx.quadraticCurveTo(x-13,headY+5,x-10,headY);
-    ctx.closePath(); ctx.fill(); ctx.stroke();
-
-    // ── skull face ────────────────────────────────────────────────
-    ctx.fillStyle=skullCol; ctx.strokeStyle=outlineCol; ctx.lineWidth=1.5;
-    ctx.beginPath();
-    ctx.ellipse(x,headY+1,8,9.5,0,0,Math.PI*2);
-    ctx.fill(); ctx.stroke();
-
-    if(dead){
-      ctx.strokeStyle=socketCol; ctx.lineWidth=2.2;
-      sLine(x-6,headY-4,x-2,headY,  0.2); sLine(x-6,headY,  x-2,headY-4,0.2);
-      sLine(x+2,headY-4,x+6,headY,  0.2); sLine(x+2,headY,  x+6,headY-4,0.2);
-      ctx.strokeStyle=outlineCol; ctx.lineWidth=1.4;
-      ctx.beginPath(); ctx.arc(x,headY+6,3.5,Math.PI*0.15,Math.PI*0.85,true); ctx.stroke();
-    } else {
-      // eye sockets — dark hollows
-      ctx.fillStyle=socketCol;
-      ctx.beginPath(); ctx.ellipse(x-4+eyeDir,headY-2,3.5,3.2,0,0,Math.PI*2); ctx.fill();
-      ctx.beginPath(); ctx.ellipse(x+4+eyeDir,headY-2,3.5,3.2,0,0,Math.PI*2); ctx.fill();
-      // ghost's glowing blue eyes inside sockets
-      ctx.fillStyle='rgba(80,160,255,0.85)';
-      ctx.beginPath(); ctx.arc(x-4+eyeDir,headY-2,1.4,0,Math.PI*2); ctx.fill();
-      ctx.beginPath(); ctx.arc(x+4+eyeDir,headY-2,1.4,0,Math.PI*2); ctx.fill();
-      ctx.fillStyle='rgba(200,230,255,0.9)';
-      ctx.beginPath(); ctx.arc(x-4+eyeDir,headY-2.5,0.6,0,Math.PI*2); ctx.fill();
-      ctx.beginPath(); ctx.arc(x+4+eyeDir,headY-2.5,0.6,0,Math.PI*2); ctx.fill();
-      // nose cavity
-      ctx.fillStyle=socketCol;
-      ctx.beginPath();
-      ctx.moveTo(x+eyeDir,headY+2);
-      ctx.lineTo(x-2+eyeDir,headY+5);
-      ctx.lineTo(x+2+eyeDir,headY+5);
-      ctx.closePath(); ctx.fill();
-      // teeth
-      ctx.strokeStyle=socketCol; ctx.lineWidth=0.9;
-      for(var t=-2;t<=2;t++){
-        ctx.fillStyle=skullCol;
-        ctx.fillRect(x+t*2.8+eyeDir-1.3,headY+6,2.4,3.8);
-        ctx.strokeRect(x+t*2.8+eyeDir-1.3,headY+6,2.4,3.8);
+    // ── operator head (skin headType switch) ─────────────────────────
+    if(!sk.headType || sk.headType==='skull') {
+      // ── Ghost / Graves: tactical helmet + skull mask ──────────────
+      ctx.fillStyle=hoodCol; ctx.strokeStyle=outlineCol; ctx.lineWidth=1.8;
+      ctx.beginPath(); ctx.arc(x,headY-2,14+r(0.3),Math.PI,0);
+      ctx.lineTo(x+16,headY+6); ctx.lineTo(x-16,headY+6); ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.fillStyle='#080808'; ctx.strokeStyle=outlineCol; ctx.lineWidth=1.0;
+      ctx.fillRect(x-16,headY+4,32,4); ctx.strokeRect(x-16,headY+4,32,4);
+      ctx.strokeStyle='#181816'; ctx.lineWidth=2.8; ctx.lineCap='round';
+      ctx.beginPath(); ctx.arc(x,headY-2,17,Math.PI*1.08,Math.PI*1.92); ctx.stroke();
+      ctx.fillStyle='#0C0C0A'; ctx.strokeStyle=outlineCol; ctx.lineWidth=1.2;
+      ctx.beginPath(); ctx.ellipse(x-19,headY+1,5,6,0,0,Math.PI*2); ctx.fill(); ctx.stroke();
+      ctx.fillStyle='#1A1A18'; ctx.beginPath(); ctx.ellipse(x-19,headY+1,3,4,0,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#0C0C0A'; ctx.strokeStyle=outlineCol; ctx.lineWidth=1.2;
+      ctx.beginPath(); ctx.ellipse(x+19,headY+1,5,6,0,0,Math.PI*2); ctx.fill(); ctx.stroke();
+      ctx.fillStyle='#1A1A18'; ctx.beginPath(); ctx.ellipse(x+19,headY+1,3,4,0,0,Math.PI*2); ctx.fill();
+      ctx.strokeStyle='#1E1E1C'; ctx.lineWidth=1.4; ctx.lineCap='round';
+      ctx.beginPath(); ctx.moveTo(x+19,headY+5); ctx.quadraticCurveTo(x+25,headY+10,x+22,headY+15); ctx.stroke();
+      ctx.fillStyle='#2C2C2A'; ctx.beginPath(); ctx.arc(x+22,headY+15,2,0,Math.PI*2); ctx.fill();
+      ctx.strokeStyle=dead?'rgba(140,138,128,0.5)':sk.stripes; ctx.lineWidth=1.8; ctx.lineCap='round';
+      sLine(x-3,headY-14,x-3,headY-5,0.2); sLine(x+3,headY-14,x+3,headY-5,0.2);
+      // skull mask
+      ctx.fillStyle=skullCol; ctx.strokeStyle=outlineCol; ctx.lineWidth=1.4;
+      ctx.beginPath(); ctx.ellipse(x,headY+5,10,12,0,0,Math.PI*2); ctx.fill(); ctx.stroke();
+      var maskSh=dead?'#454438':sk.cheek;
+      ctx.strokeStyle=maskSh; ctx.lineWidth=1.0;
+      sLine(x-9,headY+2,x-5,headY+6,0.2); sLine(x+9,headY+2,x+5,headY+6,0.2);
+      sLine(x-8,headY-2,x+8,headY-2,0.15);
+      if(dead){
+        ctx.strokeStyle='rgba(80,76,60,0.85)'; ctx.lineWidth=2.0;
+        sLine(x-6,headY+2,x-2,headY+6,0.2); sLine(x-6,headY+6,x-2,headY+2,0.2);
+        sLine(x+2,headY+2,x+6,headY+6,0.2); sLine(x+2,headY+6,x+6,headY+2,0.2);
+      } else {
+        ctx.fillStyle=socketCol;
+        ctx.beginPath(); ctx.ellipse(x-4+eyeDir,headY+3,3.5,3.0,0,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(x+4+eyeDir,headY+3,3.5,3.0,0,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle='rgba(110,105,88,0.3)';
+        ctx.beginPath(); ctx.arc(x-4+eyeDir,headY+2.5,1.1,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(x+4+eyeDir,headY+2.5,1.1,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle='rgba(0,0,0,0.3)';
+        ctx.beginPath(); ctx.moveTo(x+eyeDir,headY+6); ctx.lineTo(x-2+eyeDir,headY+9); ctx.lineTo(x+2+eyeDir,headY+9); ctx.closePath(); ctx.fill();
+        ctx.strokeStyle='rgba(80,78,65,0.55)'; ctx.lineWidth=0.8;
+        for(var t=-2;t<=2;t++){
+          ctx.fillStyle=t%2===0?'rgba(198,195,182,0.95)':'rgba(25,22,16,0.75)';
+          ctx.fillRect(x+t*2.8+eyeDir-1.2,headY+10,2.3,3.5);
+          ctx.strokeRect(x+t*2.8+eyeDir-1.2,headY+10,2.3,3.5);
+        }
+        ctx.strokeStyle=outlineCol; ctx.lineWidth=1.1;
+        sLine(x-7+eyeDir,headY+10,x+7+eyeDir,headY+10,0.2);
+        ctx.strokeStyle='rgba(0,0,0,0.16)'; ctx.lineWidth=0.6;
+        sLine(x+eyeDir,headY-2,x+eyeDir,headY+5,0.1);
+        sLine(x-6,headY+7,x+6,headY+7,0.1);
       }
-      // jaw crack line
-      ctx.strokeStyle=outlineCol; ctx.lineWidth=1.3;
-      sLine(x-7+eyeDir,headY+6,x+7+eyeDir,headY+6,0.2);
-      // cheekbone crack details
-      ctx.strokeStyle='rgba(0,0,0,0.22)'; ctx.lineWidth=0.8;
-      sLine(x-7+eyeDir,headY-1,x-5+eyeDir,headY+2,0.15);
-      sLine(x+5+eyeDir,headY-1,x+7+eyeDir,headY+2,0.15);
+
+    } else if(sk.headType==='hood') {
+      // ── König: full balaclava covering entire face ────────────────
+      ctx.fillStyle=dead?'#0E100A':sk.hoodCol; ctx.strokeStyle=outlineCol; ctx.lineWidth=1.8;
+      ctx.beginPath(); ctx.ellipse(x,headY,14,16,0,0,Math.PI*2); ctx.fill(); ctx.stroke();
+      // fabric texture
+      ctx.strokeStyle='rgba(0,0,0,0.20)'; ctx.lineWidth=0.7;
+      sLine(x-10,headY-7,x-8,headY+7,0.3); sLine(x+10,headY-7,x+8,headY+7,0.3);
+      sLine(x-3,headY-14,x-3,headY-8,0.2); sLine(x+3,headY-14,x+3,headY-8,0.2);
+      // camo pattern dots
+      ctx.fillStyle='rgba(0,0,0,0.12)';
+      for(var ci=0;ci<8;ci++){
+        ctx.beginPath(); ctx.arc(x+r(10),headY+r(12),1+Math.random(),0,Math.PI*2); ctx.fill();
+      }
+      if(dead){
+        ctx.strokeStyle='rgba(60,80,35,0.65)'; ctx.lineWidth=2.0;
+        sLine(x-6,headY-1,x-2,headY+3,0.2); sLine(x-6,headY+3,x-2,headY-1,0.2);
+        sLine(x+2,headY-1,x+6,headY+3,0.2); sLine(x+2,headY+3,x+6,headY-1,0.2);
+      } else {
+        // narrow eye slit slot
+        ctx.fillStyle='#050604';
+        ctx.beginPath(); ctx.ellipse(x,headY,10,3.2,0,0,Math.PI*2); ctx.fill();
+        // two eye holes inside slit
+        ctx.fillStyle=sk.eyeSlitCol||'#2E3C1A';
+        ctx.beginPath(); ctx.ellipse(x-5+eyeDir,headY,3.5,1.9,0,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(x+5+eyeDir,headY,3.5,1.9,0,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle='rgba(150,200,90,0.45)';
+        ctx.beginPath(); ctx.arc(x-5+eyeDir,headY-0.5,1.0,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(x+5+eyeDir,headY-0.5,1.0,0,Math.PI*2); ctx.fill();
+        // mouth slit
+        ctx.fillStyle='rgba(0,0,0,0.4)';
+        ctx.beginPath(); ctx.ellipse(x+eyeDir,headY+7,5,1.5,0,0,Math.PI*2); ctx.fill();
+      }
+      // KÖ-141 patch on forehead
+      ctx.fillStyle=dead?'rgba(30,42,15,0.7)':'rgba(50,72,25,0.88)';
+      ctx.strokeStyle=outlineCol; ctx.lineWidth=0.8;
+      if(ctx.roundRect) ctx.roundRect(x-14,headY-24,28,11,3); else ctx.rect(x-14,headY-24,28,11);
+      ctx.fill(); ctx.stroke();
+      ctx.fillStyle='#D0E0B0'; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.font='bold 7px "Courier New",monospace';
+      ctx.fillText('KÖ-141',x,headY-18.5);
+
+    } else if(sk.headType==='beret') {
+      // ── Price: beret + face + walrus mustache ─────────────────────
+      // face
+      ctx.fillStyle=dead?'#7A6040':sk.faceCol; ctx.strokeStyle=outlineCol; ctx.lineWidth=1.4;
+      ctx.beginPath(); ctx.ellipse(x,headY+3,9,11,0,0,Math.PI*2); ctx.fill(); ctx.stroke();
+      // beret (angled flat cap)
+      ctx.fillStyle=dead?'#2A2010':sk.beretCol; ctx.strokeStyle=outlineCol; ctx.lineWidth=1.6;
+      ctx.beginPath(); ctx.ellipse(x+3,headY-8,13,6,-0.25,0,Math.PI*2); ctx.fill(); ctx.stroke();
+      ctx.strokeStyle=dead?'#1A1408':'#18140A'; ctx.lineWidth=3; ctx.lineCap='butt';
+      ctx.beginPath(); ctx.ellipse(x+1,headY-3,11,3.5,-0.2,Math.PI*0.85,Math.PI*2.15); ctx.stroke();
+      // SAS cap badge
+      if(!dead){
+        ctx.fillStyle='#C8A820'; ctx.strokeStyle=outlineCol; ctx.lineWidth=0.7;
+        ctx.beginPath(); ctx.arc(x-6,headY-9,3.5,0,Math.PI*2); ctx.fill(); ctx.stroke();
+        ctx.fillStyle='#0A2060'; ctx.beginPath(); ctx.arc(x-6,headY-9,2,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle='#C8A820'; ctx.font='bold 4px serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText('★',x-6,headY-9);
+      }
+      if(dead){
+        ctx.strokeStyle='rgba(80,60,30,0.7)'; ctx.lineWidth=2.0;
+        sLine(x-5,headY+1,x-1,headY+5,0.2); sLine(x-5,headY+5,x-1,headY+1,0.2);
+        sLine(x+1,headY+1,x+5,headY+5,0.2); sLine(x+1,headY+5,x+5,headY+1,0.2);
+      } else {
+        // eyes
+        ctx.fillStyle='#1A1208';
+        ctx.beginPath(); ctx.ellipse(x-3+eyeDir,headY+1,2.5,2.2,0,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(x+3+eyeDir,headY+1,2.5,2.2,0,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle='rgba(90,65,30,0.55)';
+        ctx.beginPath(); ctx.arc(x-3+eyeDir,headY+0.5,0.9,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(x+3+eyeDir,headY+0.5,0.9,0,Math.PI*2); ctx.fill();
+        // nose
+        ctx.fillStyle='rgba(0,0,0,0.18)';
+        ctx.beginPath(); ctx.moveTo(x+eyeDir,headY+4); ctx.lineTo(x-2+eyeDir,headY+7); ctx.lineTo(x+2+eyeDir,headY+7); ctx.closePath(); ctx.fill();
+        // thick walrus mustache (Price's signature)
+        ctx.fillStyle=sk.mustCol||'#28180A'; ctx.strokeStyle=outlineCol; ctx.lineWidth=0.9;
+        ctx.beginPath();
+        ctx.moveTo(x-7+eyeDir,headY+6);
+        ctx.quadraticCurveTo(x-4+eyeDir,headY+4,x+eyeDir,headY+6);
+        ctx.quadraticCurveTo(x+4+eyeDir,headY+4,x+7+eyeDir,headY+6);
+        ctx.quadraticCurveTo(x+5+eyeDir,headY+9,x+eyeDir,headY+8);
+        ctx.quadraticCurveTo(x-5+eyeDir,headY+9,x-7+eyeDir,headY+6);
+        ctx.closePath(); ctx.fill(); ctx.stroke();
+        // jawline wrinkle
+        ctx.strokeStyle='rgba(0,0,0,0.10)'; ctx.lineWidth=0.7;
+        sLine(x-6+eyeDir,headY+10,x+6+eyeDir,headY+10,0.1);
+      }
+
+    } else if(sk.headType==='mohawk') {
+      // ── Soap: mohawk + blue face paint ───────────────────────────
+      // head
+      ctx.fillStyle=dead?'#7A6040':sk.faceCol; ctx.strokeStyle=outlineCol; ctx.lineWidth=1.4;
+      ctx.beginPath(); ctx.ellipse(x,headY+2,9.5,11.5,0,0,Math.PI*2); ctx.fill(); ctx.stroke();
+      // shaved sides (darker)
+      ctx.fillStyle=dead?'#6A5030':'rgba(0,0,0,0.18)';
+      ctx.beginPath(); ctx.ellipse(x-7,headY-4,4,5,-0.3,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(x+7,headY-4,4,5,0.3,0,Math.PI*2); ctx.fill();
+      // mohawk strip
+      ctx.fillStyle=dead?'#0E0E0C':sk.hairCol; ctx.strokeStyle=outlineCol; ctx.lineWidth=1.2;
+      ctx.beginPath();
+      ctx.moveTo(x-3,headY-6);
+      ctx.quadraticCurveTo(x-4,headY-18,x,headY-20);
+      ctx.quadraticCurveTo(x+4,headY-18,x+3,headY-6);
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.strokeStyle='rgba(0,0,0,0.22)'; ctx.lineWidth=0.6;
+      sLine(x-1,headY-8,x-1,headY-18,0.2); sLine(x+1,headY-8,x+1,headY-18,0.2);
+      if(dead){
+        ctx.strokeStyle='rgba(80,60,30,0.7)'; ctx.lineWidth=2.0;
+        sLine(x-5,headY+1,x-1,headY+5,0.2); sLine(x-5,headY+5,x-1,headY+1,0.2);
+        sLine(x+1,headY+1,x+5,headY+5,0.2); sLine(x+1,headY+5,x+5,headY+1,0.2);
+      } else {
+        // blue war paint bar across eyes
+        ctx.fillStyle='rgba(26,48,96,0.80)';
+        ctx.fillRect(x-9+eyeDir,headY-1,18,5);
+        ctx.beginPath(); ctx.ellipse(x-9+eyeDir,headY+1.5,1.5,2.5,0,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(x+9+eyeDir,headY+1.5,1.5,2.5,0,0,Math.PI*2); ctx.fill();
+        // eyes
+        ctx.fillStyle='#0A0E18';
+        ctx.beginPath(); ctx.ellipse(x-3+eyeDir,headY+1.5,2.8,2.5,0,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(x+3+eyeDir,headY+1.5,2.8,2.5,0,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle='rgba(120,170,240,0.5)';
+        ctx.beginPath(); ctx.arc(x-3+eyeDir,headY+1,1.0,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(x+3+eyeDir,headY+1,1.0,0,Math.PI*2); ctx.fill();
+        // nose
+        ctx.fillStyle='rgba(0,0,0,0.18)';
+        ctx.beginPath(); ctx.moveTo(x+eyeDir,headY+5); ctx.lineTo(x-2+eyeDir,headY+8); ctx.lineTo(x+2+eyeDir,headY+8); ctx.closePath(); ctx.fill();
+        // jawline
+        ctx.strokeStyle='rgba(0,0,0,0.12)'; ctx.lineWidth=0.7;
+        sLine(x-6+eyeDir,headY+11,x+6+eyeDir,headY+11,0.1);
+        // cheek scar
+        ctx.strokeStyle='rgba(180,100,80,0.55)'; ctx.lineWidth=1.0;
+        sLine(x-7,headY+5,x-3,headY+9,0.2);
+      }
     }
 
     // ── second-jump aura ──────────────────────────────────────────
@@ -1579,6 +2054,14 @@
     // penny bank below coins
     drawPenny(W-52, 38);
     ctx.fillStyle='#6A3408'; ctx.fillText(pennyBank+'¢', W-20, 38);
+
+    // shield indicator
+    if(shieldActive) {
+      ctx.font='18px serif'; ctx.textAlign='left'; ctx.textBaseline='top';
+      ctx.globalAlpha = 0.7 + 0.3*Math.sin(frame*0.12);
+      ctx.fillText('🛡️', 14, 58);
+      ctx.globalAlpha = 1;
+    }
 
     // ── NEW BEST banner ───────────────────────────────────────────
     if(newBestFlash > 0) {
@@ -1686,7 +2169,170 @@
   document.addEventListener('fullscreenchange', updateFsIcon);
   document.addEventListener('webkitfullscreenchange', updateFsIcon);
 
+  // ── market upgrades ───────────────────────────────────────────────
+  var MKT_ITEMS = {
+    speed:  { cost: 4,  key: 'mkt_speed'  },
+    triple: { cost: 8,  key: 'mkt_triple' },
+    shield: { cost: 12, key: 'mkt_shield' },
+    magnet: { cost: 6,  key: 'mkt_magnet' }
+  };
+  function mktOwned(id) { return +localStorage.getItem(MKT_ITEMS[id].key) === 1; }
+
+  // Apply speed upgrade
+  function effectiveSpd() { return mktOwned('speed') ? SPD * 1.25 : SPD; }
+  // Apply magnet upgrade
+  function coinRadius()   { return mktOwned('magnet') ? 75*75 : 40*40; }
+  // Triple jump: applied on respawn/landing (see patched sections below)
+  function maxJumps()     { return mktOwned('triple') ? 3 : 2; }
+
+  // Shield state (reset each run)
+  var shieldActive = false;
+  var origRespawn = respawn;
+  respawn = function() {
+    origRespawn();
+    shieldActive = mktOwned('shield');
+    jLeft = maxJumps();
+  };
+  // also patch initial spawn
+  shieldActive = mktOwned('shield');
+  jLeft = maxJumps();
+
   (function loop(){ update(); render(); requestAnimationFrame(loop); })();
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script>
+  // ── market + skins UI ────────────────────────────────────────────
+  (function() {
+    var mktModal = document.getElementById('mktmodal');
+
+    function renderSkinSlot(id) {
+      var s    = SKINS[id];
+      var owns = skinOwned(id);
+      var isEq = currentSkin === id;
+      var btnClass, btnText;
+      if (isEq)                   { btnClass='mkt-btn owned'; btnText='✓ On'; }
+      else if (owns)              { btnClass='mkt-btn buy';   btnText='Equip'; }
+      else if (pennyBank>=s.cost) { btnClass='mkt-btn buy';   btnText=s.cost+'¢'; }
+      else                        { btnClass='mkt-btn broke'; btnText=s.cost+'¢'; }
+      var previewMask = s.headType==='hood' ? s.hoodCol||s.helmet : s.mask;
+      return '<div class="mkt-item" style="padding:7px 10px;margin-bottom:6px" data-skin="'+id+'">' +
+        '<div style="width:26px;height:32px;border-radius:5px;background:'+s.helmet+';flex-shrink:0;' +
+             'display:flex;align-items:flex-end;justify-content:center;border:1px solid rgba(0,0,0,0.28)">' +
+          '<div style="width:17px;height:20px;border-radius:50% 50% 38% 38%;background:'+previewMask+';margin-bottom:2px;border:1px solid rgba(0,0,0,0.18)"></div>' +
+        '</div>' +
+        '<div class="mkt-info">' +
+          '<div class="mkt-name" style="font-size:13px">'+s.subname+'</div>' +
+          '<div class="mkt-desc">'+(s.cost===0?'Free':s.cost+'¢')+'</div>' +
+        '</div>' +
+        '<button class="'+btnClass+'" style="padding:5px 9px;font-size:11px" data-skin-id="'+id+'" data-cost="'+s.cost+'">'+btnText+'</button>' +
+      '</div>';
+    }
+
+    function refreshMarket() {
+      document.getElementById('mktbalance').textContent = 'Balance: ' + pennyBank + '¢';
+      // upgrades
+      document.querySelectorAll('.mkt-btn[data-id]').forEach(function(btn) {
+        var id=btn.dataset.id, cost=+btn.dataset.cost;
+        if (mktOwned(id)) { btn.textContent='✓ Owned'; btn.className='mkt-btn owned'; }
+        else if (pennyBank<cost) { btn.textContent=cost+'¢'; btn.className='mkt-btn broke'; }
+        else { btn.textContent=cost+'¢'; btn.className='mkt-btn buy'; }
+      });
+      // skins grouped by operator
+      var sl = document.getElementById('mkt-skins-list');
+      sl.innerHTML = SKIN_GROUPS.map(function(grp) {
+        var rows = grp.ids.map(renderSkinSlot).join('');
+        return '<div style="margin-bottom:4px">' +
+          '<div style="font:bold 12px \'Chalkboard SE\',\'Comic Sans MS\',cursive;color:#7A5828;' +
+               'padding:5px 2px 2px;border-bottom:1px solid rgba(28,25,21,0.12);margin-bottom:5px">' +
+            grp.label +
+          '</div>' + rows + '</div>';
+      }).join('');
+    }
+
+    document.getElementById('bmkt').addEventListener('click', function() {
+      refreshMarket();
+      mktModal.classList.add('open');
+    });
+
+    mktModal.addEventListener('click', function(e) {
+      // upgrade buy
+      var btn = e.target.closest('.mkt-btn[data-id]');
+      if (btn && btn.classList.contains('buy')) {
+        var id=btn.dataset.id, cost=+btn.dataset.cost;
+        if (pennyBank>=cost && !mktOwned(id)) {
+          pennyBank-=cost; localStorage.setItem('penny_bank',pennyBank);
+          localStorage.setItem(MKT_ITEMS[id].key,1);
+          updateBankDisplay(); refreshMarket();
+          if(id==='shield') shieldActive=true;
+        }
+      }
+      // skin buy / equip
+      var sbtn = e.target.closest('[data-skin-id]');
+      if (sbtn) {
+        var sid=sbtn.dataset.skinId, sc=+sbtn.dataset.cost;
+        var sOwns=skinOwned(sid);
+        if (!sOwns && pennyBank>=sc) {
+          pennyBank-=sc; localStorage.setItem('penny_bank',pennyBank);
+          localStorage.setItem('skin_'+sid,1);
+          updateBankDisplay();
+          setSkin(sid); refreshMarket();
+        } else if (sOwns) {
+          setSkin(sid); refreshMarket();
+        }
+      }
+      if (e.target===mktModal || e.target.id==='mktclose') mktModal.classList.remove('open');
+    });
+
+    document.getElementById('mktclose').addEventListener('click', function() {
+      mktModal.classList.remove('open');
+    });
+  })();
+
+  (function() {
+    var qrGenerated = false;
+    var bqr = document.getElementById('bqr');
+    var modal = document.getElementById('qrmodal');
+
+    bqr.addEventListener('click', function() {
+      modal.classList.add('open');
+      if (!qrGenerated) {
+        qrGenerated = true;
+        var url = window.location.href;
+        var isFile = url.startsWith('file://');
+
+        if (isFile) {
+          document.getElementById('qrcode').innerHTML =
+            '<div style="width:200px;padding:18px 0;font:13px \'Chalkboard SE\',\'Comic Sans MS\',cursive;color:#5A4828;line-height:1.7">' +
+            'To play on mobile, run the<br>server script first:<br><br>' +
+            '<code style="background:#E8E4D8;padding:4px 8px;border-radius:6px;font-size:12px;color:#1C1915">' +
+            'python3 server.py</code><br><br>' +
+            'Then open this file again<br>via the printed URL and<br>tap 📱 for the QR code.' +
+            '</div>';
+          document.getElementById('qrurl').textContent = 'File opened locally — QR needs an http:// URL';
+        } else {
+          document.getElementById('qrurl').textContent = url;
+          if (typeof QRCode !== 'undefined') {
+            new QRCode(document.getElementById('qrcode'), {
+              text: url,
+              width: 200, height: 200,
+              colorDark: '#1C1915', colorLight: '#F2EFE7',
+              correctLevel: QRCode.CorrectLevel.M
+            });
+          } else {
+            document.getElementById('qrcode').innerHTML =
+              '<p style="color:#D64832;font-size:12px">QR library failed to load.</p>';
+          }
+        }
+      }
+    });
+
+    document.getElementById('qrclose').addEventListener('click', function() {
+      modal.classList.remove('open');
+    });
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) modal.classList.remove('open');
+    });
+  })();
   </script>
 </body>
 </html>
