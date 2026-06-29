@@ -380,8 +380,94 @@
         </div>
         <button class="mkt-btn" data-id="magnet" data-cost="6">6¢</button>
       </div>
-      <div style="margin:12px 0 8px;border-top:1.5px solid rgba(28,25,21,0.15);padding-top:10px;font:bold 13px 'Chalkboard SE','Comic Sans MS',cursive;color:#5A4828;">🎭 Operator Skins</div>
-      <div id="mkt-skins-list"></div>
+      <div class="mkt-item">
+        <span class="mkt-icon">🪶</span>
+        <div class="mkt-info">
+          <div class="mkt-name">Feather Fall</div>
+          <div class="mkt-desc">Fall 30% slower — float like a leaf</div>
+        </div>
+        <button class="mkt-btn" data-id="feather" data-cost="5">5¢</button>
+      </div>
+      <div class="mkt-item">
+        <span class="mkt-icon">💰</span>
+        <div class="mkt-info">
+          <div class="mkt-name">Double Coins</div>
+          <div class="mkt-desc">Earn 2¢ per penny instead of 1</div>
+        </div>
+        <button class="mkt-btn" data-id="double" data-cost="9">9¢</button>
+      </div>
+      <div class="mkt-item">
+        <span class="mkt-icon">🚀</span>
+        <div class="mkt-info">
+          <div class="mkt-name">Head Start</div>
+          <div class="mkt-desc">Begin each run 200m up</div>
+        </div>
+        <button class="mkt-btn" data-id="headstart" data-cost="7">7¢</button>
+      </div>
+      <div class="mkt-item">
+        <span class="mkt-icon">👻</span>
+        <div class="mkt-info">
+          <div class="mkt-name">Ghost Mode</div>
+          <div class="mkt-desc">Invincible for the first 4 seconds</div>
+        </div>
+        <button class="mkt-btn" data-id="ghost" data-cost="14">14¢</button>
+      </div>
+      <div class="mkt-item">
+        <span class="mkt-icon">🍀</span>
+        <div class="mkt-info">
+          <div class="mkt-name">Lucky Penny</div>
+          <div class="mkt-desc">30% chance to earn a bonus penny</div>
+        </div>
+        <button class="mkt-btn" data-id="lucky" data-cost="3">3¢</button>
+      </div>
+      <div class="mkt-item">
+        <span class="mkt-icon">🌀</span>
+        <div class="mkt-info">
+          <div class="mkt-name">Dash</div>
+          <div class="mkt-desc">Double-tap direction to burst sideways</div>
+        </div>
+        <button class="mkt-btn" data-id="dash" data-cost="10">10¢</button>
+      </div>
+      <div class="mkt-item">
+        <span class="mkt-icon">🧱</span>
+        <div class="mkt-info">
+          <div class="mkt-name">Wide Platforms</div>
+          <div class="mkt-desc">Platforms are 40% wider</div>
+        </div>
+        <button class="mkt-btn" data-id="wideplat" data-cost="8">8¢</button>
+      </div>
+      <div class="mkt-item">
+        <span class="mkt-icon">⭐</span>
+        <div class="mkt-info">
+          <div class="mkt-name">Star Slayer</div>
+          <div class="mkt-desc">30% fewer stars spawn</div>
+        </div>
+        <button class="mkt-btn" data-id="fewstars" data-cost="7">7¢</button>
+      </div>
+      <div class="mkt-item">
+        <span class="mkt-icon">🔄</span>
+        <div class="mkt-info">
+          <div class="mkt-name">Second Chance</div>
+          <div class="mkt-desc">Revive once per run with half height</div>
+        </div>
+        <button class="mkt-btn" data-id="revive" data-cost="18">18¢</button>
+      </div>
+      <div class="mkt-item">
+        <span class="mkt-icon">🪙</span>
+        <div class="mkt-info">
+          <div class="mkt-name">Coin Rain</div>
+          <div class="mkt-desc">50% more gold coins spawn</div>
+        </div>
+        <button class="mkt-btn" data-id="coinrain" data-cost="6">6¢</button>
+      </div>
+      <div class="mkt-item">
+        <span class="mkt-icon">🏔️</span>
+        <div class="mkt-info">
+          <div class="mkt-name">Tight Gaps</div>
+          <div class="mkt-desc">Platforms spawn closer together</div>
+        </div>
+        <button class="mkt-btn" data-id="tightgap" data-cost="5">5¢</button>
+      </div>
       <button id="mktclose">Close</button>
     </div>
   </div>
@@ -1528,6 +1614,7 @@
   function update() {
     if(dead) return;
     frame++;
+    if(ghostTimer > 0) ghostTimer--;
     dayTime = (dayTime + 0.00015) % 1.0;
 
     // Horizontal
@@ -1541,7 +1628,7 @@
 
     // Vertical
     var prevPy = py;
-    pvy += GRAV;
+    pvy += effectiveGrav();
     py  += pvy;
 
     // Platform landing
@@ -1572,10 +1659,12 @@
       var pn=pennies[j];
       var pdx=px-pn.wx, pdy=(py-25)-pn.wy;
       if(pdx*pdx+pdy*pdy < 38*38) {
-        pennyCount++; pennyBank++;
+        var earned = mktOwned('double') ? 2 : 1;
+        if (mktOwned('lucky') && Math.random() < 0.30) earned++;
+        pennyCount++; pennyBank += earned;
         localStorage.setItem('penny_bank', pennyBank);
         updateBankDisplay();
-        popups.push({wx:pn.wx, wy:pn.wy, life:1.3, text:'1¢', col:'#7A3808'});
+        popups.push({wx:pn.wx, wy:pn.wy, life:1.3, text:'+'+earned+'¢', col:'#7A3808'});
         playCoinSFX();
         pennies.splice(j,1);
       }
@@ -1594,6 +1683,7 @@
       var ssx = s.wx + Math.sin(frame*s.spd + s.phase)*s.amp;
       var dx = px - ssx, dy = (py-26) - s.wy;
       if(dx*dx + dy*dy < 20*20) {
+        if(ghostTimer > 0) continue;
         if(shieldActive) { shieldActive=false; continue; }
         playDeathSFX(); dead=true; return;
       }
@@ -2120,6 +2210,13 @@
       ctx.fillText('🛡️', 14, 58);
       ctx.globalAlpha = 1;
     }
+    // ghost mode indicator
+    if(ghostTimer > 0) {
+      ctx.font='18px serif'; ctx.textAlign='left'; ctx.textBaseline='top';
+      ctx.globalAlpha = 0.5 + 0.5*Math.sin(frame*0.22);
+      ctx.fillText('👻', 38, 58);
+      ctx.globalAlpha = 1;
+    }
 
     // ── NEW BEST banner ───────────────────────────────────────────
     if(newBestFlash > 0) {
@@ -2229,10 +2326,21 @@
 
   // ── market upgrades ───────────────────────────────────────────────
   var MKT_ITEMS = {
-    speed:  { cost: 4,  key: 'mkt_speed'  },
-    triple: { cost: 8,  key: 'mkt_triple' },
-    shield: { cost: 12, key: 'mkt_shield' },
-    magnet: { cost: 6,  key: 'mkt_magnet' }
+    speed:     { cost: 4,  key: 'mkt_speed'     },
+    triple:    { cost: 8,  key: 'mkt_triple'    },
+    shield:    { cost: 12, key: 'mkt_shield'    },
+    magnet:    { cost: 6,  key: 'mkt_magnet'    },
+    feather:   { cost: 5,  key: 'mkt_feather'   },
+    double:    { cost: 9,  key: 'mkt_double'    },
+    headstart: { cost: 7,  key: 'mkt_headstart' },
+    ghost:     { cost: 14, key: 'mkt_ghost'     },
+    lucky:     { cost: 3,  key: 'mkt_lucky'     },
+    dash:      { cost: 10, key: 'mkt_dash'      },
+    wideplat:  { cost: 8,  key: 'mkt_wideplat'  },
+    fewstars:  { cost: 7,  key: 'mkt_fewstars'  },
+    revive:    { cost: 18, key: 'mkt_revive'    },
+    coinrain:  { cost: 6,  key: 'mkt_coinrain'  },
+    tightgap:  { cost: 5,  key: 'mkt_tightgap'  },
   };
   function mktOwned(id) { return +localStorage.getItem(MKT_ITEMS[id].key) === 1; }
 
@@ -2240,20 +2348,34 @@
   function effectiveSpd() { return mktOwned('speed') ? SPD * 1.25 : SPD; }
   // Apply magnet upgrade
   function coinRadius()   { return mktOwned('magnet') ? 75*75 : 40*40; }
-  // Triple jump: applied on respawn/landing (see patched sections below)
+  // Triple jump
   function maxJumps()     { return mktOwned('triple') ? 3 : 2; }
+  // Feather fall: reduce gravity
+  function effectiveGrav(){ return mktOwned('feather') ? GRAV * 0.70 : GRAV; }
 
-  // Shield state (reset each run)
+  // per-run state
   var shieldActive = false;
+  var ghostTimer   = 0;  // frames of ghost invincibility remaining
+  var HEAD_START_WY = 1600;
+
   var origRespawn = respawn;
   respawn = function() {
     origRespawn();
     shieldActive = mktOwned('shield');
     jLeft = maxJumps();
+    ghostTimer = mktOwned('ghost') ? 240 : 0;
+    if (mktOwned('headstart')) {
+      py   = GND - HEAD_START_WY;
+      camY = py - H * 0.55;
+      score = Math.floor(HEAD_START_WY / 8);
+      genPlats(camY - H);
+      genClouds(camY - H);
+    }
   };
   // also patch initial spawn
   shieldActive = mktOwned('shield');
   jLeft = maxJumps();
+  ghostTimer = mktOwned('ghost') ? 240 : 0;
 
   (function loop(){ update(); render(); requestAnimationFrame(loop); })();
   </script>
@@ -2288,23 +2410,12 @@
 
     function refreshMarket() {
       document.getElementById('mktbalance').textContent = 'Balance: ' + pennyBank + '¢';
-      // upgrades
       document.querySelectorAll('.mkt-btn[data-id]').forEach(function(btn) {
         var id=btn.dataset.id, cost=+btn.dataset.cost;
         if (mktOwned(id)) { btn.textContent='✓ Owned'; btn.className='mkt-btn owned'; }
         else if (pennyBank<cost) { btn.textContent=cost+'¢'; btn.className='mkt-btn broke'; }
         else { btn.textContent=cost+'¢'; btn.className='mkt-btn buy'; }
       });
-      // skins grouped by operator
-      var sl = document.getElementById('mkt-skins-list');
-      sl.innerHTML = SKIN_GROUPS.map(function(grp) {
-        var rows = grp.ids.map(renderSkinSlot).join('');
-        return '<div style="margin-bottom:4px">' +
-          '<div style="font:bold 12px \'Chalkboard SE\',\'Comic Sans MS\',cursive;color:#7A5828;' +
-               'padding:5px 2px 2px;border-bottom:1px solid rgba(28,25,21,0.12);margin-bottom:5px">' +
-            grp.label +
-          '</div>' + rows + '</div>';
-      }).join('');
     }
 
     document.getElementById('bmkt').addEventListener('click', function() {
@@ -2313,7 +2424,6 @@
     });
 
     mktModal.addEventListener('click', function(e) {
-      // upgrade buy
       var btn = e.target.closest('.mkt-btn[data-id]');
       if (btn && btn.classList.contains('buy')) {
         var id=btn.dataset.id, cost=+btn.dataset.cost;
@@ -2324,7 +2434,59 @@
           if(id==='shield') shieldActive=true;
         }
       }
-      // skin buy / equip
+      if (e.target===mktModal || e.target.id==='mktclose') mktModal.classList.remove('open');
+    });
+
+    document.getElementById('mktclose').addEventListener('click', function() {
+      mktModal.classList.remove('open');
+    });
+  })();
+
+  // ── skins modal ──────────────────────────────────────────────────
+  (function() {
+    var skinsModal = document.getElementById('skinsmodal');
+
+    function renderSkinSlot(id) {
+      var s    = SKINS[id];
+      var owns = skinOwned(id);
+      var isEq = currentSkin === id;
+      var btnClass, btnText;
+      if (isEq)                   { btnClass='skin-action equipped'; btnText='✓ On'; }
+      else if (owns)              { btnClass='skin-action equip';    btnText='Equip'; }
+      else if (pennyBank>=s.cost) { btnClass='skin-action buy';      btnText=s.cost+'¢'; }
+      else                        { btnClass='skin-action broke';    btnText=s.cost+'¢'; }
+      var previewMask = s.headType==='hood' ? s.hoodCol||s.helmet : s.mask;
+      return '<div class="skin-card' + (isEq?' active-skin':'') + '">' +
+        '<div class="skin-preview" style="background:'+s.helmet+'">' +
+          '<div class="skin-face" style="background:'+previewMask+'"></div>' +
+        '</div>' +
+        '<div class="skin-info">' +
+          '<div class="skin-name">'+s.name+' — '+s.subname+'</div>' +
+          '<div class="skin-cost">'+(s.cost===0?'Free':s.cost+'¢')+'</div>' +
+        '</div>' +
+        '<button class="'+btnClass+'" data-skin-id="'+id+'" data-cost="'+s.cost+'">'+btnText+'</button>' +
+      '</div>';
+    }
+
+    function refreshSkins() {
+      var sl = document.getElementById('skinslist');
+      sl.innerHTML = '<div style="text-align:center;font-size:12px;color:#7A3808;margin-bottom:10px">Balance: ' + pennyBank + '¢</div>' +
+        SKIN_GROUPS.map(function(grp) {
+          var rows = grp.ids.map(renderSkinSlot).join('');
+          return '<div style="margin-bottom:6px">' +
+            '<div style="font:bold 12px \'Chalkboard SE\',\'Comic Sans MS\',cursive;color:#7A5828;' +
+                 'padding:5px 2px 3px;border-bottom:1px solid rgba(28,25,21,0.12);margin-bottom:5px">' +
+              grp.label +
+            '</div>' + rows + '</div>';
+        }).join('');
+    }
+
+    document.getElementById('bskins').addEventListener('click', function() {
+      refreshSkins();
+      skinsModal.classList.add('open');
+    });
+
+    skinsModal.addEventListener('click', function(e) {
       var sbtn = e.target.closest('[data-skin-id]');
       if (sbtn) {
         var sid=sbtn.dataset.skinId, sc=+sbtn.dataset.cost;
@@ -2333,16 +2495,17 @@
           pennyBank-=sc; localStorage.setItem('penny_bank',pennyBank);
           localStorage.setItem('skin_'+sid,1);
           updateBankDisplay();
-          setSkin(sid); refreshMarket();
+          setSkin(sid); refreshSkins();
         } else if (sOwns) {
-          setSkin(sid); refreshMarket();
+          setSkin(sid); refreshSkins();
         }
+        return;
       }
-      if (e.target===mktModal || e.target.id==='mktclose') mktModal.classList.remove('open');
+      if (e.target===skinsModal || e.target.id==='skinsclose') skinsModal.classList.remove('open');
     });
 
-    document.getElementById('mktclose').addEventListener('click', function() {
-      mktModal.classList.remove('open');
+    document.getElementById('skinsclose').addEventListener('click', function() {
+      skinsModal.classList.remove('open');
     });
   })();
 
