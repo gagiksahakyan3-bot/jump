@@ -254,17 +254,18 @@
     }
     #qrmodal.open { display: flex; }
     #qrbox {
-      background: #F2EFE7; border-radius: 16px; padding: 22px 24px;
+      background: #F2EFE7; border-radius: 20px; padding: 28px 32px;
       text-align: center; box-shadow: 0 8px 40px rgba(0,0,0,0.55);
       font-family: 'Chalkboard SE','Comic Sans MS',cursive;
+      max-width: 92vw;
     }
-    #qrbox p { font: bold 15px inherit; color: #5A4828; margin-bottom: 14px; }
+    #qrbox p { font: bold 18px inherit; color: #5A4828; margin-bottom: 18px; }
     #qrbox small {
-      display: block; font: 11px inherit; color: #8A7858;
-      margin-top: 10px; max-width: 220px; word-break: break-all;
+      display: block; font: 12px inherit; color: #8A7858;
+      margin-top: 12px; max-width: 320px; word-break: break-all;
     }
     #qrcode { display: inline-block; }
-    #qrcode canvas, #qrcode img { border-radius: 6px; }
+    #qrcode canvas, #qrcode img { border-radius: 8px; width: 280px !important; height: 280px !important; }
     #qrclose {
       margin-top: 14px; padding: 6px 20px;
       font: bold 13px inherit;
@@ -468,6 +469,78 @@
         </div>
         <button class="mkt-btn" data-id="tightgap" data-cost="5">5¢</button>
       </div>
+      <div class="mkt-item">
+        <span class="mkt-icon">🪂</span>
+        <div class="mkt-info">
+          <div class="mkt-name">Slow Fall</div>
+          <div class="mkt-desc">Hold jump mid-air to glide slowly down</div>
+        </div>
+        <button class="mkt-btn" data-id="glide" data-cost="8">8¢</button>
+      </div>
+      <div class="mkt-item">
+        <span class="mkt-icon">💨</span>
+        <div class="mkt-info">
+          <div class="mkt-name">Turbo</div>
+          <div class="mkt-desc">+50% move speed (stacks with Speed)</div>
+        </div>
+        <button class="mkt-btn" data-id="turbo" data-cost="10">10¢</button>
+      </div>
+      <div class="mkt-item">
+        <span class="mkt-icon">🧲</span>
+        <div class="mkt-info">
+          <div class="mkt-name">Super Magnet</div>
+          <div class="mkt-desc">Doubles coin pull radius even further</div>
+        </div>
+        <button class="mkt-btn" data-id="supermagnet" data-cost="9">9¢</button>
+      </div>
+      <div class="mkt-item">
+        <span class="mkt-icon">💰</span>
+        <div class="mkt-info">
+          <div class="mkt-name">Penny Shower</div>
+          <div class="mkt-desc">Pennies appear much more often</div>
+        </div>
+        <button class="mkt-btn" data-id="pennyshower" data-cost="7">7¢</button>
+      </div>
+      <div class="mkt-item">
+        <span class="mkt-icon">🔁</span>
+        <div class="mkt-info">
+          <div class="mkt-name">Second Revive</div>
+          <div class="mkt-desc">Revive can trigger twice per run</div>
+        </div>
+        <button class="mkt-btn" data-id="revive2" data-cost="22">22¢</button>
+      </div>
+      <div class="mkt-item">
+        <span class="mkt-icon">⬆️</span>
+        <div class="mkt-info">
+          <div class="mkt-name">Super Jump</div>
+          <div class="mkt-desc">Jump height increased by 30%</div>
+        </div>
+        <button class="mkt-btn" data-id="highjump" data-cost="9">9¢</button>
+      </div>
+      <div class="mkt-item">
+        <span class="mkt-icon">🌀</span>
+        <div class="mkt-info">
+          <div class="mkt-name">Quad Jump</div>
+          <div class="mkt-desc">Jump 4 times in the air (needs Triple)</div>
+        </div>
+        <button class="mkt-btn" data-id="quad" data-cost="14">14¢</button>
+      </div>
+      <div class="mkt-item">
+        <span class="mkt-icon">🌟</span>
+        <div class="mkt-info">
+          <div class="mkt-name">Star Buster</div>
+          <div class="mkt-desc">First star hit per run is destroyed, not lethal</div>
+        </div>
+        <button class="mkt-btn" data-id="starbust" data-cost="13">13¢</button>
+      </div>
+      <div class="mkt-item">
+        <span class="mkt-icon">🎯</span>
+        <div class="mkt-info">
+          <div class="mkt-name">Big Head Start</div>
+          <div class="mkt-desc">Start even higher up (needs Head Start)</div>
+        </div>
+        <button class="mkt-btn" data-id="bigstart" data-cost="11">11¢</button>
+      </div>
       <button id="mktclose">Close</button>
     </div>
   </div>
@@ -617,14 +690,33 @@
       helmet:'#080810',mask:'#D0C8E8',socket:'#040408',vest:'#0C0C18',scarf:'#080810',rifle:'#0C0C18',pant:'#080812',boot:'#060608',stripes:'rgba(140,100,255,0.92)',cheek:'#7060A0'},
     graves_titan:       {name:'Graves',subname:'Titan',         icon:'⚔️',cost:12,headType:'skull',
       helmet:'#303840',mask:'#E0E8F0',socket:'#181C20',vest:'#282E38',scarf:'#20262E',rifle:'#282E38',pant:'#202830',boot:'#181C24',stripes:'rgba(255,180,0,0.96)',cheek:'#A0A8B0'},
+
+    // ── Alejandro Vargas (MW2) — 8 variants ───────────────────────
+    alejandro:          {name:'Alejandro',subname:'Vaqueros',    icon:'🦅',cost:14,headType:'beret',
+      helmet:'#1A1008',mask:'#C8A070',socket:'#0C0804',vest:'#807848',scarf:'#A8C4D8',rifle:'#706840',pant:'#484030',boot:'#2A2018',stripes:'rgba(140,180,210,0.90)',cheek:'#9A7848',beretCol:'#1A1008',faceCol:'#C8A070',mustCol:'#281408'},
+    alejandro_shadow:   {name:'Alejandro',subname:'Shadow',      icon:'🦅',cost:6, headType:'beret',
+      helmet:'#080808',mask:'#C8A070',socket:'#040404',vest:'#0E0E0E',scarf:'#0A0A0A',rifle:'#0C0C0C',pant:'#0A0A0A',boot:'#060606',stripes:'rgba(60,60,60,0.80)',cheek:'#9A7848',beretCol:'#080808',faceCol:'#C8A070',mustCol:'#281408'},
+    alejandro_arctic:   {name:'Alejandro',subname:'Arctic',      icon:'🦅',cost:6, headType:'beret',
+      helmet:'#E0E4E8',mask:'#C8A070',socket:'#181410',vest:'#D4D8DC',scarf:'#C8CCD0',rifle:'#CCD0D4',pant:'#C8CCC0',boot:'#909490',stripes:'rgba(200,220,255,0.90)',cheek:'#9A7848',beretCol:'#E0E4E8',faceCol:'#C8A070',mustCol:'#281408'},
+    alejandro_crimson:  {name:'Alejandro',subname:'Crimson',     icon:'🦅',cost:7, headType:'beret',
+      helmet:'#500A0A',mask:'#C8A070',socket:'#280404',vest:'#460808',scarf:'#3C0606',rifle:'#420808',pant:'#3A0606',boot:'#260404',stripes:'rgba(255,220,200,0.90)',cheek:'#9A7848',beretCol:'#500A0A',faceCol:'#C8A070',mustCol:'#281408'},
+    alejandro_navy:     {name:'Alejandro',subname:'Navy',        icon:'🦅',cost:7, headType:'beret',
+      helmet:'#081428',mask:'#C8A070',socket:'#040A14',vest:'#0C1222',scarf:'#081020',rifle:'#0A1020',pant:'#081018',boot:'#040A10',stripes:'rgba(100,160,240,0.90)',cheek:'#9A7848',beretCol:'#081428',faceCol:'#C8A070',mustCol:'#281408'},
+    alejandro_jungle:   {name:'Alejandro',subname:'Jungle',      icon:'🦅',cost:8, headType:'beret',
+      helmet:'#0A2C14',mask:'#C8A070',socket:'#051408',vest:'#0E2818',scarf:'#0C2010',rifle:'#0A2212',pant:'#081C10',boot:'#041008',stripes:'rgba(80,210,100,0.90)',cheek:'#9A7848',beretCol:'#0A2C14',faceCol:'#C8A070',mustCol:'#281408'},
+    alejandro_violet:   {name:'Alejandro',subname:'Violet',      icon:'🦅',cost:9, headType:'beret',
+      helmet:'#2A0848',mask:'#C8A070',socket:'#140424',vest:'#240840',scarf:'#1C0638',rifle:'#200840',pant:'#1A0836',boot:'#100420',stripes:'rgba(200,150,255,0.90)',cheek:'#9A7848',beretCol:'#2A0848',faceCol:'#C8A070',mustCol:'#281408'},
+    alejandro_legend:   {name:'Alejandro',subname:'Legend',      icon:'🦅',cost:12,headType:'beret',
+      helmet:'#705810',mask:'#C8A070',socket:'#382C08',vest:'#604A08',scarf:'#503808',rifle:'#584408',pant:'#4C3808',boot:'#302808',stripes:'rgba(255,215,0,0.96)',cheek:'#9A7848',beretCol:'#705810',faceCol:'#C8A070',mustCol:'#281408'},
   };
 
   var SKIN_GROUPS = [
-    {label:'💀 Ghost',  ids:['ghost','ghost_hazel','ghost_spectral','ghost_killswitch','ghost_d_day','ghost_carbon','ghost_blue_steel','ghost_ronin','ghost_neon_blood','ghost_kriegsmarine','ghost_quicksilver','ghost_astral','ghost_primed','ghost_bloodline','ghost_fearless']},
-    {label:'🎭 König',  ids:['koenig','koenig_obsidian','koenig_desert','koenig_urban','koenig_arctic','koenig_bronze','koenig_chemical','koenig_crimson','koenig_woodland','koenig_stealth']},
-    {label:'🪖 Price',  ids:['price','price_multicam','price_sas_classic','price_winter','price_navy','price_woodland','price_arid','price_alpine','price_midnight','price_gold']},
-    {label:'🪒 Soap',   ids:['soap','soap_urban','soap_highland','soap_blackout','soap_orbital','soap_crimson','soap_ghost_honor','soap_jungle','soap_neon_strike','soap_coyote']},
-    {label:'⚔️ Graves', ids:['graves','graves_shadow','graves_executive','graves_inferno','graves_mercury','graves_charcoal','graves_arctic_wolf','graves_vanguard','graves_phantom','graves_titan']},
+    {label:'💀 Ghost',     ids:['ghost','ghost_hazel','ghost_spectral','ghost_killswitch','ghost_d_day','ghost_carbon','ghost_blue_steel','ghost_ronin','ghost_neon_blood','ghost_kriegsmarine','ghost_quicksilver','ghost_astral','ghost_primed','ghost_bloodline','ghost_fearless']},
+    {label:'🎭 König',     ids:['koenig','koenig_obsidian','koenig_desert','koenig_urban','koenig_arctic','koenig_bronze','koenig_chemical','koenig_crimson','koenig_woodland','koenig_stealth']},
+    {label:'🪖 Price',     ids:['price','price_multicam','price_sas_classic','price_winter','price_navy','price_woodland','price_arid','price_alpine','price_midnight','price_gold']},
+    {label:'🪒 Soap',      ids:['soap','soap_urban','soap_highland','soap_blackout','soap_orbital','soap_crimson','soap_ghost_honor','soap_jungle','soap_neon_strike','soap_coyote']},
+    {label:'⚔️ Graves',    ids:['graves','graves_shadow','graves_executive','graves_inferno','graves_mercury','graves_charcoal','graves_arctic_wolf','graves_vanguard','graves_phantom','graves_titan']},
+    {label:'🦅 Alejandro', ids:['alejandro','alejandro_shadow','alejandro_arctic','alejandro_crimson','alejandro_navy','alejandro_jungle','alejandro_violet','alejandro_legend']},
   ];
 
   var currentSkin = localStorage.getItem('current_skin') || 'ghost';
@@ -1298,7 +1390,8 @@
       }
 
       // pennies: rare single copper coin, saves to bank
-      if(topWY < GND - 150 && Math.random() < 0.30) {
+      var pennyChance = mktSafe('pennyshower') ? 0.65 : 0.30;
+      if(topWY < GND - 150 && Math.random() < pennyChance) {
         pennies.push({
           wx: x1 + 15 + Math.random()*Math.max(0, pw-30),
           wy: topWY - 34 - Math.random()*26,
@@ -1626,7 +1719,7 @@
     if(!audioCtx) initAudio();
     else if(audioCtx.state==='suspended') audioCtx.resume();
     if(dead){respawn();return;}
-    if(jLeft>0){pvy=JVY; jLeft--; onG=false; playJumpSFX();}
+    if(jLeft>0){pvy=effectiveJVY(); jLeft--; onG=false; playJumpSFX();}
   }
   function goLeft()  {return K['ArrowLeft'] ||K['a']||K['A']||lHeld;}
   function goRight() {return K['ArrowRight']||K['d']||K['D']||rHeld;}
@@ -1650,7 +1743,13 @@
 
     // Vertical
     var prevPy = py;
-    pvy += effectiveGrav();
+    var grav = effectiveGrav();
+    // glide: hold jump key while falling and airborne to slow descent
+    if(mktSafe('glide') && !onG && pvy > 0 && (K[' '] || K['ArrowUp'] || K['w'] || K['W'])) {
+      grav *= 0.30;
+      pvy = Math.min(pvy, 2.5);
+    }
+    pvy += grav;
     py  += pvy;
 
     // Platform landing
@@ -1707,9 +1806,19 @@
       if(dx*dx + dy*dy < 20*20) {
         if(ghostTimer > 0) continue;
         if(shieldActive) { shieldActive=false; continue; }
+        if(mktSafe('starbust') && !starBustUsed) {
+          starBustUsed=true; stars.splice(j,1);
+          popups.push({wx:px, wy:py, life:1.8, text:'BUSTED!', col:'#FF8020'});
+          continue;
+        }
         if(mktSafe('revive') && !reviveUsed) {
-          reviveUsed=true; pvy=JVY*0.7; py-=60;
+          reviveUsed=true; pvy=effectiveJVY()*0.7; py-=60;
           popups.push({wx:px, wy:py, life:1.8, text:'REVIVE!', col:'#D64832'});
+          continue;
+        }
+        if(mktSafe('revive2') && !revive2Used) {
+          revive2Used=true; pvy=effectiveJVY()*0.7; py-=60;
+          popups.push({wx:px, wy:py, life:1.8, text:'REVIVE 2!', col:'#C020E0'});
           continue;
         }
         playDeathSFX(); dead=true; return;
@@ -1756,8 +1865,11 @@
     // Death: fell off bottom
     if(py > camY+H+80) {
       if(mktSafe('revive') && !reviveUsed) {
-        reviveUsed=true; py=camY+H-60; pvy=JVY*0.8;
+        reviveUsed=true; py=camY+H-60; pvy=effectiveJVY()*0.8;
         popups.push({wx:px, wy:py, life:1.8, text:'REVIVE!', col:'#D64832'});
+      } else if(mktSafe('revive2') && !revive2Used) {
+        revive2Used=true; py=camY+H-60; pvy=effectiveJVY()*0.8;
+        popups.push({wx:px, wy:py, life:1.8, text:'REVIVE 2!', col:'#C020E0'});
       } else { playDeathSFX(); dead=true; }
     }
 
@@ -2262,9 +2374,24 @@
       ctx.textAlign='left'; ctx.fillText('🔄', iconX, iconY);
       iconX += 28;
     }
+    if(mktSafe('revive2') && !revive2Used) {
+      ctx.globalAlpha = 0.75;
+      ctx.textAlign='left'; ctx.fillText('🔁', iconX, iconY);
+      iconX += 28;
+    }
+    if(mktSafe('starbust') && !starBustUsed) {
+      ctx.globalAlpha = 0.75;
+      ctx.textAlign='left'; ctx.fillText('🌟', iconX, iconY);
+      iconX += 28;
+    }
     if(mktSafe('dash') && dashCooldown===0) {
       ctx.globalAlpha = 0.75;
-      ctx.textAlign='left'; ctx.fillText('🌀', iconX, iconY);
+      ctx.textAlign='left'; ctx.fillText('💨', iconX, iconY);
+      iconX += 28;
+    }
+    if(mktSafe('glide') && !onG && pvy > 0) {
+      ctx.globalAlpha = 0.7 + 0.3*Math.sin(frame*0.18);
+      ctx.textAlign='left'; ctx.fillText('🪂', iconX, iconY);
       iconX += 28;
     }
     ctx.globalAlpha = 1;
@@ -2392,22 +2519,48 @@
     revive:    { cost: 18, key: 'mkt_revive'    },
     coinrain:  { cost: 6,  key: 'mkt_coinrain'  },
     tightgap:  { cost: 5,  key: 'mkt_tightgap'  },
+    glide:       { cost: 8,  key: 'mkt_glide'      },
+    turbo:       { cost: 10, key: 'mkt_turbo'      },
+    supermagnet: { cost: 9,  key: 'mkt_supermagnet'},
+    pennyshower: { cost: 7,  key: 'mkt_pennyshower'},
+    revive2:     { cost: 22, key: 'mkt_revive2'    },
+    highjump:    { cost: 9,  key: 'mkt_highjump'   },
+    quad:        { cost: 14, key: 'mkt_quad'       },
+    starbust:    { cost: 13, key: 'mkt_starbust'   },
+    bigstart:    { cost: 11, key: 'mkt_bigstart'   },
   };
   function mktOwned(id) { return +localStorage.getItem(MKT_ITEMS[id].key) === 1; }
 
   // Apply speed upgrade
-  function effectiveSpd() { return mktOwned('speed') ? SPD * 1.25 : SPD; }
+  function effectiveSpd() {
+    var s = SPD;
+    if(mktOwned('speed')) s *= 1.25;
+    if(mktOwned('turbo')) s *= 1.50;
+    return s;
+  }
   // Apply magnet upgrade
-  function coinRadius()   { return mktOwned('magnet') ? 75*75 : 40*40; }
-  // Triple jump
-  function maxJumps()     { return mktOwned('triple') ? 3 : 2; }
+  function coinRadius() {
+    if(mktOwned('supermagnet')) return 130*130;
+    if(mktOwned('magnet'))      return 75*75;
+    return 40*40;
+  }
+  // Jump count
+  function maxJumps() {
+    if(mktOwned('quad'))   return 4;
+    if(mktOwned('triple')) return 3;
+    return 2;
+  }
   // Feather fall: reduce gravity
   function effectiveGrav(){ return mktOwned('feather') ? GRAV * 0.70 : GRAV; }
+  // Jump velocity boost
+  function effectiveJVY(){ return mktOwned('highjump') ? JVY * 1.30 : JVY; }
 
   // per-run state
-  var shieldActive = false;
-  var ghostTimer   = 0;
-  var reviveUsed   = false;
+  var shieldActive  = false;
+  var ghostTimer    = 0;
+  var reviveUsed    = false;
+  var revive2Used   = false;
+  var starBustUsed  = false;
   var HEAD_START_WY = 1600;
 
   // dash state
@@ -2421,11 +2574,15 @@
     jLeft = maxJumps();
     ghostTimer = mktOwned('ghost') ? 240 : 0;
     reviveUsed = false;
+    revive2Used = false;
+    starBustUsed = false;
     dashCooldown = 0;
+    var startWY = HEAD_START_WY;
+    if (mktOwned('bigstart') && mktOwned('headstart')) startWY = HEAD_START_WY * 2.2;
     if (mktOwned('headstart')) {
-      py   = GND - HEAD_START_WY;
+      py   = GND - startWY;
       camY = py - H * 0.55;
-      score = Math.floor(HEAD_START_WY / 8);
+      score = Math.floor(startWY / 8);
       genPlats(camY - H);
       genClouds(camY - H);
     }
@@ -2594,7 +2751,7 @@
           if (typeof QRCode !== 'undefined') {
             new QRCode(document.getElementById('qrcode'), {
               text: url,
-              width: 200, height: 200,
+              width: 280, height: 280,
               colorDark: '#1C1915', colorLight: '#F2EFE7',
               correctLevel: QRCode.CorrectLevel.M
             });
