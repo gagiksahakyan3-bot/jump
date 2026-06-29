@@ -272,7 +272,7 @@
       border-radius: 20px; color: #D64832; cursor: pointer;
     }
     #jumpctrl {
-      position: fixed; top: 62px; left: 10px;
+      position: fixed; top: 110px; left: 10px;
       display: flex; align-items: center; gap: 5px;
       background: rgba(242,239,231,0.72);
       border: 1.5px solid rgba(28,25,21,0.35);
@@ -306,7 +306,7 @@
     .jbtn:active { opacity: 0.45; }
     #p2btn {
       position: fixed;
-      top: 110px; left: 56px;
+      top: 162px; left: 10px;
       transform: none;
       width: min(15vw,72px); height: min(15vw,72px);
       border-radius: 50%;
@@ -1271,15 +1271,20 @@
   }
 
   // ── platform + star generation ────────────────────────────────────
+  function mktSafe(id) { return MKT_ITEMS && mktOwned(id); }
+
   function genPlats(toWY) {
     while(topWY > toWY) {
-      topWY -= 72 + Math.random()*68;
+      var gapMult = mktSafe('tightgap') ? 0.65 : 1.0;
+      topWY -= (72 + Math.random()*68) * gapMult;
       var pw = 90 + Math.random()*140;
+      if (mktSafe('wideplat')) pw *= 1.4;
       var x1 = 10 + Math.random()*(W-pw-20);
       var tilt = (Math.random()-.5)*8;
       plats.push({x1:x1, x2:x1+pw, wy:topWY, tilt:tilt});
 
-      if(topWY < GND - 200 && Math.random() < 0.55) {
+      var starChance = mktSafe('fewstars') ? 0.55 * 0.70 : 0.55;
+      if(topWY < GND - 200 && Math.random() < starChance) {
         var sxPos = 30 + Math.random()*(W-60);
         var amp   = 25 + Math.random()*50;
         var spd   = 0.018 + Math.random()*0.024;
@@ -1302,8 +1307,10 @@
       }
 
       // coins: 1-3 in a row hovering above the platform
-      if(topWY < GND - 60 && Math.random() < 0.72) {
+      var coinChance = mktSafe('coinrain') ? 0.72 * 1.5 : 0.72;
+      if(topWY < GND - 60 && Math.random() < coinChance) {
         var cnt = 1 + Math.floor(Math.random()*3);
+        if(mktSafe('coinrain')) cnt = Math.min(cnt + 1, 5);
         var cx0 = x1 + 20 + Math.random()*Math.max(0, pw-40);
         var cwy = topWY - 28 - Math.random()*24;
         for(var ci=0; ci<cnt; ci++) {
@@ -1577,8 +1584,8 @@
     el.addEventListener('touchend',   function(e){e.preventDefault(); onUp();},{passive:false});
     el.addEventListener('touchcancel',function(){onUp();});
   }
-  bindBtn('bleft',  function(){lHeld=true;},  function(){lHeld=false;});
-  bindBtn('bright', function(){rHeld=true;},  function(){rHeld=false;});
+  bindBtn('bleft',  function(){lHeld=true; tryDash(-1);}, function(){lHeld=false;});
+  bindBtn('bright', function(){rHeld=true; tryDash(1);},  function(){rHeld=false;});
   document.getElementById('bjdn').addEventListener('click', function(){ setJumpLvl(jumpLvl-1); });
   document.getElementById('bjup').addEventListener('click', function(){ setJumpLvl(jumpLvl+1); });
   setJumpLvl(jumpLvl); // initialise dots
@@ -1594,10 +1601,24 @@
 
   // ── keyboard ──────────────────────────────────────────────────────
   var K=Object.create(null);
+  function tryDash(dir) {
+    if(!mktSafe('dash')) return;
+    var now = frame;
+    if(lastDirTap.dir===dir && now - lastDirTap.time < 14 && dashCooldown<=0) {
+      pvx = dir * effectiveSpd() * 3.2;
+      dashCooldown = 38;
+      popups.push({wx:px, wy:py-20, life:0.6, text: dir>0?'DASH →':'← DASH', col:'#1060C0'});
+      lastDirTap.dir=0;
+    } else {
+      lastDirTap = {dir:dir, time:now};
+    }
+  }
   document.addEventListener('keydown',function(e){
     if(K[e.key])return; K[e.key]=true;
     if(e.key===' '||e.key==='ArrowUp'){e.preventDefault(); doJump();}
     if(e.key==='r'||e.key==='R') respawn();
+    if(e.key==='ArrowLeft' ||e.key==='a'||e.key==='A') tryDash(-1);
+    if(e.key==='ArrowRight'||e.key==='d'||e.key==='D') tryDash(1);
   });
   document.addEventListener('keyup',function(e){K[e.key]=false;});
 
@@ -1615,6 +1636,7 @@
     if(dead) return;
     frame++;
     if(ghostTimer > 0) ghostTimer--;
+    if(dashCooldown > 0) dashCooldown--;
     dayTime = (dayTime + 0.00015) % 1.0;
 
     // Horizontal
@@ -1659,8 +1681,8 @@
       var pn=pennies[j];
       var pdx=px-pn.wx, pdy=(py-25)-pn.wy;
       if(pdx*pdx+pdy*pdy < 38*38) {
-        var earned = mktOwned('double') ? 2 : 1;
-        if (mktOwned('lucky') && Math.random() < 0.30) earned++;
+        var earned = mktSafe('double') ? 2 : 1;
+        if (mktSafe('lucky') && Math.random() < 0.30) earned++;
         pennyCount++; pennyBank += earned;
         localStorage.setItem('penny_bank', pennyBank);
         updateBankDisplay();
@@ -1685,6 +1707,11 @@
       if(dx*dx + dy*dy < 20*20) {
         if(ghostTimer > 0) continue;
         if(shieldActive) { shieldActive=false; continue; }
+        if(mktSafe('revive') && !reviveUsed) {
+          reviveUsed=true; pvy=JVY*0.7; py-=60;
+          popups.push({wx:px, wy:py, life:1.8, text:'REVIVE!', col:'#D64832'});
+          continue;
+        }
         playDeathSFX(); dead=true; return;
       }
     }
@@ -1727,7 +1754,12 @@
     }
 
     // Death: fell off bottom
-    if(py > camY+H+80) { playDeathSFX(); dead=true; }
+    if(py > camY+H+80) {
+      if(mktSafe('revive') && !reviveUsed) {
+        reviveUsed=true; py=camY+H-60; pvy=JVY*0.8;
+        popups.push({wx:px, wy:py, life:1.8, text:'REVIVE!', col:'#D64832'});
+      } else { playDeathSFX(); dead=true; }
+    }
 
     updateP2();
   }
@@ -2187,36 +2219,55 @@
     var _pc = Math.round(255 * (1 - _dn));
     var _hudCol = 'rgb('+_pc+','+_pc+','+_pc+')';
     var _subCol = 'rgba('+_pc+','+_pc+','+_pc+',0.55)';
+
+    // ── TOP-LEFT: score + best ─────────────────────────────────────
     ctx.textAlign='left'; ctx.textBaseline='top';
     ctx.font='bold 22px "Chalkboard SE","Comic Sans MS",cursive';
-    ctx.fillStyle=_hudCol; ctx.fillText(score+' m',14,10);
+    ctx.fillStyle=_hudCol;
+    ctx.fillText(score+' m', 14, 10);
     if(best>0){
-      ctx.font='14px "Chalkboard SE","Comic Sans MS",cursive';
-      ctx.fillStyle=_subCol; ctx.fillText('best: '+best,14,38);
+      ctx.font='13px "Chalkboard SE","Comic Sans MS",cursive';
+      ctx.fillStyle=_subCol;
+      ctx.fillText('best: '+best+' m', 14, 38);
     }
-    // coin count top-right
-    drawCoin(W-52, 16);
-    ctx.textAlign='right'; ctx.textBaseline='middle';
-    ctx.font='bold 18px "Chalkboard SE","Comic Sans MS",cursive';
-    ctx.fillStyle='#7A5808'; ctx.fillText(coinCount, W-20, 16);
-    // penny bank below coins
-    drawPenny(W-52, 38);
-    ctx.fillStyle='#6A3408'; ctx.fillText(pennyBank+'¢', W-20, 38);
 
-    // shield indicator
+    // ── TOP-RIGHT: coins then pennies, stacked ─────────────────────
+    ctx.textAlign='right'; ctx.textBaseline='middle';
+    ctx.font='bold 17px "Chalkboard SE","Comic Sans MS",cursive';
+    drawCoin(W-54, 16);
+    ctx.fillStyle='#7A5808';
+    ctx.fillText(coinCount, W-18, 16);
+
+    drawPenny(W-54, 42);
+    ctx.fillStyle='#6A3408';
+    ctx.font='bold 17px "Chalkboard SE","Comic Sans MS",cursive';
+    ctx.fillText(pennyBank+'¢', W-18, 42);
+
+    // ── BOTTOM-LEFT row: active power-up icons ─────────────────────
+    ctx.font='17px serif'; ctx.textBaseline='top';
+    var iconX = 14;
+    var iconY = H - 52;
     if(shieldActive) {
-      ctx.font='18px serif'; ctx.textAlign='left'; ctx.textBaseline='top';
       ctx.globalAlpha = 0.7 + 0.3*Math.sin(frame*0.12);
-      ctx.fillText('🛡️', 14, 58);
-      ctx.globalAlpha = 1;
+      ctx.textAlign='left'; ctx.fillText('🛡️', iconX, iconY);
+      iconX += 28;
     }
-    // ghost mode indicator
     if(ghostTimer > 0) {
-      ctx.font='18px serif'; ctx.textAlign='left'; ctx.textBaseline='top';
       ctx.globalAlpha = 0.5 + 0.5*Math.sin(frame*0.22);
-      ctx.fillText('👻', 38, 58);
-      ctx.globalAlpha = 1;
+      ctx.textAlign='left'; ctx.fillText('👻', iconX, iconY);
+      iconX += 28;
     }
+    if(mktSafe('revive') && !reviveUsed) {
+      ctx.globalAlpha = 0.75;
+      ctx.textAlign='left'; ctx.fillText('🔄', iconX, iconY);
+      iconX += 28;
+    }
+    if(mktSafe('dash') && dashCooldown===0) {
+      ctx.globalAlpha = 0.75;
+      ctx.textAlign='left'; ctx.fillText('🌀', iconX, iconY);
+      iconX += 28;
+    }
+    ctx.globalAlpha = 1;
 
     // ── NEW BEST banner ───────────────────────────────────────────
     if(newBestFlash > 0) {
@@ -2355,8 +2406,13 @@
 
   // per-run state
   var shieldActive = false;
-  var ghostTimer   = 0;  // frames of ghost invincibility remaining
+  var ghostTimer   = 0;
+  var reviveUsed   = false;
   var HEAD_START_WY = 1600;
+
+  // dash state
+  var dashCooldown = 0;
+  var lastDirTap = {dir:0, time:0};
 
   var origRespawn = respawn;
   respawn = function() {
@@ -2364,6 +2420,8 @@
     shieldActive = mktOwned('shield');
     jLeft = maxJumps();
     ghostTimer = mktOwned('ghost') ? 240 : 0;
+    reviveUsed = false;
+    dashCooldown = 0;
     if (mktOwned('headstart')) {
       py   = GND - HEAD_START_WY;
       camY = py - H * 0.55;
@@ -2376,6 +2434,7 @@
   shieldActive = mktOwned('shield');
   jLeft = maxJumps();
   ghostTimer = mktOwned('ghost') ? 240 : 0;
+  reviveUsed = false;
 
   (function loop(){ update(); render(); requestAnimationFrame(loop); })();
   </script>
