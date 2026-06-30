@@ -1696,10 +1696,16 @@
       // human enemies: spawn alongside blobs when gun owned
       if(mktSafe('gun') && topWY < GND - 400 && Math.random() < 0.28) {
         var hdir = Math.random() < 0.5 ? 1 : -1;
+        var newPlat = plats[plats.length - 1];
+        var epx1 = newPlat ? newPlat.x1 : 0, epx2 = newPlat ? newPlat.x2 : W;
+        var spawnX = epx1 + 10 + Math.random() * Math.max(0, epx2 - epx1 - 20);
         humanEnemies.push({
-          wx: 40 + Math.random() * (W - 80),
-          wy: topWY - 50,
+          wx: spawnX,
+          wy: topWY,
           vx: hdir * (0.6 + Math.random() * 0.8),
+          vy: 0,
+          onGround: true,
+          platX1: epx1, platX2: epx2,
           hp: 3,
           maxHp: 3,
           shootTimer: Math.floor(Math.random() * 120),
@@ -2190,16 +2196,35 @@
     // Human enemies: move, shoot, collide with player bullets & player
     for(var hi = humanEnemies.length - 1; hi >= 0; hi--) {
       var he = humanEnemies[hi];
-      // move toward player horizontally
-      var hDiffX = px - he.wx;
-      he.vx += (hDiffX > 0 ? 1 : -1) * 0.04;
-      he.vx = Math.max(-2.2, Math.min(2.2, he.vx));
-      he.wx += he.vx;
+
+      // gravity
+      he.vy = (he.vy || 0) + GRAV;
+      var prevHy = he.wy;
+      he.wy += he.vy;
+
+      // platform landing
+      he.onGround = false;
+      if(he.vy > 0) {
+        for(var pi2 = 0; pi2 < plats.length; pi2++) {
+          var hp2 = plats[pi2];
+          if((he.wx + 10 >= hp2.x1 && he.wx - 10 <= hp2.x2) && prevHy <= hp2.wy && he.wy >= hp2.wy - 1) {
+            he.wy = hp2.wy; he.vy = 0; he.onGround = true;
+            he.platX1 = hp2.x1; he.platX2 = hp2.x2;
+            break;
+          }
+        }
+      }
+
+      // only move horizontally when on a platform
+      if(he.onGround) {
+        he.wx += he.vx;
+        he.walkFrame++;
+        // turn around at platform edges or walls
+        if(he.wx <= (he.platX1 || 0) + 8 || he.wx >= (he.platX2 || W) - 8 || he.wx < 10 || he.wx > W - 10) {
+          he.vx = -he.vx;
+        }
+      }
       he.dir = he.vx >= 0 ? 1 : -1;
-      he.walkFrame++;
-      // bounce off walls
-      if(he.wx < 20) { he.wx = 20; he.vx = Math.abs(he.vx); }
-      if(he.wx > W - 20) { he.wx = W - 20; he.vx = -Math.abs(he.vx); }
       // shoot at player periodically
       he.shootTimer++;
       if(he.shootTimer >= 150) {
