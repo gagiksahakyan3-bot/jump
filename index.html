@@ -775,13 +775,14 @@
     cvs.width = W; cvs.height = H;
     GND = H - 50;
     buildGrain();
+    genCityBuildings();
     buildSkyStars();
     respawn();
   });
 
   // ── world ─────────────────────────────────────────────────────────
   var GND = H - 50;
-  var camY, px, py, pvx, pvy, onG, jLeft, score, best, frame, dead, plats, stars, topWY;
+  var camY, px, py, pvx, pvy, onG, jLeft, score, best, frame, dead, plats, stars, topWY, spawnPY;
   var newBestFlash = 0; // counts down when a new best is set
   var coins = [], coinCount = 0, popups = [];
   var pennies = [], pennyCount = 0;
@@ -798,6 +799,46 @@
   // ── day / night ───────────────────────────────────────────────────
   var dayTime   = 0.0;   // 0=noon  0.25=sunset  0.5=midnight  0.75=dawn
   var skyStars  = [];
+
+  // ── pre-generated city buildings ─────────────────────────────────
+  var cityTileW = 0, cityBldgs = [];
+  function genCityBuildings() {
+    cityTileW = W;
+    cityBldgs = [];
+    var x = 0;
+    var seed = 42;
+    function rng() { seed = (seed * 1664525 + 1013904223) & 0x7fffffff; return seed / 0x7fffffff; }
+    while (x < W + 10) {
+      var w  = Math.round(60 + rng() * 90);
+      var h  = Math.round(H * (0.22 + rng() * 0.28));
+      var type = rng() < 0.18 ? 'skyscraper' : (rng() < 0.3 ? 'tower' : (rng() < 0.5 ? 'wide' : 'flat'));
+      if (type === 'tower')      { w = Math.round(50 + rng() * 40);  h = Math.round(H * (0.38 + rng() * 0.22)); }
+      if (type === 'skyscraper') { w = Math.round(40 + rng() * 40);  h = Math.round(H * (0.55 + rng() * 0.30)); }
+      if (type === 'wide')       { w = Math.round(120 + rng() * 80); h = Math.round(H * (0.50 + rng() * 0.30)); }
+      // window grid
+      var wCols = Math.max(1, Math.floor((w - 8) / 14));
+      var wRows = Math.max(1, Math.floor((h - 14) / 16));
+      var windows = [];
+      for (var wc = 0; wc < wCols; wc++) {
+        for (var wr = 0; wr < wRows; wr++) {
+          windows.push({ lit: rng() > 0.38 });
+        }
+      }
+      // rooftop details
+      var details = [];
+      if (rng() > 0.45) { // antenna
+        details.push({ kind:'antenna', dx: Math.round(w * (0.2 + rng() * 0.6)), dh: Math.round(12 + rng() * 28) });
+      }
+      if (rng() > 0.6 && w > 40) { // water tower
+        details.push({ kind:'watertower', dx: Math.round(10 + rng() * (w - 24)), dh: 14 });
+      }
+      if (rng() > 0.65 && w > 35) { // AC unit
+        details.push({ kind:'ac', dx: Math.round(4 + rng() * (w - 20)), dh: 6 });
+      }
+      cityBldgs.push({ x: x, w: w, h: h, wCols: wCols, wRows: wRows, windows: windows, details: details });
+      x += w + Math.round(rng() * 4); // small gap between buildings
+    }
+  }
 
   // ── clouds ────────────────────────────────────────────────────────
   var clouds = [], topCloudWY = 0;
@@ -931,14 +972,25 @@
     var skG  = Math.round(topCol[1]+(horCol[1]-topCol[1])*(1-altT));
     var skB  = Math.round(topCol[2]+(horCol[2]-topCol[2])*(1-altT));
 
+    // space transition — every 200 m climbed pushes sky toward deep space
+    var spaceMix = Math.min(1, score / 1000); // score in metres, full space at 1000 m
+    // smooth by steps: each 200m adds 0.2
+    spaceMix = Math.min(1, Math.floor(score / 200) * 0.2 + (((score % 200) / 200) * 0.2));
+    var spTopR = Math.round(skR * (1-spaceMix) + 2  * spaceMix);
+    var spTopG = Math.round(skG * (1-spaceMix) + 3  * spaceMix);
+    var spTopB = Math.round(skB * (1-spaceMix) + 18 * spaceMix);
+    var spHorR = Math.round(horCol[0]*(1-spaceMix) + 4  * spaceMix);
+    var spHorG = Math.round(horCol[1]*(1-spaceMix) + 5  * spaceMix);
+    var spHorB = Math.round(horCol[2]*(1-spaceMix) + 22 * spaceMix);
+
     var grad = ctx.createLinearGradient(0,0,0,H);
-    grad.addColorStop(0, 'rgb('+skR+','+skG+','+skB+')');
-    grad.addColorStop(1, 'rgb('+horCol[0]+','+horCol[1]+','+horCol[2]+')');
+    grad.addColorStop(0, 'rgb('+spTopR+','+spTopG+','+spTopB+')');
+    grad.addColorStop(1, 'rgb('+spHorR+','+spHorG+','+spHorB+')');
     ctx.fillStyle = grad;
     ctx.fillRect(0,0,W,H);
 
-    // ── night stars ───────────────────────────────────────────────
-    var starA = Math.max(0, Math.min(1, (1-dayness)*1.6 - 0.35));
+    // ── night stars (brighter in space) ──────────────────────────
+    var starA = Math.max(spaceMix * 0.9, Math.max(0, Math.min(1, (1-dayness)*1.6 - 0.35)));
     if(starA > 0.02) {
       ctx.save();
       for(var i=0;i<skyStars.length;i++){
@@ -949,6 +1001,20 @@
         ctx.fillStyle = 'rgba('+ss.r+','+ss.g+','+ss.b+','+a.toFixed(3)+')';
         ctx.beginPath(); ctx.arc(ss.x, ss.y, ss.size, 0, Math.PI*2); ctx.fill();
       }
+      ctx.restore();
+    }
+
+    // ── space nebula overlay ──────────────────────────────────────
+    if (spaceMix > 0) {
+      ctx.save();
+      var nb1 = ctx.createRadialGradient(W*0.25, H*0.3, 0, W*0.25, H*0.3, W*0.45);
+      nb1.addColorStop(0, 'rgba(60,20,120,'+(spaceMix*0.18).toFixed(3)+')');
+      nb1.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = nb1; ctx.fillRect(0,0,W,H);
+      var nb2 = ctx.createRadialGradient(W*0.72, H*0.55, 0, W*0.72, H*0.55, W*0.38);
+      nb2.addColorStop(0, 'rgba(20,60,130,'+(spaceMix*0.14).toFixed(3)+')');
+      nb2.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = nb2; ctx.fillRect(0,0,W,H);
       ctx.restore();
     }
 
@@ -1025,15 +1091,16 @@
       ctx.restore();
     }
 
-    // ── grass strip ───────────────────────────────────────────────
+    // ── grass strip — fixed at bottom, hidden when player climbs ──
     var gy = sy(GND);
-    if(gy < H+4) {
+    var fixedGY = H - 60;
+    var nightMix = Math.max(0, Math.min(1, (1-dayness)*1.5));
+    {
       ctx.fillStyle = 'rgb('+gndCol[0]+','+gndCol[1]+','+gndCol[2]+')';
-      ctx.fillRect(0, gy, W, H - gy + 4);
+      ctx.fillRect(0, fixedGY, W, H - fixedGY + 4);
       // ── parallax mountains (far) ──────────────────────────────────
       var mOff = (camY * 0.12) % W;
       ctx.save();
-      var nightMix = Math.max(0, Math.min(1, (1-dayness)*1.5));
       var mR = Math.round(40*(1-nightMix)+8*nightMix);
       var mG = Math.round(50*(1-nightMix)+12*nightMix);
       var mB = Math.round(60*(1-nightMix)+22*nightMix);
@@ -1047,35 +1114,105 @@
         for(var mp=0;mp<mpts.length;mp++) ctx.lineTo(mox+mpts[mp]*W, H-(mhts[mp])*(H*0.45));
         ctx.lineTo(mox+W,H); ctx.closePath(); ctx.fill();
       }
+      ctx.restore();
+    }
+    {
       // ── parallax city silhouette (mid) ───────────────────────────
-      var cOff = (camY * 0.22) % W;
-      var cR = Math.round(28*(1-nightMix)+10*nightMix);
-      var cG = Math.round(32*(1-nightMix)+14*nightMix);
-      var cB = Math.round(45*(1-nightMix)+28*nightMix);
-      ctx.fillStyle = 'rgba('+cR+','+cG+','+cB+',0.70)';
-      var buildings = [
-        [0,0.28],[0.06,0.18],[0.10,0.32],[0.16,0.20],[0.20,0.38],[0.26,0.15],
-        [0.30,0.28],[0.36,0.42],[0.40,0.20],[0.45,0.34],[0.50,0.18],[0.55,0.30],
-        [0.60,0.44],[0.65,0.22],[0.70,0.36],[0.75,0.16],[0.80,0.30],[0.85,0.24],
-        [0.90,0.40],[0.95,0.18],[1.0,0.28]
-      ];
-      for(var bi=-1;bi<=2;bi++){
-        var box = bi*W - cOff%W;
-        ctx.beginPath(); ctx.moveTo(box,H);
-        for(var bj=0;bj<buildings.length-1;bj++){
-          var bx1=box+buildings[bj][0]*W, bh1=H-(buildings[bj][1])*(H*0.38);
-          var bx2=box+buildings[bj+1][0]*W;
-          ctx.lineTo(bx1,bh1); ctx.lineTo(bx1,bh1); ctx.lineTo(bx2,bh1); ctx.lineTo(bx2,H-(buildings[bj+1][1])*(H*0.38));
-        }
-        ctx.lineTo(box+W,H); ctx.closePath(); ctx.fill();
-        // windows lit at night
-        if(nightMix > 0.3) {
-          ctx.fillStyle='rgba(255,220,100,'+(nightMix*0.7).toFixed(2)+')';
-          for(var wi=0;wi<18;wi++){
-            var wx=box+(0.02+Math.random()*0.96)*W, wy=H-20-Math.random()*H*0.30;
-            ctx.fillRect(wx,wy,2,3);
+      ctx.save();
+      ctx.beginPath(); ctx.rect(0, 0, W, H); ctx.clip();
+      if (!cityTileW || cityBldgs.length === 0) genCityBuildings();
+      var cR = Math.round(28*(1-nightMix)+8*nightMix);
+      var cG = Math.round(32*(1-nightMix)+12*nightMix);
+      var cB = Math.round(45*(1-nightMix)+26*nightMix);
+      var bldgAlpha = 0.82;
+      for (var bi2 = 0; bi2 < cityBldgs.length; bi2++) {
+        {
+          var b = cityBldgs[bi2];
+          var bx = b.x;
+          var groundY = H - 60;
+          var by = groundY - b.h;
+          if (bx + b.w < -10 || bx > W + 10) continue;
+          // building body
+          ctx.fillStyle = 'rgba('+cR+','+cG+','+cB+','+bldgAlpha+')';
+          ctx.fillRect(bx, by, b.w, b.h);
+          // slight lighter face for depth
+          var fR = Math.min(255, cR + 12), fG = Math.min(255, cG + 14), fB = Math.min(255, cB + 18);
+          ctx.fillStyle = 'rgba('+fR+','+fG+','+fB+',0.18)';
+          ctx.fillRect(bx, by, b.w, Math.round(b.h * 0.12));
+          // darker bottom strip
+          ctx.fillStyle = 'rgba(0,0,0,0.18)';
+          ctx.fillRect(bx, H - 66, b.w, 6);
+          // windows
+          var wPadX = Math.max(4, Math.round((b.w - b.wCols * 9) / 2));
+          var wPadY = 10;
+          var wSpX = b.wCols > 1 ? (b.w - wPadX * 2 - 7) / (b.wCols - 1) : 0;
+          var wSpY = b.wRows > 1 ? (b.h - wPadY - 10) / (b.wRows - 1) : 0;
+          if (b.wCols === 1) wSpX = 0;
+          if (b.wRows === 1) wSpY = 0;
+          for (var wc2 = 0; wc2 < b.wCols; wc2++) {
+            for (var wr2 = 0; wr2 < b.wRows; wr2++) {
+              var win = b.windows[wc2 * b.wRows + wr2];
+              var wx = bx + wPadX + wc2 * (wSpX || 0);
+              var wy2 = by + wPadY + wr2 * (wSpY || 0);
+              if (win.lit && nightMix > 0.15) {
+                // warm yellow-orange lit window
+                var wAlpha = (0.55 + nightMix * 0.4).toFixed(2);
+                ctx.fillStyle = 'rgba(255,210,90,'+wAlpha+')';
+                ctx.fillRect(wx, wy2, 7, 5);
+                // glow halo
+                if (nightMix > 0.5) {
+                  ctx.fillStyle = 'rgba(255,210,90,0.12)';
+                  ctx.fillRect(wx - 2, wy2 - 2, 11, 9);
+                }
+              } else if (!win.lit) {
+                // dark unlit window
+                ctx.fillStyle = 'rgba(0,0,0,0.28)';
+                ctx.fillRect(wx, wy2, 7, 5);
+              } else {
+                // daytime window — slight blue reflection
+                ctx.fillStyle = 'rgba(140,170,210,0.22)';
+                ctx.fillRect(wx, wy2, 7, 5);
+              }
+            }
           }
-          ctx.fillStyle='rgba('+cR+','+cG+','+cB+',0.70)';
+          // rooftop details
+          for (var di = 0; di < b.details.length; di++) {
+            var det = b.details[di];
+            var dx2 = bx + det.dx;
+            if (det.kind === 'antenna') {
+              var aR = Math.max(cR + 60, 80), aG = Math.max(cG + 65, 85), aB = Math.max(cB + 80, 110);
+              ctx.strokeStyle = 'rgba('+aR+','+aG+','+aB+',0.90)';
+              ctx.lineWidth = 1.5;
+              ctx.beginPath(); ctx.moveTo(dx2, by); ctx.lineTo(dx2, by - det.dh); ctx.stroke();
+              // small dish/ball at top
+              ctx.fillStyle = 'rgba('+aR+','+aG+','+aB+',0.80)';
+              ctx.beginPath(); ctx.arc(dx2, by - det.dh, 2.5, 0, Math.PI * 2); ctx.fill();
+              // blinking light at night
+              if (nightMix > 0.5 && (frame >> 3) % 2 === 0) {
+                ctx.fillStyle = 'rgba(255,60,60,0.90)';
+                ctx.beginPath(); ctx.arc(dx2, by - det.dh, 2, 0, Math.PI * 2); ctx.fill();
+              }
+            } else if (det.kind === 'watertower') {
+              // tank body
+              ctx.fillStyle = 'rgba('+Math.min(255,cR+18)+','+Math.min(255,cG+20)+','+Math.min(255,cB+24)+',0.78)';
+              ctx.fillRect(dx2 - 7, by - 18, 14, 14);
+              // legs
+              ctx.strokeStyle = 'rgba('+cR+','+cG+','+cB+',0.85)'; ctx.lineWidth = 1.2;
+              ctx.beginPath(); ctx.moveTo(dx2 - 7, by - 4); ctx.lineTo(dx2 - 10, by); ctx.stroke();
+              ctx.beginPath(); ctx.moveTo(dx2 + 7, by - 4); ctx.lineTo(dx2 + 10, by); ctx.stroke();
+              ctx.beginPath(); ctx.moveTo(dx2, by - 4); ctx.lineTo(dx2, by); ctx.stroke();
+              // dome top
+              ctx.fillStyle = 'rgba('+Math.min(255,cR+24)+','+Math.min(255,cG+26)+','+Math.min(255,cB+30)+',0.75)';
+              ctx.beginPath(); ctx.ellipse(dx2, by - 18, 8, 4, 0, Math.PI, 0); ctx.fill();
+            } else if (det.kind === 'ac') {
+              ctx.fillStyle = 'rgba('+Math.min(255,cR+8)+','+Math.min(255,cG+9)+','+Math.min(255,cB+12)+',0.75)';
+              ctx.fillRect(dx2, by - 5, 14, 5);
+            }
+          }
+          // roofline edge
+          ctx.strokeStyle = 'rgba('+Math.min(255,cR+30)+','+Math.min(255,cG+34)+','+Math.min(255,cB+44)+',0.45)';
+          ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(bx + b.w, by); ctx.stroke();
         }
       }
       ctx.restore();
@@ -1497,15 +1634,15 @@
 
   function genPlats(toWY) {
     while(topWY > toWY) {
-      var gapMult = mktSafe('tightgap') ? 0.65 : 1.0;
+      var tgl = mktLevel('tightgap'), gapMult = tgl > 0 ? Math.pow(0.65, tgl) : 1.0;
       topWY -= (72 + Math.random()*68) * gapMult;
       var pw = 90 + Math.random()*140;
-      if (mktSafe('wideplat')) pw *= 1.4;
+      var wpl = mktLevel('wideplat'); if (wpl > 0) pw *= Math.pow(1.4, wpl);
       var x1 = 10 + Math.random()*(W-pw-20);
       var tilt = (Math.random()-.5)*8;
       plats.push({x1:x1, x2:x1+pw, wy:topWY, tilt:tilt});
 
-      var starChance = mktSafe('fewstars') ? 0.55 * 0.70 : 0.55;
+      var fsl = mktLevel('fewstars'), starChance = fsl > 0 ? 0.55 * Math.pow(0.70, fsl) : 0.55;
       if(topWY < GND - 200 && Math.random() < starChance) {
         var sxPos = 30 + Math.random()*(W-60);
         var amp   = 25 + Math.random()*50;
@@ -1520,7 +1657,7 @@
       }
 
       // pennies: rare single copper coin, saves to bank
-      var pennyChance = mktSafe('pennyshower') ? 0.65 : 0.30;
+      var psl = mktLevel('pennyshower'), pennyChance = psl > 0 ? Math.min(0.30 + psl * 0.175, 0.95) : 0.30;
       if(topWY < GND - 150 && Math.random() < pennyChance) {
         pennies.push({
           wx: x1 + 15 + Math.random()*Math.max(0, pw-30),
@@ -1530,10 +1667,10 @@
       }
 
       // coins: 1-3 in a row hovering above the platform
-      var coinChance = mktSafe('coinrain') ? 0.72 * 1.5 : 0.72;
+      var crl = mktLevel('coinrain'), coinChance = crl > 0 ? Math.min(0.72 * Math.pow(1.5, crl), 0.98) : 0.72;
       if(topWY < GND - 60 && Math.random() < coinChance) {
         var cnt = 1 + Math.floor(Math.random()*3);
-        if(mktSafe('coinrain')) cnt = Math.min(cnt + 1, 5);
+        if(crl > 0) cnt = Math.min(cnt + crl, 5 + crl);
         var cx0 = x1 + 20 + Math.random()*Math.max(0, pw-40);
         var cwy = topWY - 28 - Math.random()*24;
         for(var ci=0; ci<cnt; ci++) {
@@ -1554,6 +1691,7 @@
     genPlats(GND - H*2.8);
     topCloudWY=GND; clouds=[];
     genClouds(GND - H*3);
+    genCityBuildings();
   }
 
   function respawn() {
@@ -1562,7 +1700,8 @@
     score=0; coinCount=0; pennyCount=0; frame=0; dead=false;
     popups=[];
     buildWorld();
-    camY = GND - H*0.88;
+    spawnPY = GND;
+    camY = GND - H + 60;
   }
 
   function spawnP2() {
@@ -1839,7 +1978,7 @@
   }
   document.addEventListener('keydown',function(e){
     if(K[e.key])return; K[e.key]=true;
-    if(e.key===' '||e.key==='ArrowUp'){e.preventDefault(); doJump();}
+    if(e.key===' '||e.key==='ArrowUp'||e.key==='w'||e.key==='W'){e.preventDefault(); doJump();}
     if(e.key==='r'||e.key==='R') respawn();
     if(e.key==='ArrowLeft' ||e.key==='a'||e.key==='A') tryDash(-1);
     if(e.key==='ArrowRight'||e.key==='d'||e.key==='D') tryDash(1);
@@ -1912,8 +2051,9 @@
       var pn=pennies[j];
       var pdx=px-pn.wx, pdy=(py-25)-pn.wy;
       if(pdx*pdx+pdy*pdy < 38*38) {
-        var earned = mktSafe('double') ? 2 : 1;
-        if (mktSafe('lucky') && Math.random() < 0.30) earned++;
+        var dl = mktLevel('double'), ll = mktLevel('lucky');
+        var earned = 1 + dl;
+        if (ll > 0 && Math.random() < Math.min(ll * 0.30, 0.90)) earned++;
         spawnParticles(pn.wx, sy(pn.wy), 'coin');
         pennyCount++; pennyBank += earned;
         localStorage.setItem('penny_bank', pennyBank);
@@ -1938,7 +2078,7 @@
       var dx = px - ssx, dy = (py-26) - s.wy;
       if(dx*dx + dy*dy < 20*20) {
         if(ghostTimer > 0) continue;
-        if(shieldActive) { shieldActive=false; continue; }
+        if(shieldActive > 0) { shieldActive--; continue; }
         if(mktSafe('starbust') && !starBustUsed) {
           starBustUsed=true; stars.splice(j,1);
           popups.push({wx:px, wy:py, life:1.8, text:'BUSTED!', col:'#FF8020'});
@@ -1958,8 +2098,8 @@
       }
     }
 
-    // Score
-    var h = Math.max(0, GND - py);
+    // Score — measured from spawn position so it starts at 0
+    var h = Math.max(0, spawnPY - py);
     if(Math.floor(h/8) > score) score = Math.floor(h/8);
     if(score > best) {
       best = score;
@@ -1968,7 +2108,7 @@
     }
     if(newBestFlash > 0) newBestFlash--;
 
-    // Camera: only moves up
+    // Camera: follows player upward
     var tc = py - H*0.44;
     if(tc < camY) camY += (tc-camY)*0.1;
 
@@ -2020,24 +2160,14 @@
       if(Math.min(y1,y2)>H+8 || Math.max(y1,y2)<-8) continue;
       ctx.save();
 
-      // height-based color theme
-      var alt = Math.max(0, GND - p.wy);
       var pw  = p.x2 - p.x1;
-      var theme;
-      if(alt < 400)        theme = {top:'#8B6040',side:'#5A3820',line:'#3A2010',tex:'#A07848'}; // wood
-      else if(alt < 1200)  theme = {top:'#707880',side:'#404850',line:'#282E34',tex:'#8890A0'}; // stone
-      else if(alt < 2800)  theme = {top:'#5878A8',side:'#304868',line:'#1C2C40',tex:'#7898C8'}; // metal/steel
-      else if(alt < 5000)  theme = {top:'#80A8C8',side:'#4870A0',line:'#2C4870',tex:'#A0C8E8'}; // ice
-      else                 theme = {top:'#E8F0F8',side:'#B0C8E8',line:'#8090A8',tex:'#FFFFFF'};  // cloud
-
-      // night darkening
       var dayness = Math.max(0, Math.cos(dayTime * Math.PI * 2));
-      var dk = 0.55 + 0.45*dayness;
-
-      function hexDk(hex, f) {
-        var r=parseInt(hex.slice(1,3),16), g2=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
-        return 'rgb('+Math.round(r*f)+','+Math.round(g2*f)+','+Math.round(b*f)+')';
-      }
+      var nightMixP = Math.max(0, Math.min(1, (1-dayness)*1.5));
+      // white at night, black at day
+      var platV = Math.round(255 * nightMixP);
+      var platTop  = 'rgb('+platV+','+platV+','+platV+')';
+      var platSide = 'rgb('+Math.round(platV*0.6)+','+Math.round(platV*0.6)+','+Math.round(platV*0.6)+')';
+      var platLine = nightMixP > 0.5 ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.20)';
 
       var thick = Math.max(4, Math.min(10, 4 + (pw/W)*8));
 
@@ -2051,7 +2181,7 @@
       ctx.closePath(); ctx.fill();
 
       // side face (bottom bevel)
-      ctx.fillStyle = hexDk(theme.side, dk);
+      ctx.fillStyle = platSide;
       ctx.beginPath();
       ctx.moveTo(p.x1, y1);
       ctx.lineTo(p.x2, y2);
@@ -2060,7 +2190,7 @@
       ctx.closePath(); ctx.fill();
 
       // top face
-      ctx.fillStyle = hexDk(theme.top, dk);
+      ctx.fillStyle = platTop;
       ctx.beginPath();
       ctx.moveTo(p.x1, y1);
       ctx.lineTo(p.x2, y2);
@@ -2069,38 +2199,29 @@
       ctx.closePath(); ctx.fill();
 
       // highlight strip on top edge
-      ctx.fillStyle = 'rgba(255,255,255,'+(0.15*dk)+')';
+      var hlAlpha = nightMixP > 0.5 ? 0.12 : 0.08;
+      ctx.fillStyle = 'rgba(255,255,255,'+hlAlpha+')';
       ctx.fillRect(p.x1+1, Math.min(y1,y2)-2, pw-2, 1.5);
 
       // surface texture lines
-      ctx.strokeStyle = hexDk(theme.line, dk*0.7);
+      ctx.strokeStyle = platLine;
       ctx.lineWidth = 0.7; ctx.lineCap='butt';
-      var spacing = alt < 400 ? 12 : 20; // wood has closer grain
-      for(var tx=p.x1+spacing; tx<p.x2-4; tx+=spacing) {
+      for(var tx=p.x1+14; tx<p.x2-4; tx+=14) {
         var ty = y1 + (y2-y1)*(tx-p.x1)/pw;
         ctx.beginPath(); ctx.moveTo(tx, ty-1); ctx.lineTo(tx, ty+thick-1); ctx.stroke();
       }
 
       // left/right end caps
-      ctx.fillStyle = hexDk(theme.side, dk*0.8);
+      ctx.fillStyle = platSide;
       ctx.fillRect(p.x1-1, y1-2, 2, thick+3);
       ctx.fillRect(p.x2-1, y2-2, 2, thick+3);
 
       // outline
-      ctx.strokeStyle = hexDk(theme.line, dk);
+      ctx.strokeStyle = nightMixP > 0.5 ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.55)';
       ctx.lineWidth = 1.0; ctx.lineCap='round';
       ctx.beginPath();
       ctx.moveTo(p.x1, y1); ctx.lineTo(p.x2, y2);
       ctx.stroke();
-
-      // cloud platforms get a soft glow
-      if(alt >= 5000) {
-        var cg = ctx.createRadialGradient((p.x1+p.x2)/2, y1-4, 0, (p.x1+p.x2)/2, y1-4, pw*0.6);
-        cg.addColorStop(0,'rgba(200,230,255,0.22)');
-        cg.addColorStop(1,'rgba(200,230,255,0)');
-        ctx.fillStyle=cg;
-        ctx.fillRect(p.x1-20, y1-20, pw+40, 30);
-      }
 
       ctx.restore();
     }
@@ -2126,7 +2247,7 @@
     if(onG || pvy > 0) {
       var shadowDist = Math.min(1, Math.max(0, (py - (GND-500)) / 500));
       var shadowW = 18 + shadowDist * 8;
-      var shadowY = sy(GND) - 2;
+      var shadowY = H - 62;
       var sg2 = ctx.createRadialGradient(x, shadowY, 0, x, shadowY, shadowW);
       sg2.addColorStop(0,'rgba(0,0,0,'+(0.30*(1-shadowDist*0.7)).toFixed(2)+')');
       sg2.addColorStop(1,'rgba(0,0,0,0)');
@@ -2555,7 +2676,7 @@
       ctx.beginPath(); ctx.ellipse(x, gy-25, 22, 35, 0, 0, Math.PI*2); ctx.fill();
     }
     // shield bubble
-    if(shieldActive) {
+    if(shieldActive > 0) {
       var sa = 0.35 + 0.20*Math.sin(frame*0.14);
       ctx.strokeStyle='rgba(80,160,255,'+sa.toFixed(2)+')';
       ctx.lineWidth = 2.5;
@@ -2602,9 +2723,9 @@
     ctx.font='17px serif'; ctx.textBaseline='top';
     var iconX = 14;
     var iconY = H - 52;
-    if(shieldActive) {
+    if(shieldActive > 0) {
       ctx.globalAlpha = 0.7 + 0.3*Math.sin(frame*0.12);
-      ctx.textAlign='left'; ctx.fillText('🛡️', iconX, iconY);
+      ctx.textAlign='left'; ctx.fillText('🛡️'+(shieldActive>1?'×'+shieldActive:''), iconX, iconY);
       iconX += 28;
     }
     if(ghostTimer > 0) {
@@ -2753,59 +2874,65 @@
 
   // ── market upgrades ───────────────────────────────────────────────
   var MKT_ITEMS = {
-    speed:     { cost: 4,  key: 'mkt_speed'     },
-    triple:    { cost: 8,  key: 'mkt_triple'    },
-    shield:    { cost: 12, key: 'mkt_shield'    },
-    magnet:    { cost: 6,  key: 'mkt_magnet'    },
-    feather:   { cost: 5,  key: 'mkt_feather'   },
-    double:    { cost: 9,  key: 'mkt_double'    },
-    headstart: { cost: 7,  key: 'mkt_headstart' },
-    ghost:     { cost: 14, key: 'mkt_ghost'     },
-    lucky:     { cost: 3,  key: 'mkt_lucky'     },
-    dash:      { cost: 10, key: 'mkt_dash'      },
-    wideplat:  { cost: 8,  key: 'mkt_wideplat'  },
-    fewstars:  { cost: 7,  key: 'mkt_fewstars'  },
-    revive:    { cost: 18, key: 'mkt_revive'    },
-    coinrain:  { cost: 6,  key: 'mkt_coinrain'  },
-    tightgap:  { cost: 5,  key: 'mkt_tightgap'  },
-    glide:       { cost: 8,  key: 'mkt_glide'      },
-    turbo:       { cost: 10, key: 'mkt_turbo'      },
-    supermagnet: { cost: 9,  key: 'mkt_supermagnet'},
-    pennyshower: { cost: 7,  key: 'mkt_pennyshower'},
-    revive2:     { cost: 22, key: 'mkt_revive2'    },
-    highjump:    { cost: 9,  key: 'mkt_highjump'   },
-    quad:        { cost: 14, key: 'mkt_quad'       },
-    starbust:    { cost: 13, key: 'mkt_starbust'   },
-    bigstart:    { cost: 11, key: 'mkt_bigstart'   },
+    speed:     { baseCost: 4,  key: 'mkt_speed'     },
+    triple:    { baseCost: 8,  key: 'mkt_triple',    max: 1 },
+    shield:    { baseCost: 12, key: 'mkt_shield'    },
+    magnet:    { baseCost: 6,  key: 'mkt_magnet'    },
+    feather:   { baseCost: 5,  key: 'mkt_feather'   },
+    double:    { baseCost: 9,  key: 'mkt_double'    },
+    headstart: { baseCost: 7,  key: 'mkt_headstart' },
+    ghost:     { baseCost: 14, key: 'mkt_ghost',     max: 1 },
+    lucky:     { baseCost: 3,  key: 'mkt_lucky'     },
+    dash:      { baseCost: 10, key: 'mkt_dash',      max: 1 },
+    wideplat:  { baseCost: 8,  key: 'mkt_wideplat'  },
+    fewstars:  { baseCost: 7,  key: 'mkt_fewstars'  },
+    revive:    { baseCost: 18, key: 'mkt_revive'    },
+    coinrain:  { baseCost: 6,  key: 'mkt_coinrain'  },
+    tightgap:  { baseCost: 5,  key: 'mkt_tightgap',  max: 1 },
+    glide:       { baseCost: 8,  key: 'mkt_glide',      max: 1 },
+    turbo:       { baseCost: 10, key: 'mkt_turbo'      },
+    supermagnet: { baseCost: 9,  key: 'mkt_supermagnet'},
+    pennyshower: { baseCost: 7,  key: 'mkt_pennyshower'},
+    revive2:     { baseCost: 22, key: 'mkt_revive2',   max: 1 },
+    highjump:    { baseCost: 9,  key: 'mkt_highjump'   },
+    quad:        { baseCost: 14, key: 'mkt_quad',       max: 1 },
+    starbust:    { baseCost: 13, key: 'mkt_starbust',   max: 1 },
+    bigstart:    { baseCost: 11, key: 'mkt_bigstart',   max: 1 },
   };
-  function mktOwned(id) { return +localStorage.getItem(MKT_ITEMS[id].key) === 1; }
+  function mktLevel(id) { return (MKT_ITEMS && MKT_ITEMS[id]) ? +localStorage.getItem(MKT_ITEMS[id].key) || 0 : 0; }
+  function mktOwned(id) { return mktLevel(id) > 0; }
+  function mktNextCost(id) { return MKT_ITEMS[id].baseCost * (mktLevel(id) + 1); }
+  function mktAtMax(id) { var m = MKT_ITEMS[id].max; return m != null && mktLevel(id) >= m; }
 
-  // Apply speed upgrade
+  // Apply speed upgrade (stacks per level)
   function effectiveSpd() {
     var s = SPD;
-    if(mktOwned('speed')) s *= 1.25;
-    if(mktOwned('turbo')) s *= 1.50;
+    var sl = mktLevel('speed'), tl = mktLevel('turbo');
+    if(sl > 0) s *= Math.pow(1.25, sl);
+    if(tl > 0) s *= Math.pow(1.50, tl);
     return s;
   }
-  // Apply magnet upgrade
+  // Apply magnet upgrade (radius doubles per level)
   function coinRadius() {
-    if(mktOwned('supermagnet')) return 130*130;
-    if(mktOwned('magnet'))      return 75*75;
-    return 40*40;
+    var ml = mktLevel('magnet'), sml = mktLevel('supermagnet');
+    var base = 40;
+    if(sml > 0) base = 130 * Math.pow(1.5, sml - 1);
+    else if(ml > 0) base = 75 * Math.pow(1.5, ml - 1);
+    return base * base;
   }
-  // Jump count
+  // Jump count (binary: triple=3, quad=4)
   function maxJumps() {
     if(mktOwned('quad'))   return 4;
     if(mktOwned('triple')) return 3;
     return 2;
   }
-  // Feather fall: reduce gravity
-  function effectiveGrav(){ return mktOwned('feather') ? GRAV * 0.70 : GRAV; }
-  // Jump velocity boost
-  function effectiveJVY(){ return mktOwned('highjump') ? JVY * 1.30 : JVY; }
+  // Feather fall: reduce gravity per level
+  function effectiveGrav(){ var l=mktLevel('feather'); return l>0 ? GRAV * Math.pow(0.70, l) : GRAV; }
+  // Jump velocity boost per level
+  function effectiveJVY(){ var l=mktLevel('highjump'); return l>0 ? JVY * Math.pow(1.30, l) : JVY; }
 
   // per-run state
-  var shieldActive  = false;
+  var shieldActive  = 0;
   var ghostTimer    = 0;
   var reviveUsed    = false;
   var revive2Used   = false;
@@ -2819,7 +2946,7 @@
   var origRespawn = respawn;
   respawn = function() {
     origRespawn();
-    shieldActive = mktOwned('shield');
+    shieldActive = mktLevel('shield');
     jLeft = maxJumps();
     ghostTimer = mktOwned('ghost') ? 240 : 0;
     reviveUsed = false;
@@ -2827,8 +2954,10 @@
     starBustUsed = false;
     dashCooldown = 0;
     var startWY = HEAD_START_WY;
-    if (mktOwned('bigstart') && mktOwned('headstart')) startWY = HEAD_START_WY * 2.2;
-    if (mktOwned('headstart')) {
+    var hsl = mktLevel('headstart');
+    if (hsl > 0) startWY = HEAD_START_WY * (1 + 0.5 * hsl);
+    if (mktOwned('bigstart') && hsl > 0) startWY *= 2.2;
+    if (hsl > 0) {
       py   = GND - startWY;
       camY = py - H * 0.55;
       score = Math.floor(startWY / 8);
@@ -2837,7 +2966,7 @@
     }
   };
   // also patch initial spawn
-  shieldActive = mktOwned('shield');
+  shieldActive = mktLevel('shield');
   jLeft = maxJumps();
   ghostTimer = mktOwned('ghost') ? 240 : 0;
   reviveUsed = false;
@@ -2876,10 +3005,17 @@
     function refreshMarket() {
       document.getElementById('mktbalance').textContent = 'Balance: ' + pennyBank + '¢';
       document.querySelectorAll('.mkt-btn[data-id]').forEach(function(btn) {
-        var id=btn.dataset.id, cost=+btn.dataset.cost;
-        if (mktOwned(id)) { btn.textContent='✓ Owned'; btn.className='mkt-btn owned'; }
-        else if (pennyBank<cost) { btn.textContent=cost+'¢'; btn.className='mkt-btn broke'; }
-        else { btn.textContent=cost+'¢'; btn.className='mkt-btn buy'; }
+        var id = btn.dataset.id;
+        var lv = mktLevel(id);
+        if (mktAtMax(id)) {
+          btn.textContent = '✓ Max'; btn.className = 'mkt-btn owned';
+        } else {
+          var cost = mktNextCost(id);
+          btn.dataset.cost = cost;
+          var label = (lv > 0 ? 'Lv.' + lv + ' → ' : '') + cost + '¢';
+          if (pennyBank >= cost) { btn.textContent = label; btn.className = 'mkt-btn buy'; }
+          else                   { btn.textContent = label; btn.className = 'mkt-btn broke'; }
+        }
       });
     }
 
@@ -2891,12 +3027,13 @@
     mktModal.addEventListener('click', function(e) {
       var btn = e.target.closest('.mkt-btn[data-id]');
       if (btn && btn.classList.contains('buy')) {
-        var id=btn.dataset.id, cost=+btn.dataset.cost;
-        if (pennyBank>=cost && !mktOwned(id)) {
-          pennyBank-=cost; localStorage.setItem('penny_bank',pennyBank);
-          localStorage.setItem(MKT_ITEMS[id].key,1);
+        var id = btn.dataset.id;
+        var nextCost = mktNextCost(id);
+        if (pennyBank >= nextCost && !mktAtMax(id)) {
+          pennyBank -= nextCost; localStorage.setItem('penny_bank', pennyBank);
+          localStorage.setItem(MKT_ITEMS[id].key, mktLevel(id) + 1);
           updateBankDisplay(); refreshMarket();
-          if(id==='shield') shieldActive=true;
+          if(id==='shield') shieldActive = mktLevel('shield');
         }
       }
       if (e.target===mktModal || e.target.id==='mktclose') mktModal.classList.remove('open');
