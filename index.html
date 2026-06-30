@@ -541,6 +541,30 @@
         </div>
         <button class="mkt-btn" data-id="bigstart" data-cost="11">11¢</button>
       </div>
+      <div class="mkt-item">
+        <span class="mkt-icon">⚔️</span>
+        <div class="mkt-info">
+          <div class="mkt-name">Sword</div>
+          <div class="mkt-desc">Slash through stars — 2 kills per run per level</div>
+        </div>
+        <button class="mkt-btn" data-id="sword" data-cost="15">15¢</button>
+      </div>
+      <div class="mkt-item">
+        <span class="mkt-icon">🔫</span>
+        <div class="mkt-info">
+          <div class="mkt-name">Gun</div>
+          <div class="mkt-desc">Auto-fires a bullet upward every 2 seconds</div>
+        </div>
+        <button class="mkt-btn" data-id="gun" data-cost="20">20¢</button>
+      </div>
+      <div class="mkt-item">
+        <span class="mkt-icon">💣</span>
+        <div class="mkt-info">
+          <div class="mkt-name">Bomb</div>
+          <div class="mkt-desc">Press B to wipe all stars on screen — once per run</div>
+        </div>
+        <button class="mkt-btn" data-id="bomb" data-cost="25">25¢</button>
+      </div>
       <button id="mktclose">Close</button>
     </div>
   </div>
@@ -2087,6 +2111,11 @@
           popups.push({wx:px, wy:py, life:1.8, text:'BUSTED!', col:'#FF8020'});
           continue;
         }
+        if(mktSafe('sword') && swordKills > 0) {
+          swordKills--; stars.splice(j,1); j--;
+          popups.push({wx:px, wy:py, life:1.8, text:'⚔️ SLASH!', col:'#E8C020'});
+          continue;
+        }
         if(mktSafe('revive') && !reviveUsed) {
           reviveUsed=true; pvy=effectiveJVY()*0.7; py-=60;
           popups.push({wx:px, wy:py, life:1.8, text:'REVIVE!', col:'#D64832'});
@@ -2099,6 +2128,40 @@
         }
         spawnParticles(px, sy(py), 'death'); playDeathSFX(); dead=true; return;
       }
+    }
+
+    // Gun: fire bullets upward periodically
+    if(mktSafe('gun') && !dead) {
+      gunTimer++;
+      if(gunTimer >= 120) { // fire every 2 seconds (60fps)
+        gunTimer = 0;
+        bullets.push({wx: px, wy: py - 20, vy: -14});
+      }
+    }
+    // Update bullets
+    for(var bi = bullets.length - 1; bi >= 0; bi--) {
+      bullets[bi].wy += bullets[bi].vy;
+      var hit = false;
+      for(var si = stars.length - 1; si >= 0; si--) {
+        var bstar = stars[si];
+        var bsx = bstar.wx + Math.sin(frame*bstar.spd + bstar.phase)*bstar.amp;
+        var bdx = bullets[bi].wx - bsx, bdy = bullets[bi].wy - bstar.wy;
+        if(bdx*bdx + bdy*bdy < 18*18) {
+          popups.push({wx:bstar.wx, wy:bstar.wy, life:1.2, text:'💥', col:'#FF6020'});
+          stars.splice(si, 1); hit = true; break;
+        }
+      }
+      if(hit || sy(bullets[bi].wy) < -40) bullets.splice(bi, 1);
+    }
+    // Bomb: press B to destroy all on-screen stars
+    if(mktSafe('bomb') && !bombUsed && (K['b'] || K['B'])) {
+      bombUsed = true;
+      var bombed = 0;
+      for(var boi = stars.length - 1; boi >= 0; boi--) {
+        var bsy = sy(stars[boi].wy);
+        if(bsy > -30 && bsy < H + 30) { stars.splice(boi, 1); bombed++; }
+      }
+      if(bombed > 0) popups.push({wx:px, wy:py-40, life:2.2, text:'💣 BOOM!', col:'#FF2020'});
     }
 
     // Score — measured from spawn position so it starts at 0
@@ -2837,6 +2900,22 @@
     ctx.globalAlpha=1;
   }
 
+  function drawBullets() {
+    if(!bullets.length) return;
+    ctx.save();
+    ctx.fillStyle = '#FFE040';
+    ctx.shadowColor = '#FF8800';
+    ctx.shadowBlur = 8;
+    for(var i = 0; i < bullets.length; i++) {
+      var b = bullets[i];
+      var bsy = sy(b.wy);
+      ctx.beginPath();
+      ctx.arc(b.wx, bsy, 4, 0, Math.PI*2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
   function render() {
     drawBG();
     drawClouds();
@@ -2845,6 +2924,7 @@
     drawParticles();
     drawCoins();
     drawPennies();
+    drawBullets();
     drawStars();
     drawFigure();
     drawP2Figure();
@@ -2916,6 +2996,9 @@
     quad:        { baseCost: 14, key: 'mkt_quad',       max: 1 },
     starbust:    { baseCost: 13, key: 'mkt_starbust',   max: 1 },
     bigstart:    { baseCost: 11, key: 'mkt_bigstart',   max: 1 },
+    sword:       { baseCost: 15, key: 'mkt_sword'      },
+    gun:         { baseCost: 20, key: 'mkt_gun',        max: 1 },
+    bomb:        { baseCost: 25, key: 'mkt_bomb'       },
   };
   function mktLevel(id) { return (MKT_ITEMS && MKT_ITEMS[id]) ? +localStorage.getItem(MKT_ITEMS[id].key) || 0 : 0; }
   function mktOwned(id) { return mktLevel(id) > 0; }
@@ -2955,6 +3038,10 @@
   var reviveUsed    = false;
   var revive2Used   = false;
   var starBustUsed  = false;
+  var swordKills    = 0;
+  var bombUsed      = false;
+  var bullets       = [];
+  var gunTimer      = 0;
   var HEAD_START_WY = 1600;
 
   // dash state
@@ -2971,6 +3058,10 @@
     revive2Used = false;
     starBustUsed = false;
     dashCooldown = 0;
+    swordKills = mktLevel('sword') * 2;
+    bombUsed = false;
+    bullets = [];
+    gunTimer = 0;
     var startWY = HEAD_START_WY;
     var hsl = mktLevel('headstart');
     if (hsl > 0) startWY = HEAD_START_WY * (1 + 0.5 * hsl);
@@ -2988,6 +3079,8 @@
   jLeft = maxJumps();
   ghostTimer = mktOwned('ghost') ? 240 : 0;
   reviveUsed = false;
+  swordKills = mktLevel('sword') * 2;
+  bombUsed = false;
 
   (function loop(){ update(); render(); requestAnimationFrame(loop); })();
   </script>
