@@ -238,6 +238,15 @@
       color: #B02818;
       cursor: default; opacity: 0.65;
     }
+    #mktreset {
+      display: block; width: 100%; margin-top: 4px; margin-bottom: 2px;
+      padding: 7px;
+      font: bold 13px 'Chalkboard SE','Comic Sans MS',cursive;
+      background: rgba(80,20,20,0.18);
+      border: 1.5px solid rgba(180,40,40,0.55);
+      border-radius: 20px; color: #c03030; cursor: pointer;
+    }
+    #mktreset:active { opacity: 0.6; }
     #mktclose {
       display: block; width: 100%; margin-top: 4px;
       padding: 7px;
@@ -565,6 +574,7 @@
         </div>
         <button class="mkt-btn" data-id="bomb" data-cost="25">25¢</button>
       </div>
+      <button id="mktreset">🗑️ Reset All Purchases</button>
       <button id="mktclose">Close</button>
     </div>
   </div>
@@ -1683,6 +1693,32 @@
         });
       }
 
+      // enemies: only spawn when player owns the gun
+      if(mktSafe('gun') && topWY < GND - 300 && Math.random() < 0.35) {
+        var evx = (Math.random() < 0.5 ? 1 : -1) * (0.8 + Math.random() * 1.4);
+        enemies.push({
+          wx: 30 + Math.random() * (W - 60),
+          wy: topWY - 40 - Math.random() * 50,
+          vx: evx,
+          hp: 2,
+          maxHp: 2
+        });
+      }
+      // human enemies: spawn alongside blobs when gun owned
+      if(mktSafe('gun') && topWY < GND - 400 && Math.random() < 0.28) {
+        var hdir = Math.random() < 0.5 ? 1 : -1;
+        humanEnemies.push({
+          wx: 40 + Math.random() * (W - 80),
+          wy: topWY - 50,
+          vx: hdir * (0.6 + Math.random() * 0.8),
+          hp: 3,
+          maxHp: 3,
+          shootTimer: Math.floor(Math.random() * 120),
+          dir: hdir,
+          walkFrame: 0
+        });
+      }
+
       // pennies: rare single copper coin, saves to bank
       var psl = mktLevel('pennyshower'), pennyChance = psl > 0 ? Math.min(0.30 + psl * 0.175, 0.95) : 0.30;
       if(topWY < GND - 150 && Math.random() < pennyChance) {
@@ -1713,7 +1749,7 @@
   }
 
   function buildWorld() {
-    plats=[]; stars=[]; coins=[]; pennies=[]; topWY=GND;
+    plats=[]; stars=[]; coins=[]; pennies=[]; enemies=[]; humanEnemies=[]; enemyBullets=[]; topWY=GND;
     plats.push({x1:-10, x2:W+10, wy:GND, tilt:0});
     genPlats(GND - H*2.8);
     topCloudWY=GND; clouds=[];
@@ -1961,6 +1997,21 @@
   respawn();
   buildSkyStars();
 
+  // ── click-to-shoot ────────────────────────────────────────────────
+  cvs.addEventListener('click', function(e) {
+    if(dead) return;
+    if(!mktSafe('gun') && !mktSafe('sword') && !mktSafe('bomb')) return;
+    var rect = cvs.getBoundingClientRect();
+    var mx = (e.clientX - rect.left) * (W / rect.width);
+    var my = (e.clientY - rect.top)  * (H / rect.height);
+    var bx = px, by = py - 20; // bullet origin (player chest)
+    var dx = mx - bx, dy = my - sy(by);
+    var len = Math.sqrt(dx*dx + dy*dy);
+    if(len < 1) return;
+    var spd = 16;
+    bullets.push({wx: bx, wy: by, vx: dx/len*spd, vy: dy/len*spd});
+  });
+
   // ── button controls ───────────────────────────────────────────────
   var lHeld=false, rHeld=false;
 
@@ -2141,6 +2192,7 @@
     // Update bullets
     for(var bi = bullets.length - 1; bi >= 0; bi--) {
       bullets[bi].wy += bullets[bi].vy;
+      if(bullets[bi].vx) bullets[bi].wx += bullets[bi].vx;
       var hit = false;
       for(var si = stars.length - 1; si >= 0; si--) {
         var bstar = stars[si];
@@ -2151,8 +2203,147 @@
           stars.splice(si, 1); hit = true; break;
         }
       }
-      if(hit || sy(bullets[bi].wy) < -40) bullets.splice(bi, 1);
+      var bscx = bullets[bi].wx, bscy = sy(bullets[bi].wy);
+      if(hit || bscy < -40 || bscy > H+40 || bscx < -40 || bscx > W+40) bullets.splice(bi, 1);
     }
+    // Update enemies: move + check bullet hits + check player collision
+    for(var ei = enemies.length - 1; ei >= 0; ei--) {
+      var en = enemies[ei];
+      en.wx += en.vx;
+      if(en.wx < 20 || en.wx > W - 20) en.vx = -en.vx;
+      // bullet hits
+      var enemyHit = false;
+      for(var bi2 = bullets.length - 1; bi2 >= 0; bi2--) {
+        var eb = bullets[bi2];
+        var edx = eb.wx - en.wx, edy = eb.wy - en.wy;
+        if(edx*edx + edy*edy < 22*22) {
+          bullets.splice(bi2, 1);
+          en.hp--;
+          if(en.hp <= 0) {
+            popups.push({wx:en.wx, wy:en.wy, life:1.5, text:'💀 KILL!', col:'#FF3030'});
+            enemies.splice(ei, 1);
+            enemyHit = true;
+          } else {
+            popups.push({wx:en.wx, wy:en.wy, life:1.0, text:'HIT!', col:'#FF8040'});
+          }
+          break;
+        }
+      }
+      if(enemyHit) continue;
+      // player collision
+      var epdx = px - en.wx, epdy = (py - 26) - en.wy;
+      if(epdx*epdx + epdy*epdy < 22*22) {
+        if(ghostTimer > 0) continue;
+        if(shieldActive > 0) { shieldActive--; continue; }
+        if(mktSafe('sword') && swordKills > 0) {
+          swordKills--; enemies.splice(ei, 1);
+          popups.push({wx:en.wx, wy:en.wy, life:1.5, text:'⚔️ SLASH!', col:'#E8C020'});
+          continue;
+        }
+        if(mktSafe('revive') && !reviveUsed) {
+          reviveUsed=true; pvy=effectiveJVY()*0.7; py-=60;
+          popups.push({wx:px, wy:py, life:1.8, text:'REVIVE!', col:'#D64832'});
+          continue;
+        }
+        if(mktSafe('revive2') && !revive2Used) {
+          revive2Used=true; pvy=effectiveJVY()*0.7; py-=60;
+          popups.push({wx:px, wy:py, life:1.8, text:'REVIVE 2!', col:'#C020E0'});
+          continue;
+        }
+        spawnParticles(px, sy(py), 'death'); playDeathSFX(); dead=true; return;
+      }
+    }
+
+    // Human enemies: move, shoot, collide with player bullets & player
+    for(var hi = humanEnemies.length - 1; hi >= 0; hi--) {
+      var he = humanEnemies[hi];
+      // move toward player horizontally
+      var hDiffX = px - he.wx;
+      he.vx += (hDiffX > 0 ? 1 : -1) * 0.04;
+      he.vx = Math.max(-2.2, Math.min(2.2, he.vx));
+      he.wx += he.vx;
+      he.dir = he.vx >= 0 ? 1 : -1;
+      he.walkFrame++;
+      // bounce off walls
+      if(he.wx < 20) { he.wx = 20; he.vx = Math.abs(he.vx); }
+      if(he.wx > W - 20) { he.wx = W - 20; he.vx = -Math.abs(he.vx); }
+      // shoot at player periodically
+      he.shootTimer++;
+      if(he.shootTimer >= 150) {
+        he.shootTimer = 0;
+        var hsdx = px - he.wx, hsdy = (py - 26) - he.wy;
+        var hsl2 = Math.sqrt(hsdx*hsdx + hsdy*hsdy);
+        if(hsl2 > 0) {
+          enemyBullets.push({wx: he.wx, wy: he.wy - 20, vx: hsdx/hsl2*7, vy: hsdy/hsl2*7});
+        }
+      }
+      // check player bullets hitting this human
+      var humanHit = false;
+      for(var hbi = bullets.length - 1; hbi >= 0; hbi--) {
+        var hb = bullets[hbi];
+        var hbdx = hb.wx - he.wx, hbdy = hb.wy - he.wy;
+        if(hbdx*hbdx + hbdy*hbdy < 20*20) {
+          bullets.splice(hbi, 1);
+          he.hp--;
+          if(he.hp <= 0) {
+            popups.push({wx:he.wx, wy:he.wy, life:1.5, text:'💀 KILL!', col:'#FF3030'});
+            humanEnemies.splice(hi, 1); humanHit = true;
+          } else {
+            popups.push({wx:he.wx, wy:he.wy, life:1.0, text:'HIT!', col:'#FF8040'});
+          }
+          break;
+        }
+      }
+      if(humanHit) continue;
+      // player touch collision
+      var hepdx = px - he.wx, hepdy = (py - 26) - he.wy;
+      if(hepdx*hepdx + hepdy*hepdy < 24*24) {
+        if(ghostTimer > 0) continue;
+        if(shieldActive > 0) { shieldActive--; continue; }
+        if(mktSafe('sword') && swordKills > 0) {
+          swordKills--; humanEnemies.splice(hi, 1);
+          popups.push({wx:he.wx, wy:he.wy, life:1.5, text:'⚔️ SLASH!', col:'#E8C020'}); continue;
+        }
+        if(mktSafe('revive') && !reviveUsed) {
+          reviveUsed=true; pvy=effectiveJVY()*0.7; py-=60;
+          popups.push({wx:px, wy:py, life:1.8, text:'REVIVE!', col:'#D64832'}); continue;
+        }
+        if(mktSafe('revive2') && !revive2Used) {
+          revive2Used=true; pvy=effectiveJVY()*0.7; py-=60;
+          popups.push({wx:px, wy:py, life:1.8, text:'REVIVE 2!', col:'#C020E0'}); continue;
+        }
+        spawnParticles(px, sy(py), 'death'); playDeathSFX(); dead=true; return;
+      }
+      // cull off-screen
+      if(he.wy > camY + H + 120) { humanEnemies.splice(hi, 1); }
+    }
+
+    // Enemy bullets: move and check player collision
+    for(var ebi = enemyBullets.length - 1; ebi >= 0; ebi--) {
+      var eb2 = enemyBullets[ebi];
+      eb2.wx += eb2.vx; eb2.wy += eb2.vy;
+      var ebsy = sy(eb2.wy);
+      if(ebsy < -40 || ebsy > H+40 || eb2.wx < -40 || eb2.wx > W+40) {
+        enemyBullets.splice(ebi, 1); continue;
+      }
+      if(dead) continue;
+      var ebdx = px - eb2.wx, ebdy = (py-26) - eb2.wy;
+      if(ebdx*ebdx + ebdy*ebdy < 16*16) {
+        enemyBullets.splice(ebi, 1);
+        if(ghostTimer > 0) continue;
+        if(shieldActive > 0) { shieldActive--; continue; }
+        if(mktSafe('revive') && !reviveUsed) {
+          reviveUsed=true; pvy=effectiveJVY()*0.7; py-=60;
+          popups.push({wx:px, wy:py, life:1.8, text:'REVIVE!', col:'#D64832'}); continue;
+        }
+        if(mktSafe('revive2') && !revive2Used) {
+          revive2Used=true; pvy=effectiveJVY()*0.7; py-=60;
+          popups.push({wx:px, wy:py, life:1.8, text:'REVIVE 2!', col:'#C020E0'}); continue;
+        }
+        spawnParticles(px, sy(py), 'death'); playDeathSFX(); dead=true; return;
+      }
+    }
+
     // Bomb: press B to destroy all on-screen stars
     if(mktSafe('bomb') && !bombUsed && (K['b'] || K['B'])) {
       bombUsed = true;
@@ -2161,6 +2352,15 @@
         var bsy = sy(stars[boi].wy);
         if(bsy > -30 && bsy < H + 30) { stars.splice(boi, 1); bombed++; }
       }
+      for(var boi = enemies.length - 1; boi >= 0; boi--) {
+        var bey = sy(enemies[boi].wy);
+        if(bey > -30 && bey < H + 30) { enemies.splice(boi, 1); bombed++; }
+      }
+      for(var boi = humanEnemies.length - 1; boi >= 0; boi--) {
+        var bhey = sy(humanEnemies[boi].wy);
+        if(bhey > -30 && bhey < H + 30) { humanEnemies.splice(boi, 1); bombed++; }
+      }
+      enemyBullets = [];
       if(bombed > 0) popups.push({wx:px, wy:py-40, life:2.2, text:'💣 BOOM!', col:'#FF2020'});
     }
 
@@ -2194,6 +2394,9 @@
     }
     for(var j=pennies.length-1;j>=0;j--){
       if(pennies[j].wy > camY+H+120) pennies.splice(j,1);
+    }
+    for(var j=enemies.length-1;j>=0;j--){
+      if(enemies[j].wy > camY+H+120) enemies.splice(j,1);
     }
     for(var ci=clouds.length-1;ci>=0;ci--){
       var cc=clouds[ci];
@@ -2900,6 +3103,130 @@
     ctx.globalAlpha=1;
   }
 
+  function drawHumanEnemies() {
+    if(!humanEnemies.length && !enemyBullets.length) return;
+    ctx.save();
+    // draw enemy bullets first (behind figures)
+    ctx.fillStyle = '#FF4040';
+    ctx.shadowColor = '#FF0000'; ctx.shadowBlur = 6;
+    for(var i = 0; i < enemyBullets.length; i++) {
+      var eb = enemyBullets[i];
+      var eby = sy(eb.wy);
+      if(eby < -20 || eby > H+20) continue;
+      ctx.beginPath(); ctx.arc(eb.wx, eby, 4, 0, Math.PI*2); ctx.fill();
+    }
+    ctx.shadowBlur = 0;
+
+    // draw human enemy figures
+    for(var i = 0; i < humanEnemies.length; i++) {
+      var he = humanEnemies[i];
+      var hx = he.wx, hy = sy(he.wy);
+      if(hy < -60 || hy > H+60) continue;
+      var d = he.dir;
+      var walk = Math.sin(he.walkFrame * 0.18) * 6;
+
+      ctx.strokeStyle = '#222'; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+
+      // body
+      ctx.fillStyle = '#8B2020';
+      ctx.strokeStyle = '#4A0000'; ctx.lineWidth = 1.5;
+      // torso
+      ctx.fillRect(hx-7, hy-38, 14, 18);
+      ctx.strokeRect(hx-7, hy-38, 14, 18);
+      // head
+      ctx.fillStyle = '#C8A070';
+      ctx.beginPath(); ctx.arc(hx, hy-46, 9, 0, Math.PI*2);
+      ctx.fill(); ctx.stroke();
+      // helmet
+      ctx.fillStyle = '#3A2010';
+      ctx.fillRect(hx-9, hy-54, 18, 10);
+      ctx.strokeRect(hx-9, hy-54, 18, 10);
+      // eyes — look at player direction
+      ctx.fillStyle = '#000';
+      ctx.fillRect(hx + d*2 - 2, hy-49, 3, 3);
+
+      // legs (animated walk)
+      ctx.strokeStyle = '#5A1010'; ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(hx, hy-20);
+      ctx.lineTo(hx - 6, hy - 6 + walk);
+      ctx.lineTo(hx - 8, hy + 6);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(hx, hy-20);
+      ctx.lineTo(hx + 6, hy - 6 - walk);
+      ctx.lineTo(hx + 8, hy + 6);
+      ctx.stroke();
+
+      // arms — one raised with gun
+      ctx.strokeStyle = '#8B2020'; ctx.lineWidth = 3;
+      // gun arm (aimed forward)
+      var armAngle = d > 0 ? -0.2 : Math.PI + 0.2;
+      ctx.beginPath();
+      ctx.moveTo(hx, hy-34);
+      ctx.lineTo(hx + d*18, hy-30);
+      ctx.stroke();
+      // gun barrel
+      ctx.strokeStyle = '#333'; ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(hx + d*14, hy-31);
+      ctx.lineTo(hx + d*26, hy-31);
+      ctx.stroke();
+      // off arm
+      ctx.strokeStyle = '#8B2020'; ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(hx, hy-34);
+      ctx.lineTo(hx - d*10, hy-26);
+      ctx.stroke();
+
+      // HP bar
+      var barW = 32;
+      ctx.fillStyle = '#400000';
+      ctx.fillRect(hx - barW/2, hy - 62, barW, 4);
+      ctx.fillStyle = '#FF4040';
+      ctx.fillRect(hx - barW/2, hy - 62, barW * (he.hp / he.maxHp), 4);
+    }
+    ctx.restore();
+  }
+
+  function drawEnemies() {
+    if(!enemies.length) return;
+    ctx.save();
+    for(var i = 0; i < enemies.length; i++) {
+      var en = enemies[i];
+      var ex = en.wx, ey = sy(en.wy);
+      if(ey < -40 || ey > H + 40) continue;
+
+      // body (red circle)
+      ctx.fillStyle = '#CC2020';
+      ctx.strokeStyle = '#800000';
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(ex, ey, 16, 0, Math.PI*2);
+      ctx.fill(); ctx.stroke();
+
+      // face: angry eyes
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath(); ctx.ellipse(ex - 5, ey - 3, 4, 5, en.vx > 0 ? -0.3 : 0.3, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(ex + 5, ey - 3, 4, 5, en.vx > 0 ? 0.3 : -0.3, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#000000';
+      ctx.beginPath(); ctx.arc(ex - 5, ey - 3, 2, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(ex + 5, ey - 3, 2, 0, Math.PI*2); ctx.fill();
+
+      // angry brow lines
+      ctx.strokeStyle = '#000000'; ctx.lineWidth = 2; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(ex - 9, ey - 8); ctx.lineTo(ex - 2, ey - 6); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(ex + 9, ey - 8); ctx.lineTo(ex + 2, ey - 6); ctx.stroke();
+
+      // HP bar
+      var barW = 32, barH = 4;
+      ctx.fillStyle = '#400000';
+      ctx.fillRect(ex - barW/2, ey - 24, barW, barH);
+      ctx.fillStyle = '#FF4040';
+      ctx.fillRect(ex - barW/2, ey - 24, barW * (en.hp / en.maxHp), barH);
+    }
+    ctx.restore();
+  }
+
   function drawBullets() {
     if(!bullets.length) return;
     ctx.save();
@@ -2924,6 +3251,8 @@
     drawParticles();
     drawCoins();
     drawPennies();
+    drawHumanEnemies();
+    drawEnemies();
     drawBullets();
     drawStars();
     drawFigure();
@@ -3042,6 +3371,9 @@
   var bombUsed      = false;
   var bullets       = [];
   var gunTimer      = 0;
+  var enemies       = [];
+  var humanEnemies  = [];
+  var enemyBullets  = [];
   var HEAD_START_WY = 1600;
 
   // dash state
@@ -3062,6 +3394,9 @@
     bombUsed = false;
     bullets = [];
     gunTimer = 0;
+    enemies = [];
+    humanEnemies = [];
+    enemyBullets = [];
     var startWY = HEAD_START_WY;
     var hsl = mktLevel('headstart');
     if (hsl > 0) startWY = HEAD_START_WY * (1 + 0.5 * hsl);
@@ -3152,6 +3487,15 @@
 
     document.getElementById('mktclose').addEventListener('click', function() {
       mktModal.classList.remove('open');
+    });
+
+    document.getElementById('mktreset').addEventListener('click', function() {
+      if(!confirm('Reset ALL purchases? This cannot be undone.')) return;
+      var ids = Object.keys(MKT_ITEMS);
+      for(var i = 0; i < ids.length; i++) {
+        localStorage.removeItem(MKT_ITEMS[ids[i]].key);
+      }
+      refreshMarket();
     });
   })();
 
