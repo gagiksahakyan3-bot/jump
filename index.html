@@ -1129,9 +1129,10 @@
         {
           var b = cityBldgs[bi2];
           var bx = b.x;
-          var groundY = H - 60;
+          var groundY = GND - camY;
           var by = groundY - b.h;
           if (bx + b.w < -10 || bx > W + 10) continue;
+          if (groundY < 0 || by > H) continue;
           // building body
           ctx.fillStyle = 'rgba('+cR+','+cG+','+cB+','+bldgAlpha+')';
           ctx.fillRect(bx, by, b.w, b.h);
@@ -1141,7 +1142,7 @@
           ctx.fillRect(bx, by, b.w, Math.round(b.h * 0.12));
           // darker bottom strip
           ctx.fillStyle = 'rgba(0,0,0,0.18)';
-          ctx.fillRect(bx, H - 66, b.w, 6);
+          ctx.fillRect(bx, groundY - 6, b.w, 6);
           // windows
           var wPadX = Math.max(4, Math.round((b.w - b.wCols * 9) / 2));
           var wPadY = 10;
