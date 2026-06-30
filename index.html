@@ -783,6 +783,7 @@
   // ── world ─────────────────────────────────────────────────────────
   var GND = H - 50;
   var camY, px, py, pvx, pvy, onG, jLeft, score, best, frame, dead, plats, stars, topWY, spawnPY;
+  var spaceMix = 0;
   var newBestFlash = 0; // counts down when a new best is set
   var coins = [], coinCount = 0, popups = [];
   var pennies = [], pennyCount = 0;
@@ -973,9 +974,10 @@
     var skB  = Math.round(topCol[2]+(horCol[2]-topCol[2])*(1-altT));
 
     // space transition — every 200 m climbed pushes sky toward deep space
-    var spaceMix = Math.min(1, score / 1000); // score in metres, full space at 1000 m
+    spaceMix = Math.min(1, score / 1000); // score in metres, full space at 1000 m
     // smooth by steps: each 200m adds 0.2
     spaceMix = Math.min(1, Math.floor(score / 200) * 0.2 + (((score % 200) / 200) * 0.2));
+
     var spTopR = Math.round(skR * (1-spaceMix) + 2  * spaceMix);
     var spTopG = Math.round(skG * (1-spaceMix) + 3  * spaceMix);
     var spTopB = Math.round(skB * (1-spaceMix) + 18 * spaceMix);
@@ -2159,6 +2161,21 @@
       var p = plats[i];
       var y1=sy(p.wy), y2=sy(p.wy+p.tilt);
       if(Math.min(y1,y2)>H+8 || Math.max(y1,y2)<-8) continue;
+
+      // in space: draw as simple white stick only
+      if (spaceMix >= 1) {
+        ctx.save();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(p.x1, y1);
+        ctx.lineTo(p.x2, y2);
+        ctx.stroke();
+        ctx.restore();
+        continue;
+      }
+
       ctx.save();
 
       var pw  = p.x2 - p.x1;
@@ -2694,8 +2711,8 @@
     ctx.save();
     var _dn = Math.max(0, Math.cos(dayTime * Math.PI * 2));
     var _pc = Math.round(255 * (1 - _dn));
-    var _hudCol = 'rgb('+_pc+','+_pc+','+_pc+')';
-    var _subCol = 'rgba('+_pc+','+_pc+','+_pc+',0.55)';
+    var _hudCol = spaceMix >= 1 ? '#ffffff' : 'rgb('+_pc+','+_pc+','+_pc+')';
+    var _subCol = spaceMix >= 1 ? 'rgba(255,255,255,0.55)' : 'rgba('+_pc+','+_pc+','+_pc+',0.55)';
 
     // ── TOP-LEFT: score + best ─────────────────────────────────────
     ctx.textAlign='left'; ctx.textBaseline='top';
