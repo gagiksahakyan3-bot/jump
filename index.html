@@ -1693,17 +1693,6 @@
         });
       }
 
-      // enemies: only spawn when player owns the gun
-      if(mktSafe('gun') && topWY < GND - 300 && Math.random() < 0.35) {
-        var evx = (Math.random() < 0.5 ? 1 : -1) * (0.8 + Math.random() * 1.4);
-        enemies.push({
-          wx: 30 + Math.random() * (W - 60),
-          wy: topWY - 40 - Math.random() * 50,
-          vx: evx,
-          hp: 2,
-          maxHp: 2
-        });
-      }
       // human enemies: spawn alongside blobs when gun owned
       if(mktSafe('gun') && topWY < GND - 400 && Math.random() < 0.28) {
         var hdir = Math.random() < 0.5 ? 1 : -1;
@@ -1749,7 +1738,7 @@
   }
 
   function buildWorld() {
-    plats=[]; stars=[]; coins=[]; pennies=[]; enemies=[]; humanEnemies=[]; enemyBullets=[]; topWY=GND;
+    plats=[]; stars=[]; coins=[]; pennies=[]; humanEnemies=[]; enemyBullets=[]; topWY=GND;
     plats.push({x1:-10, x2:W+10, wy:GND, tilt:0});
     genPlats(GND - H*2.8);
     topCloudWY=GND; clouds=[];
@@ -2181,14 +2170,6 @@
       }
     }
 
-    // Gun: fire bullets upward periodically
-    if(mktSafe('gun') && !dead) {
-      gunTimer++;
-      if(gunTimer >= 120) { // fire every 2 seconds (60fps)
-        gunTimer = 0;
-        bullets.push({wx: px, wy: py - 20, vy: -14});
-      }
-    }
     // Update bullets
     for(var bi = bullets.length - 1; bi >= 0; bi--) {
       bullets[bi].wy += bullets[bi].vy;
@@ -2206,54 +2187,6 @@
       var bscx = bullets[bi].wx, bscy = sy(bullets[bi].wy);
       if(hit || bscy < -40 || bscy > H+40 || bscx < -40 || bscx > W+40) bullets.splice(bi, 1);
     }
-    // Update enemies: move + check bullet hits + check player collision
-    for(var ei = enemies.length - 1; ei >= 0; ei--) {
-      var en = enemies[ei];
-      en.wx += en.vx;
-      if(en.wx < 20 || en.wx > W - 20) en.vx = -en.vx;
-      // bullet hits
-      var enemyHit = false;
-      for(var bi2 = bullets.length - 1; bi2 >= 0; bi2--) {
-        var eb = bullets[bi2];
-        var edx = eb.wx - en.wx, edy = eb.wy - en.wy;
-        if(edx*edx + edy*edy < 22*22) {
-          bullets.splice(bi2, 1);
-          en.hp--;
-          if(en.hp <= 0) {
-            popups.push({wx:en.wx, wy:en.wy, life:1.5, text:'💀 KILL!', col:'#FF3030'});
-            enemies.splice(ei, 1);
-            enemyHit = true;
-          } else {
-            popups.push({wx:en.wx, wy:en.wy, life:1.0, text:'HIT!', col:'#FF8040'});
-          }
-          break;
-        }
-      }
-      if(enemyHit) continue;
-      // player collision
-      var epdx = px - en.wx, epdy = (py - 26) - en.wy;
-      if(epdx*epdx + epdy*epdy < 22*22) {
-        if(ghostTimer > 0) continue;
-        if(shieldActive > 0) { shieldActive--; continue; }
-        if(mktSafe('sword') && swordKills > 0) {
-          swordKills--; enemies.splice(ei, 1);
-          popups.push({wx:en.wx, wy:en.wy, life:1.5, text:'⚔️ SLASH!', col:'#E8C020'});
-          continue;
-        }
-        if(mktSafe('revive') && !reviveUsed) {
-          reviveUsed=true; pvy=effectiveJVY()*0.7; py-=60;
-          popups.push({wx:px, wy:py, life:1.8, text:'REVIVE!', col:'#D64832'});
-          continue;
-        }
-        if(mktSafe('revive2') && !revive2Used) {
-          revive2Used=true; pvy=effectiveJVY()*0.7; py-=60;
-          popups.push({wx:px, wy:py, life:1.8, text:'REVIVE 2!', col:'#C020E0'});
-          continue;
-        }
-        spawnParticles(px, sy(py), 'death'); playDeathSFX(); dead=true; return;
-      }
-    }
-
     // Human enemies: move, shoot, collide with player bullets & player
     for(var hi = humanEnemies.length - 1; hi >= 0; hi--) {
       var he = humanEnemies[hi];
@@ -2352,10 +2285,6 @@
         var bsy = sy(stars[boi].wy);
         if(bsy > -30 && bsy < H + 30) { stars.splice(boi, 1); bombed++; }
       }
-      for(var boi = enemies.length - 1; boi >= 0; boi--) {
-        var bey = sy(enemies[boi].wy);
-        if(bey > -30 && bey < H + 30) { enemies.splice(boi, 1); bombed++; }
-      }
       for(var boi = humanEnemies.length - 1; boi >= 0; boi--) {
         var bhey = sy(humanEnemies[boi].wy);
         if(bhey > -30 && bhey < H + 30) { humanEnemies.splice(boi, 1); bombed++; }
@@ -2394,9 +2323,6 @@
     }
     for(var j=pennies.length-1;j>=0;j--){
       if(pennies[j].wy > camY+H+120) pennies.splice(j,1);
-    }
-    for(var j=enemies.length-1;j>=0;j--){
-      if(enemies[j].wy > camY+H+120) enemies.splice(j,1);
     }
     for(var ci=clouds.length-1;ci>=0;ci--){
       var cc=clouds[ci];
@@ -3189,44 +3115,6 @@
     ctx.restore();
   }
 
-  function drawEnemies() {
-    if(!enemies.length) return;
-    ctx.save();
-    for(var i = 0; i < enemies.length; i++) {
-      var en = enemies[i];
-      var ex = en.wx, ey = sy(en.wy);
-      if(ey < -40 || ey > H + 40) continue;
-
-      // body (red circle)
-      ctx.fillStyle = '#CC2020';
-      ctx.strokeStyle = '#800000';
-      ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.arc(ex, ey, 16, 0, Math.PI*2);
-      ctx.fill(); ctx.stroke();
-
-      // face: angry eyes
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath(); ctx.ellipse(ex - 5, ey - 3, 4, 5, en.vx > 0 ? -0.3 : 0.3, 0, Math.PI*2); ctx.fill();
-      ctx.beginPath(); ctx.ellipse(ex + 5, ey - 3, 4, 5, en.vx > 0 ? 0.3 : -0.3, 0, Math.PI*2); ctx.fill();
-      ctx.fillStyle = '#000000';
-      ctx.beginPath(); ctx.arc(ex - 5, ey - 3, 2, 0, Math.PI*2); ctx.fill();
-      ctx.beginPath(); ctx.arc(ex + 5, ey - 3, 2, 0, Math.PI*2); ctx.fill();
-
-      // angry brow lines
-      ctx.strokeStyle = '#000000'; ctx.lineWidth = 2; ctx.lineCap = 'round';
-      ctx.beginPath(); ctx.moveTo(ex - 9, ey - 8); ctx.lineTo(ex - 2, ey - 6); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(ex + 9, ey - 8); ctx.lineTo(ex + 2, ey - 6); ctx.stroke();
-
-      // HP bar
-      var barW = 32, barH = 4;
-      ctx.fillStyle = '#400000';
-      ctx.fillRect(ex - barW/2, ey - 24, barW, barH);
-      ctx.fillStyle = '#FF4040';
-      ctx.fillRect(ex - barW/2, ey - 24, barW * (en.hp / en.maxHp), barH);
-    }
-    ctx.restore();
-  }
-
   function drawBullets() {
     if(!bullets.length) return;
     ctx.save();
@@ -3252,7 +3140,6 @@
     drawCoins();
     drawPennies();
     drawHumanEnemies();
-    drawEnemies();
     drawBullets();
     drawStars();
     drawFigure();
@@ -3371,7 +3258,6 @@
   var bombUsed      = false;
   var bullets       = [];
   var gunTimer      = 0;
-  var enemies       = [];
   var humanEnemies  = [];
   var enemyBullets  = [];
   var HEAD_START_WY = 1600;
@@ -3394,7 +3280,6 @@
     bombUsed = false;
     bullets = [];
     gunTimer = 0;
-    enemies = [];
     humanEnemies = [];
     enemyBullets = [];
     var startWY = HEAD_START_WY;
