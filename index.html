@@ -1011,6 +1011,7 @@
   // ── world ─────────────────────────────────────────────────────────
   var GND = H - 50;
   var camY, px, py, pvx, pvy, onG, jLeft, score, best, frame, dead, plats, stars, topWY, spawnPY;
+  var standingPlat = null;
   var spaceMix = 0;
   var newBestFlash = 0;
   var coins = [], coinCount = 0, popups = [];
@@ -2562,7 +2563,7 @@
     if(!audioCtx) initAudio();
     else if(audioCtx.state==='suspended') audioCtx.resume();
     if(dead){respawn();return;}
-    if(jLeft>0){pvy=effectiveJVY(); jLeft--; onG=false; playJumpSFX(); spawnParticles(px, sy(py), 'jump');}
+    if(jLeft>0){pvy=effectiveJVY(); jLeft--; onG=false; standingPlat=null; playJumpSFX(); spawnParticles(px, sy(py), 'jump');}
   }
   function goLeft()  {return K['ArrowLeft'] ||K['a']||K['A']||lHeld;}
   function goRight() {return K['ArrowRight']||K['d']||K['D']||rHeld;}
@@ -2595,15 +2596,21 @@
     pvy += grav;
     py  += pvy;
 
-    // Move moving platforms
+    // Move moving platforms and carry the player along if standing on one
     for(var i=0; i<plats.length; i++) {
       var mp = plats[i];
       if(mp.type === 'move') {
         var mw = mp.mvW || (mp.x2 - mp.x1);
+        var oldX1 = mp.x1;
         var center = mp.mvX1 + mp.mvRange * Math.sin(frame * 0.022 + mp.mvX1 * 0.1);
         center = Math.max(mw/2+10, Math.min(W-mw/2-10, center));
+        var dx = (center - mw/2) - oldX1;
         mp.x1 = center - mw/2;
         mp.x2 = center + mw/2;
+        // carry player if they're standing on this platform
+        if(standingPlat === mp) {
+          px += dx;
+        }
       }
       if(mp.type === 'crumble' && mp.crumbling) {
         mp.crumbleTimer++;
@@ -2615,16 +2622,19 @@
     var justLanded = false;
     if(pvy > 0) {
       onG = false;
+      standingPlat = null;
       for(var i=0; i<plats.length; i++) {
         var p = plats[i];
         if(p.type === 'crumble' && p.crumbling && p.crumbleTimer > 10) continue;
         if((px+10 >= p.x1 && px-10 <= p.x2) && prevPy <= p.wy && py >= p.wy-1) {
           if(p.type === 'bounce') {
             py=p.wy; pvy=effectiveJVY()*1.55; jLeft=maxJumps();
+            standingPlat = null;
             spawnParticles(px, sy(py), 'bounce');
             popups.push({wx:px, wy:py-10, life:0.8, text:'BOING!', col:'#20C040'});
           } else {
             py=p.wy; pvy=0; onG=true; jLeft=maxJumps();
+            standingPlat = p;
             spawnParticles(px, sy(py), 'land');
             justLanded = true;
           }
@@ -3865,44 +3875,62 @@
     ctx.font='bold 17px "Chalkboard SE","Comic Sans MS",cursive';
     ctx.fillText(pennyBank+'¢', W-18, 42);
 
-    // ── BOTTOM-LEFT row: active power-up icons ─────────────────────
-    ctx.font='17px serif'; ctx.textBaseline='top';
+    // ── BELOW BEST: combo + active power-up icons ─────────────────
+    var _statusY = (best > 0) ? 56 : 38;
+
+    // combo counter
+    if(combo >= 2) {
+      var cpulse = combo >= 5 ? 1+0.08*Math.sin(frame*0.3) : 1;
+      ctx.save();
+      ctx.translate(14, _statusY + 8);
+      ctx.scale(cpulse, cpulse);
+      ctx.textAlign='left'; ctx.textBaseline='middle';
+      var cCol = combo>=10?'#FF4010':combo>=5?'#FF9020':'#60C030';
+      ctx.font='bold '+(combo>=5?16:13)+'px "Chalkboard SE","Comic Sans MS",cursive';
+      ctx.fillStyle='rgba(0,0,0,0.35)'; ctx.fillText('×'+combo+' COMBO', 1,1);
+      ctx.fillStyle=cCol; ctx.fillText('×'+combo+' COMBO', 0,0);
+      ctx.restore();
+      _statusY += 22;
+    }
+
+    // power-up icons
+    ctx.font='15px serif'; ctx.textBaseline='top';
     var iconX = 14;
-    var iconY = H - 52;
+    var iconY = _statusY;
     if(shieldActive > 0) {
       ctx.globalAlpha = 0.7 + 0.3*Math.sin(frame*0.12);
       ctx.textAlign='left'; ctx.fillText('🛡️'+(shieldActive>1?'×'+shieldActive:''), iconX, iconY);
-      iconX += 28;
+      iconX += 24;
     }
     if(ghostTimer > 0) {
       ctx.globalAlpha = 0.5 + 0.5*Math.sin(frame*0.22);
       ctx.textAlign='left'; ctx.fillText('👻', iconX, iconY);
-      iconX += 28;
+      iconX += 24;
     }
     if(mktSafe('revive') && !reviveUsed) {
       ctx.globalAlpha = 0.75;
       ctx.textAlign='left'; ctx.fillText('🔄', iconX, iconY);
-      iconX += 28;
+      iconX += 24;
     }
     if(mktSafe('revive2') && !revive2Used) {
       ctx.globalAlpha = 0.75;
       ctx.textAlign='left'; ctx.fillText('🔁', iconX, iconY);
-      iconX += 28;
+      iconX += 24;
     }
     if(mktSafe('starbust') && !starBustUsed) {
       ctx.globalAlpha = 0.75;
       ctx.textAlign='left'; ctx.fillText('🌟', iconX, iconY);
-      iconX += 28;
+      iconX += 24;
     }
     if(mktSafe('dash') && dashCooldown===0) {
       ctx.globalAlpha = 0.75;
       ctx.textAlign='left'; ctx.fillText('💨', iconX, iconY);
-      iconX += 28;
+      iconX += 24;
     }
     if(mktSafe('glide') && !onG && pvy > 0) {
       ctx.globalAlpha = 0.7 + 0.3*Math.sin(frame*0.18);
       ctx.textAlign='left'; ctx.fillText('🪂', iconX, iconY);
-      iconX += 28;
+      iconX += 24;
     }
     ctx.globalAlpha = 1;
 
@@ -3914,19 +3942,6 @@
     ctx.fillText('⬆ '+zoneName, W/2, 8);
     ctx.globalAlpha = 1;
 
-    // ── Combo counter ─────────────────────────────────────────────
-    if(combo >= 2) {
-      var cpulse = combo >= 5 ? 1+0.08*Math.sin(frame*0.3) : 1;
-      ctx.save();
-      ctx.translate(14 + 50, H - 80);
-      ctx.scale(cpulse, cpulse);
-      ctx.textAlign='center'; ctx.textBaseline='middle';
-      var cCol = combo>=10?'#FF4010':combo>=5?'#FF9020':'#60C030';
-      ctx.font='bold '+(combo>=5?20:16)+'px "Chalkboard SE","Comic Sans MS",cursive';
-      ctx.fillStyle='rgba(0,0,0,0.4)'; ctx.fillText('×'+combo+' COMBO', 1,1);
-      ctx.fillStyle=cCol; ctx.fillText('×'+combo+' COMBO', 0,0);
-      ctx.restore();
-    }
 
     // ── Milestone banner ──────────────────────────────────────────
     if(milestonePop > 0) {
