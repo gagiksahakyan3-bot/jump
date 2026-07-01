@@ -238,6 +238,20 @@
       color: #B02818;
       cursor: default; opacity: 0.65;
     }
+    .mkt-sell {
+      flex-shrink: 0;
+      padding: 4px 8px;
+      font: bold 11px 'Chalkboard SE','Comic Sans MS',cursive;
+      border-radius: 12px;
+      cursor: pointer;
+      border: 1.5px solid rgba(140,40,20,0.45);
+      background: rgba(140,40,20,0.10);
+      color: #8C2814;
+      transition: opacity 0.15s;
+      display: none;
+    }
+    .mkt-sell:active { opacity: 0.6; }
+    .mkt-sell.visible { display: block; }
     #mktreset {
       display: block; width: 100%; margin-top: 4px; margin-bottom: 2px;
       padding: 7px;
@@ -364,7 +378,7 @@
           <div class="mkt-name">Speed Boost</div>
           <div class="mkt-desc">Run 25% faster</div>
         </div>
-        <button class="mkt-btn" data-id="speed" data-cost="4">4¢</button>
+        <button class="mkt-btn" data-id="speed" data-cost="4">4¢</button><button class="mkt-sell" data-id="speed">🗑️ Sell</button>
       </div>
       <div class="mkt-item">
         <span class="mkt-icon">⬆️</span>
@@ -372,7 +386,7 @@
           <div class="mkt-name">Triple Jump</div>
           <div class="mkt-desc">3 jumps instead of 2</div>
         </div>
-        <button class="mkt-btn" data-id="triple" data-cost="8">8¢</button>
+        <button class="mkt-btn" data-id="triple" data-cost="8">8¢</button><button class="mkt-sell" data-id="triple">🗑️ Sell</button>
       </div>
       <div class="mkt-item">
         <span class="mkt-icon">🛡️</span>
@@ -380,7 +394,7 @@
           <div class="mkt-name">Shield</div>
           <div class="mkt-desc">Survive one star hit per run</div>
         </div>
-        <button class="mkt-btn" data-id="shield" data-cost="12">12¢</button>
+        <button class="mkt-btn" data-id="shield" data-cost="12">12¢</button><button class="mkt-sell" data-id="shield">🗑️ Sell</button>
       </div>
       <div class="mkt-item">
         <span class="mkt-icon">🧲</span>
@@ -388,7 +402,7 @@
           <div class="mkt-name">Coin Magnet</div>
           <div class="mkt-desc">Attract coins from farther away</div>
         </div>
-        <button class="mkt-btn" data-id="magnet" data-cost="6">6¢</button>
+        <button class="mkt-btn" data-id="magnet" data-cost="6">6¢</button><button class="mkt-sell" data-id="magnet">🗑️ Sell</button>
       </div>
       <div class="mkt-item">
         <span class="mkt-icon">🪶</span>
@@ -396,7 +410,7 @@
           <div class="mkt-name">Feather Fall</div>
           <div class="mkt-desc">Fall 30% slower — float like a leaf</div>
         </div>
-        <button class="mkt-btn" data-id="feather" data-cost="5">5¢</button>
+        <button class="mkt-btn" data-id="feather" data-cost="5">5¢</button><button class="mkt-sell" data-id="feather">🗑️ Sell</button>
       </div>
       <div class="mkt-item">
         <span class="mkt-icon">💰</span>
@@ -404,7 +418,7 @@
           <div class="mkt-name">Double Coins</div>
           <div class="mkt-desc">Earn 2¢ per penny instead of 1</div>
         </div>
-        <button class="mkt-btn" data-id="double" data-cost="9">9¢</button>
+        <button class="mkt-btn" data-id="double" data-cost="9">9¢</button><button class="mkt-sell" data-id="double">🗑️ Sell</button>
       </div>
       <div class="mkt-item">
         <span class="mkt-icon">🚀</span>
@@ -412,7 +426,7 @@
           <div class="mkt-name">Head Start</div>
           <div class="mkt-desc">Begin each run 200m up</div>
         </div>
-        <button class="mkt-btn" data-id="headstart" data-cost="7">7¢</button>
+        <button class="mkt-btn" data-id="headstart" data-cost="7">7¢</button><button class="mkt-sell" data-id="headstart">🗑️ Sell</button>
       </div>
       <div class="mkt-item">
         <span class="mkt-icon">👻</span>
@@ -420,7 +434,7 @@
           <div class="mkt-name">Ghost Mode</div>
           <div class="mkt-desc">Invincible for the first 4 seconds</div>
         </div>
-        <button class="mkt-btn" data-id="ghost" data-cost="14">14¢</button>
+        <button class="mkt-btn" data-id="ghost" data-cost="14">14¢</button><button class="mkt-sell" data-id="ghost">🗑️ Sell</button>
       </div>
       <div class="mkt-item">
         <span class="mkt-icon">🍀</span>
@@ -428,7 +442,7 @@
           <div class="mkt-name">Lucky Penny</div>
           <div class="mkt-desc">30% chance to earn a bonus penny</div>
         </div>
-        <button class="mkt-btn" data-id="lucky" data-cost="3">3¢</button>
+        <button class="mkt-btn" data-id="lucky" data-cost="3">3¢</button><button class="mkt-sell" data-id="lucky">🗑️ Sell</button>
       </div>
       <div class="mkt-item">
         <span class="mkt-icon">🌀</span>
@@ -436,7 +450,7 @@
           <div class="mkt-name">Dash</div>
           <div class="mkt-desc">Double-tap direction to burst sideways</div>
         </div>
-        <button class="mkt-btn" data-id="dash" data-cost="10">10¢</button>
+        <button class="mkt-btn" data-id="dash" data-cost="10">10¢</button><button class="mkt-sell" data-id="dash">🗑️ Sell</button>
       </div>
       <div class="mkt-item">
         <span class="mkt-icon">🧱</span>
@@ -444,7 +458,7 @@
           <div class="mkt-name">Wide Platforms</div>
           <div class="mkt-desc">Platforms are 40% wider</div>
         </div>
-        <button class="mkt-btn" data-id="wideplat" data-cost="8">8¢</button>
+        <button class="mkt-btn" data-id="wideplat" data-cost="8">8¢</button><button class="mkt-sell" data-id="wideplat">🗑️ Sell</button>
       </div>
       <div class="mkt-item">
         <span class="mkt-icon">⭐</span>
@@ -452,7 +466,7 @@
           <div class="mkt-name">Star Slayer</div>
           <div class="mkt-desc">30% fewer stars spawn</div>
         </div>
-        <button class="mkt-btn" data-id="fewstars" data-cost="7">7¢</button>
+        <button class="mkt-btn" data-id="fewstars" data-cost="7">7¢</button><button class="mkt-sell" data-id="fewstars">🗑️ Sell</button>
       </div>
       <div class="mkt-item">
         <span class="mkt-icon">🔄</span>
@@ -460,7 +474,7 @@
           <div class="mkt-name">Second Chance</div>
           <div class="mkt-desc">Revive once per run with half height</div>
         </div>
-        <button class="mkt-btn" data-id="revive" data-cost="18">18¢</button>
+        <button class="mkt-btn" data-id="revive" data-cost="18">18¢</button><button class="mkt-sell" data-id="revive">🗑️ Sell</button>
       </div>
       <div class="mkt-item">
         <span class="mkt-icon">🪙</span>
@@ -468,7 +482,7 @@
           <div class="mkt-name">Coin Rain</div>
           <div class="mkt-desc">50% more gold coins spawn</div>
         </div>
-        <button class="mkt-btn" data-id="coinrain" data-cost="6">6¢</button>
+        <button class="mkt-btn" data-id="coinrain" data-cost="6">6¢</button><button class="mkt-sell" data-id="coinrain">🗑️ Sell</button>
       </div>
       <div class="mkt-item">
         <span class="mkt-icon">🏔️</span>
@@ -476,7 +490,7 @@
           <div class="mkt-name">Tight Gaps</div>
           <div class="mkt-desc">Platforms spawn closer together</div>
         </div>
-        <button class="mkt-btn" data-id="tightgap" data-cost="5">5¢</button>
+        <button class="mkt-btn" data-id="tightgap" data-cost="5">5¢</button><button class="mkt-sell" data-id="tightgap">🗑️ Sell</button>
       </div>
       <div class="mkt-item">
         <span class="mkt-icon">🪂</span>
@@ -484,7 +498,7 @@
           <div class="mkt-name">Slow Fall</div>
           <div class="mkt-desc">Hold jump mid-air to glide slowly down</div>
         </div>
-        <button class="mkt-btn" data-id="glide" data-cost="8">8¢</button>
+        <button class="mkt-btn" data-id="glide" data-cost="8">8¢</button><button class="mkt-sell" data-id="glide">🗑️ Sell</button>
       </div>
       <div class="mkt-item">
         <span class="mkt-icon">💨</span>
@@ -492,7 +506,7 @@
           <div class="mkt-name">Turbo</div>
           <div class="mkt-desc">+50% move speed (stacks with Speed)</div>
         </div>
-        <button class="mkt-btn" data-id="turbo" data-cost="10">10¢</button>
+        <button class="mkt-btn" data-id="turbo" data-cost="10">10¢</button><button class="mkt-sell" data-id="turbo">🗑️ Sell</button>
       </div>
       <div class="mkt-item">
         <span class="mkt-icon">🧲</span>
@@ -500,7 +514,7 @@
           <div class="mkt-name">Super Magnet</div>
           <div class="mkt-desc">Doubles coin pull radius even further</div>
         </div>
-        <button class="mkt-btn" data-id="supermagnet" data-cost="9">9¢</button>
+        <button class="mkt-btn" data-id="supermagnet" data-cost="9">9¢</button><button class="mkt-sell" data-id="supermagnet">🗑️ Sell</button>
       </div>
       <div class="mkt-item">
         <span class="mkt-icon">💰</span>
@@ -508,7 +522,7 @@
           <div class="mkt-name">Penny Shower</div>
           <div class="mkt-desc">Pennies appear much more often</div>
         </div>
-        <button class="mkt-btn" data-id="pennyshower" data-cost="7">7¢</button>
+        <button class="mkt-btn" data-id="pennyshower" data-cost="7">7¢</button><button class="mkt-sell" data-id="pennyshower">🗑️ Sell</button>
       </div>
       <div class="mkt-item">
         <span class="mkt-icon">🔁</span>
@@ -516,7 +530,7 @@
           <div class="mkt-name">Second Revive</div>
           <div class="mkt-desc">Revive can trigger twice per run</div>
         </div>
-        <button class="mkt-btn" data-id="revive2" data-cost="22">22¢</button>
+        <button class="mkt-btn" data-id="revive2" data-cost="22">22¢</button><button class="mkt-sell" data-id="revive2">🗑️ Sell</button>
       </div>
       <div class="mkt-item">
         <span class="mkt-icon">⬆️</span>
@@ -524,7 +538,7 @@
           <div class="mkt-name">Super Jump</div>
           <div class="mkt-desc">Jump height increased by 30%</div>
         </div>
-        <button class="mkt-btn" data-id="highjump" data-cost="9">9¢</button>
+        <button class="mkt-btn" data-id="highjump" data-cost="9">9¢</button><button class="mkt-sell" data-id="highjump">🗑️ Sell</button>
       </div>
       <div class="mkt-item">
         <span class="mkt-icon">🌀</span>
@@ -532,7 +546,7 @@
           <div class="mkt-name">Quad Jump</div>
           <div class="mkt-desc">Jump 4 times in the air (needs Triple)</div>
         </div>
-        <button class="mkt-btn" data-id="quad" data-cost="14">14¢</button>
+        <button class="mkt-btn" data-id="quad" data-cost="14">14¢</button><button class="mkt-sell" data-id="quad">🗑️ Sell</button>
       </div>
       <div class="mkt-item">
         <span class="mkt-icon">🌟</span>
@@ -540,7 +554,7 @@
           <div class="mkt-name">Star Buster</div>
           <div class="mkt-desc">First star hit per run is destroyed, not lethal</div>
         </div>
-        <button class="mkt-btn" data-id="starbust" data-cost="13">13¢</button>
+        <button class="mkt-btn" data-id="starbust" data-cost="13">13¢</button><button class="mkt-sell" data-id="starbust">🗑️ Sell</button>
       </div>
       <div class="mkt-item">
         <span class="mkt-icon">🎯</span>
@@ -548,7 +562,7 @@
           <div class="mkt-name">Big Head Start</div>
           <div class="mkt-desc">Start even higher up (needs Head Start)</div>
         </div>
-        <button class="mkt-btn" data-id="bigstart" data-cost="11">11¢</button>
+        <button class="mkt-btn" data-id="bigstart" data-cost="11">11¢</button><button class="mkt-sell" data-id="bigstart">🗑️ Sell</button>
       </div>
       <div class="mkt-item">
         <span class="mkt-icon">⚔️</span>
@@ -556,7 +570,7 @@
           <div class="mkt-name">Sword</div>
           <div class="mkt-desc">Slash through stars — 2 kills per run per level</div>
         </div>
-        <button class="mkt-btn" data-id="sword" data-cost="15">15¢</button>
+        <button class="mkt-btn" data-id="sword" data-cost="15">15¢</button><button class="mkt-sell" data-id="sword">🗑️ Sell</button>
       </div>
       <div class="mkt-item">
         <span class="mkt-icon">🔫</span>
@@ -564,7 +578,7 @@
           <div class="mkt-name">Gun</div>
           <div class="mkt-desc">Auto-fires a bullet upward every 2 seconds</div>
         </div>
-        <button class="mkt-btn" data-id="gun" data-cost="20">20¢</button>
+        <button class="mkt-btn" data-id="gun" data-cost="20">20¢</button><button class="mkt-sell" data-id="gun">🗑️ Sell</button>
       </div>
       <div class="mkt-item">
         <span class="mkt-icon">💣</span>
@@ -572,7 +586,7 @@
           <div class="mkt-name">Bomb</div>
           <div class="mkt-desc">Press B to wipe all stars on screen — once per run</div>
         </div>
-        <button class="mkt-btn" data-id="bomb" data-cost="25">25¢</button>
+        <button class="mkt-btn" data-id="bomb" data-cost="25">25¢</button><button class="mkt-sell" data-id="bomb">🗑️ Sell</button>
       </div>
       <button id="mktreset">🗑️ Reset All Purchases</button>
       <button id="mktclose">Close</button>
@@ -848,7 +862,7 @@
   var p2active=false, p2x=0, p2y=0, p2vx=0, p2vy=0;
   var p2onG=false, p2jLeft=2, p2dead=false;
   var p2frame=0, p2score=0, p2dir=0;
-  var p2stuckTimer=0, p2respawnTimer=0, p2aiTick=0;
+  var p2stuckTimer=0, p2respawnTimer=0, p2aiTick=0, p2aiShootTimer=0;
 
   // ── day / night ───────────────────────────────────────────────────
   var dayTime   = 0.0;   // 0=noon  0.25=sunset  0.5=midnight  0.75=dawn
@@ -1081,6 +1095,76 @@
       nb2.addColorStop(1, 'rgba(0,0,0,0)');
       ctx.fillStyle = nb2; ctx.fillRect(0,0,W,H);
       ctx.restore();
+
+      // ── background planets ────────────────────────────────────────
+      // parallax speed per planet: farther planets drift slower
+      var PLANETS = [
+        {nx:0.82, ny:0.18, r:38, c1:'#7B4FCF', c2:'#3A1870', ring:false, tilt:0,    pspd:0.012},
+        {nx:0.12, ny:0.28, r:22, c1:'#CF7B4F', c2:'#6B2C10', ring:true,  tilt:0.38, pspd:0.022},
+        {nx:0.65, ny:0.62, r:54, c1:'#4F9BCF', c2:'#1A3A6B', ring:true,  tilt:-0.28,pspd:0.008},
+        {nx:0.38, ny:0.08, r:16, c1:'#7BCF8A', c2:'#1A6B2C', ring:false, tilt:0,    pspd:0.030},
+        {nx:0.92, ny:0.70, r:28, c1:'#CF4F6B', c2:'#6B1A28', ring:false, tilt:0,    pspd:0.018},
+      ];
+      ctx.save();
+      var pAlpha = spaceMix;
+      for(var pi2 = 0; pi2 < PLANETS.length; pi2++) {
+        var pl2 = PLANETS[pi2];
+        // each planet scrolls at its own parallax speed; wrap so it stays on screen
+        var px2 = pl2.nx * W + Math.sin(frame * 0.0006 + pi2) * 3;
+        var rawPY = pl2.ny * H + camY * pl2.pspd;
+        var py2 = ((rawPY % H) + H) % H;
+        var pr2 = pl2.r;
+        ctx.globalAlpha = pAlpha * 0.82;
+
+        // atmosphere glow
+        var ag = ctx.createRadialGradient(px2, py2, pr2*0.6, px2, py2, pr2*1.9);
+        ag.addColorStop(0, pl2.c1);
+        ag.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = ag;
+        ctx.beginPath(); ctx.arc(px2, py2, pr2*1.9, 0, Math.PI*2); ctx.fill();
+
+        // planet disc
+        var pg = ctx.createRadialGradient(px2 - pr2*0.3, py2 - pr2*0.3, pr2*0.1, px2, py2, pr2);
+        pg.addColorStop(0,   pl2.c1);
+        pg.addColorStop(0.6, pl2.c2);
+        pg.addColorStop(1,   '#050510');
+        ctx.fillStyle = pg;
+        ctx.beginPath(); ctx.arc(px2, py2, pr2, 0, Math.PI*2); ctx.fill();
+
+        // surface band lines
+        ctx.globalAlpha = pAlpha * 0.25;
+        ctx.strokeStyle = pl2.c1;
+        ctx.lineWidth = pr2 * 0.12;
+        for(var bi3 = -1; bi3 <= 1; bi3++) {
+          var by3 = py2 + bi3 * pr2 * 0.32;
+          var bw3 = Math.sqrt(Math.max(0, pr2*pr2 - (by3-py2)*(by3-py2))) * 0.95;
+          ctx.beginPath(); ctx.moveTo(px2 - bw3, by3); ctx.lineTo(px2 + bw3, by3); ctx.stroke();
+        }
+
+        // ring
+        if(pl2.ring) {
+          ctx.globalAlpha = pAlpha * 0.45;
+          ctx.save();
+          ctx.translate(px2, py2);
+          ctx.rotate(pl2.tilt);
+          ctx.scale(1, 0.28);
+          ctx.strokeStyle = pl2.c1;
+          ctx.lineWidth = pr2 * 0.22;
+          ctx.beginPath(); ctx.arc(0, 0, pr2 * 1.55, 0, Math.PI*2); ctx.stroke();
+          ctx.strokeStyle = pl2.c2;
+          ctx.lineWidth = pr2 * 0.10;
+          ctx.beginPath(); ctx.arc(0, 0, pr2 * 1.75, 0, Math.PI*2); ctx.stroke();
+          ctx.restore();
+        }
+
+        // sketchy outline
+        ctx.globalAlpha = pAlpha * 0.35;
+        ctx.strokeStyle = pl2.c1;
+        ctx.lineWidth = 1.2;
+        sCirc(px2, py2, pr2);
+      }
+      ctx.globalAlpha = 1;
+      ctx.restore();
     }
 
     // ── sun ───────────────────────────────────────────────────────
@@ -1163,23 +1247,67 @@
     {
       ctx.fillStyle = 'rgb('+gndCol[0]+','+gndCol[1]+','+gndCol[2]+')';
       ctx.fillRect(0, fixedGY, W, H - fixedGY + 4);
-      // ── parallax mountains (far) ──────────────────────────────────
-      var mOff = (camY * 0.12) % W;
-      ctx.save();
-      var mR = Math.round(40*(1-nightMix)+8*nightMix);
-      var mG = Math.round(50*(1-nightMix)+12*nightMix);
-      var mB = Math.round(60*(1-nightMix)+22*nightMix);
-      ctx.fillStyle = 'rgba('+mR+','+mG+','+mB+',0.55)';
-      for(var mi=-1;mi<=2;mi++){
-        var mox = mi*W - mOff%W;
-        ctx.beginPath();
-        ctx.moveTo(mox,H);
-        var mpts=[0,.12,.22,.30,.42,.52,.60,.72,.82,.90,1.0];
-        var mhts=[0.52,0.38,0.55,0.32,0.48,0.25,0.60,0.35,0.50,0.28,0.52];
-        for(var mp=0;mp<mpts.length;mp++) ctx.lineTo(mox+mpts[mp]*W, H-(mhts[mp])*(H*0.45));
-        ctx.lineTo(mox+W,H); ctx.closePath(); ctx.fill();
+
+      // climbH: how far above starting position camera has moved (in pixels)
+      // at start camY ≈ GND so climbH ≈ 0; as player rises, climbH grows
+      var climbH = Math.max(0, GND - camY - H);
+
+      // far mountains sit at the horizon (H*0.82) and barely drift up (5% of climb)
+      var mBaseY  = H * 0.82 - climbH * 0.05;
+      // mid mountains are lower on screen and drift up faster (14%)
+      var mBaseY2 = H * 0.88 - climbH * 0.14;
+
+      // fade both layers out as space takes over
+      var mAlpha = Math.max(0, 1 - spaceMix * 2.2);
+
+      if(mAlpha > 0.01 && mBaseY > -H * 0.7) {
+        // ── parallax mountains layer 1 (far, barely moves, tall) ─────
+        var mOff1 = (camY * 0.04) % W;
+        ctx.save();
+        ctx.globalAlpha = mAlpha;
+        var mR = Math.round(40*(1-nightMix)+8*nightMix);
+        var mG = Math.round(50*(1-nightMix)+12*nightMix);
+        var mB = Math.round(60*(1-nightMix)+22*nightMix);
+        ctx.fillStyle = 'rgba('+mR+','+mG+','+mB+',0.45)';
+        var mpts1=[0,.10,.20,.30,.42,.52,.62,.72,.82,.90,1.0];
+        var mhts1=[0.55,0.38,0.62,0.28,0.52,0.20,0.68,0.32,0.58,0.24,0.55];
+        for(var mi=-1;mi<=2;mi++){
+          var mox1 = mi*W - mOff1%W;
+          ctx.beginPath(); ctx.moveTo(mox1, mBaseY);
+          for(var mp=0;mp<mpts1.length;mp++) ctx.lineTo(mox1+mpts1[mp]*W, mBaseY-mhts1[mp]*(H*0.52));
+          ctx.lineTo(mox1+W, mBaseY); ctx.closePath(); ctx.fill();
+        }
+        // snow caps
+        ctx.fillStyle = 'rgba(220,228,240,'+(0.35*(1-nightMix*0.5)).toFixed(3)+')';
+        for(var mi=-1;mi<=2;mi++){
+          var mox1 = mi*W - mOff1%W;
+          var pk1x = mox1+mpts1[6]*W, pk1y = mBaseY-mhts1[6]*(H*0.52);
+          ctx.beginPath(); ctx.moveTo(pk1x-18, pk1y+14); ctx.lineTo(pk1x, pk1y); ctx.lineTo(pk1x+20, pk1y+12); ctx.closePath(); ctx.fill();
+          var pk2x = mox1+mpts1[2]*W, pk2y = mBaseY-mhts1[2]*(H*0.52);
+          ctx.beginPath(); ctx.moveTo(pk2x-14, pk2y+10); ctx.lineTo(pk2x, pk2y); ctx.lineTo(pk2x+16, pk2y+10); ctx.closePath(); ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+        ctx.restore();
+
+        // ── parallax mountains layer 2 (mid, drifts faster, shorter) ─
+        var mOff2 = (camY * 0.10) % W;
+        ctx.save();
+        ctx.globalAlpha = mAlpha;
+        var mR2 = Math.round(28*(1-nightMix)+6*nightMix);
+        var mG2 = Math.round(36*(1-nightMix)+10*nightMix);
+        var mB2 = Math.round(48*(1-nightMix)+20*nightMix);
+        ctx.fillStyle = 'rgba('+mR2+','+mG2+','+mB2+',0.68)';
+        var mpts2=[0,.08,.18,.28,.38,.50,.60,.70,.80,.90,1.0];
+        var mhts2=[0.28,0.20,0.36,0.16,0.30,0.13,0.38,0.18,0.32,0.15,0.28];
+        for(var mi=-1;mi<=2;mi++){
+          var mox2 = mi*W - mOff2%W;
+          ctx.beginPath(); ctx.moveTo(mox2, mBaseY2);
+          for(var mp=0;mp<mpts2.length;mp++) ctx.lineTo(mox2+mpts2[mp]*W, mBaseY2-mhts2[mp]*(H*0.38));
+          ctx.lineTo(mox2+W, mBaseY2); ctx.closePath(); ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+        ctx.restore();
       }
-      ctx.restore();
     }
     {
       // ── parallax city silhouette (mid) ───────────────────────────
@@ -1836,7 +1964,7 @@
   function spawnP2() {
     p2x=px+60; p2y=py; p2vx=0; p2vy=0;
     p2onG=true; p2jLeft=2; p2dead=false;
-    p2frame=0; p2score=0; p2dir=0; p2stuckTimer=0; p2respawnTimer=0;
+    p2frame=0; p2score=0; p2dir=0; p2stuckTimer=0; p2respawnTimer=0; p2aiShootTimer=0;
   }
 
   function updateP2() {
@@ -1853,20 +1981,24 @@
     if(p2aiTick >= 22) {
       p2aiTick = 0;
 
-      // threat: nearest hazard star
-      var threat=null, minD=110;
-      for(var j=0;j<stars.length;j++){
-        var s=stars[j];
-        var ssx=s.wx+Math.sin(frame*s.spd+s.phase)*s.amp;
-        var dx2=p2x-ssx, dy2=p2y-s.wy;
-        var d=Math.sqrt(dx2*dx2+dy2*dy2);
-        if(d<minD){minD=d; threat={x:ssx,y:s.wy};}
+      // target: nearest visible enemy
+      var aiTarget = null, minED = Infinity;
+      for(var j=0; j<humanEnemies.length; j++){
+        var he2 = humanEnemies[j];
+        var esx = he2.wx, esy = sy(he2.wy);
+        if(esy < -80 || esy > H+80) continue; // off-screen
+        var edx = p2x - esx, edy = p2y - he2.wy;
+        var ed = Math.sqrt(edx*edx + edy*edy);
+        if(ed < minED){ minED = ed; aiTarget = he2; }
       }
-      if(threat) {
-        p2dir = p2x>threat.x ? 1 : -1;
-        if(p2jLeft>0){ p2vy=JVY; p2jLeft--; p2onG=false; playJumpSFX(); }
+
+      if(aiTarget) {
+        // face the enemy and walk toward it if far, hold ground if close
+        var atdx = aiTarget.wx - p2x;
+        p2dir = atdx > 0 ? 1 : -1;
+        if(Math.abs(atdx) < 60) p2dir = 0; // close enough, stop and shoot
       } else {
-        // find best platform above
+        // no enemies — find best platform above
         var bestP=null, bestV=-Infinity;
         for(var i=0;i<plats.length;i++){
           var pl=plats[i];
@@ -1891,6 +2023,28 @@
       // double-jump when falling
       if(!p2onG && p2jLeft>0 && p2vy>5 && Math.random()<0.12){
         p2vy=JVY*0.82; p2jLeft--; playJumpSFX();
+      }
+    }
+
+    // ── AI shooting at enemies ─────────────────────────────────────
+    if(!p2aiShootTimer) p2aiShootTimer = 0;
+    p2aiShootTimer++;
+    if(p2aiShootTimer >= 55 && humanEnemies.length > 0) {
+      // find nearest enemy in range
+      var shootTarget = null, minSD = Infinity;
+      for(var j=0; j<humanEnemies.length; j++){
+        var he3 = humanEnemies[j];
+        if(sy(he3.wy) < -80 || sy(he3.wy) > H+80) continue;
+        var sdx = he3.wx - p2x, sdy = he3.wy - p2y;
+        var sd = Math.sqrt(sdx*sdx + sdy*sdy);
+        if(sd < minSD){ minSD = sd; shootTarget = he3; }
+      }
+      if(shootTarget && minSD < 500) {
+        p2aiShootTimer = 0;
+        var sdx = shootTarget.wx - p2x, sdy = shootTarget.wy - p2y;
+        var sl = Math.sqrt(sdx*sdx + sdy*sdy);
+        var bspd = 14;
+        bullets.push({wx: p2x, wy: p2y - 20, vx: sdx/sl*bspd, vy: sdy/sl*bspd});
       }
     }
 
@@ -3730,6 +3884,18 @@
           if (pennyBank >= cost) { btn.textContent = label; btn.className = 'mkt-btn buy'; }
           else                   { btn.textContent = label; btn.className = 'mkt-btn broke'; }
         }
+        // sell button: visible only when owned, shows refund amount (half cost per level)
+        var sellBtn = btn.nextElementSibling;
+        if (sellBtn && sellBtn.classList.contains('mkt-sell')) {
+          var lv2 = mktLevel(id);
+          if (lv2 > 0) {
+            var refund = Math.ceil(MKT_ITEMS[id].baseCost * lv2 * 0.5);
+            sellBtn.textContent = '🗑️ -' + refund + '¢ back';
+            sellBtn.classList.add('visible');
+          } else {
+            sellBtn.classList.remove('visible');
+          }
+        }
       });
     }
 
@@ -3748,6 +3914,18 @@
           localStorage.setItem(MKT_ITEMS[id].key, mktLevel(id) + 1);
           updateBankDisplay(); refreshMarket();
           if(id==='shield') shieldActive = mktLevel('shield');
+        }
+      }
+      var sellBtn = e.target.closest('.mkt-sell[data-id]');
+      if (sellBtn) {
+        var id = sellBtn.dataset.id;
+        var lv = mktLevel(id);
+        if (lv > 0) {
+          var refund = Math.ceil(MKT_ITEMS[id].baseCost * lv * 0.5);
+          localStorage.setItem(MKT_ITEMS[id].key, 0);
+          pennyBank += refund; localStorage.setItem('penny_bank', pennyBank);
+          updateBankDisplay(); refreshMarket();
+          if(id==='shield') shieldActive = 0;
         }
       }
       if (e.target===mktModal || e.target.id==='mktclose') mktModal.classList.remove('open');
