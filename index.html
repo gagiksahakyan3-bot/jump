@@ -2406,8 +2406,10 @@
       var humanHit = false;
       for(var hbi = bullets.length - 1; hbi >= 0; hbi--) {
         var hb = bullets[hbi];
-        var hbdx = hb.wx - he.wx, hbdy = hb.wy - he.wy;
-        if(hbdx*hbdx + hbdy*hbdy < 20*20) {
+        var hbdx = hb.wx - he.wx;
+        var bodyCenterWY = he.wy - 27; // mid-body in world coords
+        var hbdy = hb.wy - bodyCenterWY;
+        if(Math.abs(hbdx) < 22 && Math.abs(hb.wy - he.wy) < 58) {
           bullets.splice(hbi, 1);
           he.hp--;
           if(he.hp <= 0) {
