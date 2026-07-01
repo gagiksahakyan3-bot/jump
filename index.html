@@ -660,7 +660,7 @@
   // render at half resolution on mobile to cut GPU fill-rate in half
   var SCALE = isMobile ? 0.5 : 1.0;
   // on mobile show a smaller centered game window (82% of viewport)
-  var MOBILE_SHRINK = 0.82;
+  var MOBILE_SHRINK = 0.55;
   function gameDisplayW() { return isMobile ? Math.round(window.innerWidth  * MOBILE_SHRINK) : window.innerWidth; }
   function gameDisplayH() { return isMobile ? Math.round(window.innerHeight * MOBILE_SHRINK) : window.innerHeight; }
   var W = Math.round(gameDisplayW() * SCALE);
