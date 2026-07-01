@@ -9,6 +9,10 @@
     html, body { width: 100%; height: 100%; overflow: hidden; background: #1C1915; }
     body { font-family: 'Chalkboard SE', 'Bradley Hand ITC', 'Comic Sans MS', cursive; }
     canvas { display: block; position: fixed; top: 0; left: 0; width: 100%; height: 100%; }
+    @media (max-width: 768px) and (pointer: coarse) {
+      canvas { border-radius: 14px;
+               box-shadow: 0 0 0 3px rgba(28,25,21,0.55), 0 8px 32px rgba(0,0,0,0.6); }
+    }
     /* ── mobile controller layout ── */
     .ctrl-btn {
       position: fixed;
@@ -655,11 +659,19 @@
                  (navigator.maxTouchPoints > 1 && window.innerWidth < 900);
   // render at half resolution on mobile to cut GPU fill-rate in half
   var SCALE = isMobile ? 0.5 : 1.0;
-  var W = Math.round(window.innerWidth  * SCALE);
-  var H = Math.round(window.innerHeight * SCALE);
+  // on mobile show a smaller centered game window (82% of viewport)
+  var MOBILE_SHRINK = 0.82;
+  function gameDisplayW() { return isMobile ? Math.round(window.innerWidth  * MOBILE_SHRINK) : window.innerWidth; }
+  function gameDisplayH() { return isMobile ? Math.round(window.innerHeight * MOBILE_SHRINK) : window.innerHeight; }
+  var W = Math.round(gameDisplayW() * SCALE);
+  var H = Math.round(gameDisplayH() * SCALE);
   cvs.width  = W; cvs.height = H;
-  cvs.style.width  = window.innerWidth  + 'px';
-  cvs.style.height = window.innerHeight + 'px';
+  cvs.style.width  = gameDisplayW() + 'px';
+  cvs.style.height = gameDisplayH() + 'px';
+  if(isMobile) {
+    cvs.style.top  = Math.round((window.innerHeight - gameDisplayH()) / 2) + 'px';
+    cvs.style.left = Math.round((window.innerWidth  - gameDisplayW()) / 2) + 'px';
+  }
   ctx.imageSmoothingEnabled = false;
   // ── CoD operator skins ────────────────────────────────────────────
   var SKINS = {
@@ -982,9 +994,13 @@
   buildGrain();
 
   window.addEventListener('resize', function(){
-    W = Math.round(window.innerWidth * SCALE); H = Math.round(window.innerHeight * SCALE);
+    W = Math.round(gameDisplayW() * SCALE); H = Math.round(gameDisplayH() * SCALE);
     cvs.width = W; cvs.height = H;
-    cvs.style.width = window.innerWidth + 'px'; cvs.style.height = window.innerHeight + 'px';
+    cvs.style.width = gameDisplayW() + 'px'; cvs.style.height = gameDisplayH() + 'px';
+    if(isMobile) {
+      cvs.style.top  = Math.round((window.innerHeight - gameDisplayH()) / 2) + 'px';
+      cvs.style.left = Math.round((window.innerWidth  - gameDisplayW()) / 2) + 'px';
+    }
     GND = H - 50;
     buildGrain();
     genCityBuildings();
