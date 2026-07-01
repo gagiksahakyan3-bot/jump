@@ -841,8 +841,12 @@
   function sLine(x1,y1,x2,y2,w) {
     if(w==null)w=1.5;
     ctx.beginPath();
-    ctx.moveTo(x1+r(w*.3),y1+r(w*.3));
-    ctx.quadraticCurveTo((x1+x2)*.5+r(w*2),(y1+y2)*.5+r(w*2),x2+r(w*.3),y2+r(w*.3));
+    if(isMobile) {
+      ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); // straight lines on mobile (faster)
+    } else {
+      ctx.moveTo(x1+r(w*.3),y1+r(w*.3));
+      ctx.quadraticCurveTo((x1+x2)*.5+r(w*2),(y1+y2)*.5+r(w*2),x2+r(w*.3),y2+r(w*.3));
+    }
     ctx.stroke();
   }
   function sCirc(cx,cy,rad) {
@@ -978,7 +982,7 @@
   // ── sky star field ────────────────────────────────────────────────
   function buildSkyStars() {
     skyStars = [];
-    for(var i=0;i<180;i++){
+    for(var i=0;i<(isMobile?55:180);i++){
       var warm = Math.random()<0.28;
       var br   = 0.38 + Math.random()*0.62;
       skyStars.push({
@@ -996,6 +1000,7 @@
 
   // ── particle system ──────────────────────────────────────────────────
   function spawnParticles(x, y, type) {
+    if(isMobile && particles.length > 30) return; // cap particles on mobile
     var n, i, p;
     if(type==='land') {
       for(i=0;i<6;i++){
@@ -1167,12 +1172,14 @@
         var pr2 = pl2.r;
         ctx.globalAlpha = pAlpha * 0.82;
 
-        // atmosphere glow
-        var ag = ctx.createRadialGradient(px2, py2, pr2*0.6, px2, py2, pr2*1.9);
-        ag.addColorStop(0, pl2.c1);
-        ag.addColorStop(1, 'rgba(0,0,0,0)');
-        ctx.fillStyle = ag;
-        ctx.beginPath(); ctx.arc(px2, py2, pr2*1.9, 0, Math.PI*2); ctx.fill();
+        // atmosphere glow (skip on mobile)
+        if(!isMobile) {
+          var ag = ctx.createRadialGradient(px2, py2, pr2*0.6, px2, py2, pr2*1.9);
+          ag.addColorStop(0, pl2.c1);
+          ag.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.fillStyle = ag;
+          ctx.beginPath(); ctx.arc(px2, py2, pr2*1.9, 0, Math.PI*2); ctx.fill();
+        }
 
         // planet disc
         var pg = ctx.createRadialGradient(px2 - pr2*0.3, py2 - pr2*0.3, pr2*0.1, px2, py2, pr2);
@@ -1182,14 +1189,16 @@
         ctx.fillStyle = pg;
         ctx.beginPath(); ctx.arc(px2, py2, pr2, 0, Math.PI*2); ctx.fill();
 
-        // surface band lines
-        ctx.globalAlpha = pAlpha * 0.25;
-        ctx.strokeStyle = pl2.c1;
-        ctx.lineWidth = pr2 * 0.12;
-        for(var bi3 = -1; bi3 <= 1; bi3++) {
-          var by3 = py2 + bi3 * pr2 * 0.32;
-          var bw3 = Math.sqrt(Math.max(0, pr2*pr2 - (by3-py2)*(by3-py2))) * 0.95;
-          ctx.beginPath(); ctx.moveTo(px2 - bw3, by3); ctx.lineTo(px2 + bw3, by3); ctx.stroke();
+        // surface band lines (skip on mobile)
+        if(!isMobile) {
+          ctx.globalAlpha = pAlpha * 0.25;
+          ctx.strokeStyle = pl2.c1;
+          ctx.lineWidth = pr2 * 0.12;
+          for(var bi3 = -1; bi3 <= 1; bi3++) {
+            var by3 = py2 + bi3 * pr2 * 0.32;
+            var bw3 = Math.sqrt(Math.max(0, pr2*pr2 - (by3-py2)*(by3-py2))) * 0.95;
+            ctx.beginPath(); ctx.moveTo(px2 - bw3, by3); ctx.lineTo(px2 + bw3, by3); ctx.stroke();
+          }
         }
 
         // ring
@@ -1387,7 +1396,10 @@
           // darker bottom strip
           ctx.fillStyle = 'rgba(0,0,0,0.18)';
           ctx.fillRect(bx, groundY - 6, b.w, 6);
-          // windows
+          // windows (skip on mobile for perf)
+          if(isMobile) { ctx.fillStyle='rgba(255,210,90,0.18)'; ctx.fillRect(bx+4,by+8,b.w-8,b.h-14); }
+          if(!isMobile) var wPadX = Math.max(4, Math.round((b.w - b.wCols * 9) / 2));
+          if(!isMobile) {
           var wPadX = Math.max(4, Math.round((b.w - b.wCols * 9) / 2));
           var wPadY = 10;
           var wSpX = b.wCols > 1 ? (b.w - wPadX * 2 - 7) / (b.wCols - 1) : 0;
@@ -1420,7 +1432,9 @@
               }
             }
           }
+          } // end !isMobile windows block
           // rooftop details
+          if(isMobile) continue; // skip rooftop details on mobile
           for (var di = 0; di < b.details.length; di++) {
             var det = b.details[di];
             var dx2 = bx + det.dx;
@@ -3797,14 +3811,14 @@
     ctx.save();
     // draw enemy bullets first (behind figures)
     ctx.fillStyle = '#FF4040';
-    ctx.shadowColor = '#FF0000'; ctx.shadowBlur = 6;
+    ctx.shadowColor = isMobile ? "transparent" : '#FF0000'; ctx.shadowBlur = isMobile ? 0 : 6;
     for(var i = 0; i < enemyBullets.length; i++) {
       var eb = enemyBullets[i];
       var eby = sy(eb.wy);
       if(eby < -20 || eby > H+20) continue;
       ctx.beginPath(); ctx.arc(eb.wx, eby, 4, 0, Math.PI*2); ctx.fill();
     }
-    ctx.shadowBlur = 0;
+    ctx.shadowBlur = isMobile ? 0 : 0;
 
     // draw human enemy figures
     for(var i = 0; i < humanEnemies.length; i++) {
@@ -3897,8 +3911,8 @@
     if(!bullets.length) return;
     ctx.save();
     ctx.fillStyle = '#FFE040';
-    ctx.shadowColor = '#FF8800';
-    ctx.shadowBlur = 8;
+    ctx.shadowColor = isMobile ? "transparent" : '#FF8800';
+    ctx.shadowBlur = isMobile ? 0 : 8;
     for(var i = 0; i < bullets.length; i++) {
       var b = bullets[i];
       var bsy = sy(b.wy);
@@ -3925,13 +3939,13 @@
       ctx.beginPath(); ctx.arc(psx, psy2, 12, 0, Math.PI*2); ctx.fill();
       // core bolt
       ctx.globalAlpha = lifeF;
-      ctx.shadowColor = '#A020FF'; ctx.shadowBlur = 10;
+      ctx.shadowColor = isMobile ? "transparent" : '#A020FF'; ctx.shadowBlur = isMobile ? 0 : 10;
       ctx.fillStyle = '#E8B0FF';
       ctx.beginPath(); ctx.ellipse(psx, psy2, 7, 3, Math.atan2(pl4.vy, pl4.vx), 0, Math.PI*2); ctx.fill();
       // bright center
       ctx.fillStyle = '#FFFFFF';
       ctx.beginPath(); ctx.ellipse(psx, psy2, 3, 1.5, Math.atan2(pl4.vy, pl4.vx), 0, Math.PI*2); ctx.fill();
-      ctx.shadowBlur = 0;
+      ctx.shadowBlur = isMobile ? 0 : 0;
     }
     ctx.globalAlpha = 1;
     ctx.restore();
@@ -4161,7 +4175,14 @@
   swordKills = mktLevel('sword') * 2;
   bombUsed = false;
 
-  (function loop(){ update(); render(); requestAnimationFrame(loop); })();
+  // On mobile target ~30fps by skipping every other render
+  var _loopFrame = 0;
+  (function loop(){
+    requestAnimationFrame(loop);
+    _loopFrame++;
+    if(isMobile && _loopFrame % 2 === 0) { update(); render(); }
+    else if(!isMobile) { update(); render(); }
+  })();
   </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script>
