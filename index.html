@@ -1302,11 +1302,10 @@
 
     // ── grass strip — fixed at bottom, hidden when player climbs ──
     var gy = sy(GND);
-    var fixedGY = H - 60;
     var nightMix = Math.max(0, Math.min(1, (1-dayness)*1.5));
     {
       ctx.fillStyle = 'rgb('+gndCol[0]+','+gndCol[1]+','+gndCol[2]+')';
-      ctx.fillRect(0, fixedGY, W, H - fixedGY + 4);
+      ctx.fillRect(0, gy, W, H - gy + 4);
 
       // climbH: how far above starting position camera has moved (in pixels)
       // at start camY ≈ GND so climbH ≈ 0; as player rises, climbH grows
