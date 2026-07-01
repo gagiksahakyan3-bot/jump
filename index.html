@@ -3070,8 +3070,8 @@
       var y1=sy(p.wy), y2=sy(p.wy+p.tilt);
       if(Math.min(y1,y2)>H+8 || Math.max(y1,y2)<-8) continue;
 
-      // in space: draw as simple white stick only
-      if (spaceMix >= 1) {
+      // in space: normal platforms become white sticks, but typed platforms keep their identity
+      if (spaceMix >= 1 && (!p.type || p.type === 'normal')) {
         ctx.save();
         ctx.strokeStyle = '#ffffff';
         ctx.lineWidth = 2;
