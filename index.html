@@ -588,6 +588,46 @@
         </div>
         <button class="mkt-btn" data-id="bomb" data-cost="25">25¢</button><button class="mkt-sell" data-id="bomb">🗑️ Sell</button>
       </div>
+      <div class="mkt-item">
+        <span class="mkt-icon">🔫</span>
+        <div class="mkt-info">
+          <div class="mkt-name">Shotgun</div>
+          <div class="mkt-desc">Click to fire 5 spread pellets</div>
+        </div>
+        <button class="mkt-btn" data-id="shotgun" data-cost="8">8¢</button><button class="mkt-sell" data-id="shotgun">🗑️ Sell</button>
+      </div>
+      <div class="mkt-item">
+        <span class="mkt-icon">🎯</span>
+        <div class="mkt-info">
+          <div class="mkt-name">Sniper Rifle</div>
+          <div class="mkt-desc">Fast precise bullet — one-shots enemies</div>
+        </div>
+        <button class="mkt-btn" data-id="sniper" data-cost="12">12¢</button><button class="mkt-sell" data-id="sniper">🗑️ Sell</button>
+      </div>
+      <div class="mkt-item">
+        <span class="mkt-icon">🚀</span>
+        <div class="mkt-info">
+          <div class="mkt-name">Rocket Launcher</div>
+          <div class="mkt-desc">In space: fires rockets with explosion — has base/tube on back</div>
+        </div>
+        <button class="mkt-btn" data-id="rocket" data-cost="18">18¢</button><button class="mkt-sell" data-id="rocket">🗑️ Sell</button>
+      </div>
+      <div class="mkt-item">
+        <span class="mkt-icon">🛡️</span>
+        <div class="mkt-info">
+          <div class="mkt-name">Armor Plate</div>
+          <div class="mkt-desc">Absorbs one lethal hit — destroyed on use, rebuy for 5¢</div>
+        </div>
+        <button class="mkt-btn" data-id="armor" data-cost="5">5¢</button><button class="mkt-sell" data-id="armor">🗑️ Sell</button>
+      </div>
+      <div class="mkt-item">
+        <span class="mkt-icon">⚡</span>
+        <div class="mkt-info">
+          <div class="mkt-name">Plasma Cannon</div>
+          <div class="mkt-desc">Rapid-fire charged bolts that pierce through multiple enemies</div>
+        </div>
+        <button class="mkt-btn" data-id="plasma" data-cost="22">22¢</button><button class="mkt-sell" data-id="plasma">🗑️ Sell</button>
+      </div>
       <button id="mktreset">🗑️ Reset All Purchases</button>
       <button id="mktclose">Close</button>
     </div>
@@ -615,8 +655,18 @@
   'use strict';
   var cvs = document.getElementById('c');
   var ctx  = cvs.getContext('2d');
-  var W = window.innerWidth, H = window.innerHeight;
-  cvs.width = W; cvs.height = H;
+
+  // ── mobile detection & quality tier ──────────────────────────────
+  var isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) ||
+                 (navigator.maxTouchPoints > 1 && window.innerWidth < 900);
+  // render at half resolution on mobile to cut GPU fill-rate in half
+  var SCALE = isMobile ? 0.5 : 1.0;
+  var W = Math.round(window.innerWidth  * SCALE);
+  var H = Math.round(window.innerHeight * SCALE);
+  cvs.width  = W; cvs.height = H;
+  cvs.style.width  = window.innerWidth  + 'px';
+  cvs.style.height = window.innerHeight + 'px';
+  ctx.imageSmoothingEnabled = false;
   // ── CoD operator skins ────────────────────────────────────────────
   var SKINS = {
     // ── Ghost (Task Force 141) — 15 variants ───────────────────────
@@ -819,8 +869,9 @@
   buildGrain();
 
   window.addEventListener('resize', function(){
-    W = window.innerWidth; H = window.innerHeight;
+    W = Math.round(window.innerWidth * SCALE); H = Math.round(window.innerHeight * SCALE);
     cvs.width = W; cvs.height = H;
+    cvs.style.width = window.innerWidth + 'px'; cvs.style.height = window.innerHeight + 'px';
     GND = H - 50;
     buildGrain();
     genCityBuildings();
@@ -1836,12 +1887,20 @@
       var tilt = (Math.random()-.5)*8;
       var depth = GND - topWY;
       var ptype = 'normal';
-      if (depth > 300) {
+      // custom platforms start at 100m (depth ~800px) and ramp up quickly
+      var ptDepthStart = 800; // ~100m
+      if (depth > ptDepthStart) {
+        var ptT = Math.min(1, (depth - ptDepthStart) / 2000); // 0→1 over next 250m
         var pr = Math.random();
-        if      (pr < 0.10) ptype = 'crumble';
-        else if (pr < 0.20) ptype = 'bounce';
-        else if (pr < 0.28) ptype = 'ice';
-        else if (pr < 0.40 && depth > 600) ptype = 'move';
+        // chances ramp from ~30% at 100m to ~90% at 350m+
+        var specialChance = 0.30 + ptT * 0.60;
+        if (pr < specialChance) {
+          var pr2 = Math.random();
+          if      (pr2 < 0.28) ptype = 'crumble';
+          else if (pr2 < 0.52) ptype = 'bounce';
+          else if (pr2 < 0.72) ptype = 'ice';
+          else                  ptype = 'move';
+        }
       }
       plats.push({x1:x1, x2:x1+pw, wy:topWY, tilt:tilt, type:ptype,
         crumbleTimer:0, crumbling:false,
@@ -2140,14 +2199,72 @@
     ctx.strokeStyle='rgba(30,30,28,0.35)'; ctx.lineWidth=0.8;
     sLine(x-8,shldrY+4,x-8,hipY-3,0.15); sLine(x+8,shldrY+4,x+8,hipY-3,0.15);
 
-    // arms (swing opposite legs)
-    var aswg2=-swg2*0.55;
+    // ── gun direction: aim at nearest enemy or face movement dir ────
+    var p2gd = (p2vx >= 0) ? 1 : -1; // default face direction
+    var p2aimAngle = 0; // angle from horizontal, 0 = straight right
+    var p2justShot = p2aiShootTimer < 7;
+    // find nearest visible enemy for aiming
+    var p2aimTarget = null, p2minAD = Infinity;
+    for(var j=0; j<humanEnemies.length; j++){
+      var hea = humanEnemies[j];
+      if(sy(hea.wy) < -80 || sy(hea.wy) > H+80) continue;
+      var adx = hea.wx - p2x, ady = (hea.wy-26) - p2y;
+      var ad = Math.sqrt(adx*adx + ady*ady);
+      if(ad < p2minAD){ p2minAD = ad; p2aimTarget = hea; }
+    }
+    if(p2aimTarget) {
+      p2gd = p2aimTarget.wx > p2x ? 1 : -1;
+      p2aimAngle = Math.atan2((p2aimTarget.wy-26) - (p2y-20), p2aimTarget.wx - p2x);
+    }
+
+    // gun pivot at chest
+    var gpx = x + p2gd*7, gpy = shldrY+10;
+    var gunLen = 28, gunH = 5;
+    var cosA = Math.cos(p2aimAngle), sinA = Math.sin(p2aimAngle);
+    var gTipX = gpx + p2gd*gunLen*cosA, gTipY = gpy + gunLen*Math.abs(sinA)*Math.sign(sinA);
+
+    ctx.save();
+    ctx.translate(gpx, gpy);
+    ctx.rotate(p2gd > 0 ? p2aimAngle : Math.PI - p2aimAngle);
+    // receiver body
+    ctx.fillStyle='#1A1A18'; ctx.strokeStyle='#050504'; ctx.lineWidth=1.1;
+    ctx.fillRect(0, -gunH/2, gunLen*0.58, gunH); ctx.strokeRect(0, -gunH/2, gunLen*0.58, gunH);
+    // barrel
+    ctx.fillStyle='#0C0C0A';
+    ctx.fillRect(gunLen*0.55, -gunH*0.3, gunLen*0.45, gunH*0.55); ctx.strokeRect(gunLen*0.55, -gunH*0.3, gunLen*0.45, gunH*0.55);
+    // stock
+    ctx.fillStyle='#2A2218';
+    ctx.beginPath(); ctx.moveTo(0,-gunH/2); ctx.lineTo(-8,-gunH/2); ctx.lineTo(-10,gunH*0.8); ctx.lineTo(0,gunH/2); ctx.closePath(); ctx.fill(); ctx.stroke();
+    // mag
+    ctx.fillStyle='#141412'; ctx.strokeStyle='#050504'; ctx.lineWidth=0.9;
+    ctx.fillRect(gunLen*0.2, gunH/2, 6, 9); ctx.strokeRect(gunLen*0.2, gunH/2, 6, 9);
+    // iron sight
+    ctx.fillStyle='#303028';
+    ctx.fillRect(gunLen*0.88, -gunH/2-3, 2, 3); ctx.strokeRect(gunLen*0.88, -gunH/2-3, 2, 3);
+    // muzzle flash
+    if(p2justShot) {
+      var fa = (p2aiShootTimer / 7);
+      ctx.globalAlpha = 1 - fa;
+      ctx.fillStyle='#FFE040'; ctx.strokeStyle='rgba(255,120,0,0.7)'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.arc(gunLen+3, 0, 6-fa*3, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle='#FFF8A0';
+      ctx.beginPath(); ctx.arc(gunLen+3, 0, 3-fa*1.5, 0, Math.PI*2); ctx.fill();
+      ctx.globalAlpha=1;
+    }
+    ctx.restore();
+
+    // arms gripping the gun
+    var aswg2 = p2aimTarget ? 0 : -swg2*0.55;
     ctx.lineWidth=4.2; ctx.strokeStyle=bodyC;
-    sLine(x+9+aswg2*0.25,shldrY+7,x+16+aswg2*0.12,shldrY+17-aswg2*0.2,0.5);
-    sLine(x-9-aswg2*0.25,shldrY+7,x-16-aswg2*0.12,shldrY+17+aswg2*0.2,0.5);
+    // front arm holds fore-grip
+    var fa1x = gpx + p2gd*gunLen*0.65*cosA;
+    var fa1y = gpy + gunLen*0.65*Math.abs(sinA)*Math.sign(sinA);
+    sLine(x+p2gd*9, shldrY+7, fa1x, fa1y, 0.5);
+    // rear arm holds stock/pistol grip
+    sLine(x-p2gd*9, shldrY+7, gpx-p2gd*2, gpy+2, 0.5);
     ctx.fillStyle=bodyC; ctx.strokeStyle=outC; ctx.lineWidth=0.9;
-    ctx.beginPath(); ctx.arc(x+16+aswg2*0.12,shldrY+17-aswg2*0.2,3.5,0,Math.PI*2); ctx.fill(); ctx.stroke();
-    ctx.beginPath(); ctx.arc(x-16-aswg2*0.12,shldrY+17+aswg2*0.2,3.5,0,Math.PI*2); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.arc(fa1x, fa1y, 3.5, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.arc(gpx-p2gd*2, gpy+2, 3.5, 0, Math.PI*2); ctx.fill(); ctx.stroke();
 
     // helmet dome
     ctx.fillStyle=hoodC; ctx.strokeStyle=outC; ctx.lineWidth=1.8;
@@ -2220,16 +2337,36 @@
   // ── click-to-shoot ────────────────────────────────────────────────
   cvs.addEventListener('click', function(e) {
     if(dead) return;
-    if(!mktSafe('gun') && !mktSafe('sword') && !mktSafe('bomb')) return;
+    var hasWeapon = mktSafe('gun') || mktSafe('sword') || mktSafe('bomb') ||
+                    mktSafe('shotgun') || mktSafe('sniper') || mktSafe('rocket') || mktSafe('plasma');
+    if(!hasWeapon) return;
     var rect = cvs.getBoundingClientRect();
     var mx = (e.clientX - rect.left) * (W / rect.width);
     var my = (e.clientY - rect.top)  * (H / rect.height);
-    var bx = px, by = py - 20; // bullet origin (player chest)
+    var bx = px, by = py - 20;
     var dx = mx - bx, dy = my - sy(by);
     var len = Math.sqrt(dx*dx + dy*dy);
     if(len < 1) return;
-    var spd = 16;
-    bullets.push({wx: bx, wy: by, vx: dx/len*spd, vy: dy/len*spd});
+    var ndx = dx/len, ndy = dy/len;
+
+    if(mktSafe('plasma')) {
+      // Plasma: fast piercing bolt — fires 3 in quick burst
+      for(var pli=0; pli<3; pli++) {
+        plasmas.push({wx: bx, wy: by + pli*2, vx: ndx*22, vy: ndy*22, life: 55, hitIds: {}});
+      }
+    } else if(mktSafe('rocket') && spaceMix > 0.15) {
+      rockets.push({wx: bx, wy: by, vx: ndx*7, vy: ndy*7, life: 180});
+    } else if(mktSafe('sniper')) {
+      bullets.push({wx: bx, wy: by, vx: ndx*28, vy: ndy*28, dmg: 99});
+    } else if(mktSafe('shotgun')) {
+      for(var si=0; si<5; si++) {
+        var spread = (si - 2) * 0.12;
+        var ang = Math.atan2(ndy, ndx) + spread;
+        bullets.push({wx: bx, wy: by, vx: Math.cos(ang)*14, vy: Math.sin(ang)*14, life: 28});
+      }
+    } else if(mktSafe('gun')) {
+      bullets.push({wx: bx, wy: by, vx: ndx*16, vy: ndy*16});
+    }
   });
 
   // ── button controls ───────────────────────────────────────────────
@@ -2493,7 +2630,7 @@
           popups.push({wx:px, wy:py, life:1.8, text:'REVIVE 2!', col:'#C020E0'});
           continue;
         }
-        spawnParticles(px, sy(py), 'death'); playDeathSFX(); dead=true; return;
+        if(armorActive){ armorActive=false; localStorage.setItem(MKT_ITEMS.armor.key,0); spawnParticles(px,sy(py),'hurt'); popups.push({wx:px,wy:py-20,life:1.5,text:'🛡️ ARMOR BROKEN!',col:'#60A8FF'}); continue; } spawnParticles(px, sy(py), 'death'); playDeathSFX(); dead=true; return;
       }
     }
 
@@ -2501,6 +2638,7 @@
     for(var bi = bullets.length - 1; bi >= 0; bi--) {
       bullets[bi].wy += bullets[bi].vy;
       if(bullets[bi].vx) bullets[bi].wx += bullets[bi].vx;
+      if(bullets[bi].life != null) { bullets[bi].life--; if(bullets[bi].life <= 0) { bullets.splice(bi,1); continue; } }
       var hit = false;
       for(var si = stars.length - 1; si >= 0; si--) {
         var bstar = stars[si];
@@ -2514,6 +2652,64 @@
       var bscx = bullets[bi].wx, bscy = sy(bullets[bi].wy);
       if(hit || bscy < -40 || bscy > H+40 || bscx < -40 || bscx > W+40) bullets.splice(bi, 1);
     }
+    // Rockets: move, explode on enemy hit or timeout
+    for(var ri = rockets.length - 1; ri >= 0; ri--) {
+      var rkt = rockets[ri];
+      rkt.wx += rkt.vx; rkt.wy += rkt.vy;
+      rkt.life--;
+      var rsy = sy(rkt.wy);
+      if(rkt.life <= 0 || rsy < -60 || rsy > H+60) { rockets.splice(ri,1); continue; }
+      var rktHit = false;
+      for(var rhi = humanEnemies.length - 1; rhi >= 0; rhi--) {
+        var rhe = humanEnemies[rhi];
+        var rdx = rkt.wx - rhe.wx, rdy = rkt.wy - rhe.wy;
+        if(Math.abs(rdx) < 40 && Math.abs(rdy) < 60) {
+          var expX = rkt.wx, expY = rkt.wy;
+          for(var rei = humanEnemies.length - 1; rei >= 0; rei--) {
+            var exdx = expX - humanEnemies[rei].wx, exdy = expY - humanEnemies[rei].wy;
+            if(exdx*exdx + exdy*exdy < 80*80) {
+              popups.push({wx:humanEnemies[rei].wx, wy:humanEnemies[rei].wy-10, life:1.2, text:'💥', col:'#FF6020'});
+              humanEnemies.splice(rei, 1);
+            }
+          }
+          spawnParticles(expX, sy(expY), 'bounce');
+          popups.push({wx:expX, wy:expY-10, life:1.5, text:'💥 BOOM!', col:'#FF4010'});
+          score += 100;
+          rockets.splice(ri, 1);
+          rktHit = true;
+          break;
+        }
+      }
+    }
+
+    // Plasma bolts: fast pierce — don't remove on first hit, use hitIds to skip already-hit enemies
+    for(var pli = plasmas.length - 1; pli >= 0; pli--) {
+      var pl3 = plasmas[pli];
+      pl3.wx += pl3.vx; pl3.wy += pl3.vy;
+      pl3.life--;
+      var plsy = sy(pl3.wy);
+      if(pl3.life <= 0 || plsy < -40 || plsy > H+40 || pl3.wx < -40 || pl3.wx > W+40) {
+        plasmas.splice(pli, 1); continue;
+      }
+      for(var phi = humanEnemies.length - 1; phi >= 0; phi--) {
+        var phe = humanEnemies[phi];
+        if(pl3.hitIds[phi]) continue; // already pierced this one
+        var phdx = pl3.wx - phe.wx, phdy = pl3.wy - phe.wy;
+        if(Math.abs(phdx) < 20 && Math.abs(phdy) < 55) {
+          pl3.hitIds[phi] = true;
+          phe.hp -= 2;
+          spawnParticles(phe.wx, sy(phe.wy)-20, 'hurt');
+          if(phe.hp <= 0) {
+            popups.push({wx:phe.wx, wy:phe.wy-10, life:1.3, text:'⚡ ZAP!', col:'#A040FF'});
+            score += 60;
+            humanEnemies.splice(phi, 1);
+          } else {
+            popups.push({wx:phe.wx, wy:phe.wy-10, life:0.8, text:'⚡', col:'#C080FF'});
+          }
+        }
+      }
+    }
+
     // Human enemies: move, shoot, collide with player bullets & player
     for(var hi = humanEnemies.length - 1; hi >= 0; hi--) {
       var he = humanEnemies[hi];
@@ -2565,7 +2761,8 @@
         var hbdy = hb.wy - bodyCenterWY;
         if(Math.abs(hbdx) < 22 && Math.abs(hb.wy - he.wy) < 58) {
           bullets.splice(hbi, 1);
-          he.hp--;
+          var dmg = hb.dmg || 1;
+          he.hp -= dmg;
           if(he.hp <= 0) {
             popups.push({wx:he.wx, wy:he.wy, life:1.5, text:'💀 KILL!', col:'#FF3030'});
             humanEnemies.splice(hi, 1); humanHit = true;
@@ -2593,7 +2790,7 @@
           revive2Used=true; pvy=effectiveJVY()*0.7; py-=60;
           popups.push({wx:px, wy:py, life:1.8, text:'REVIVE 2!', col:'#C020E0'}); continue;
         }
-        spawnParticles(px, sy(py), 'death'); playDeathSFX(); dead=true; return;
+        if(armorActive){ armorActive=false; localStorage.setItem(MKT_ITEMS.armor.key,0); spawnParticles(px,sy(py),'hurt'); popups.push({wx:px,wy:py-20,life:1.5,text:'🛡️ ARMOR BROKEN!',col:'#60A8FF'}); continue; } spawnParticles(px, sy(py), 'death'); playDeathSFX(); dead=true; return;
       }
       // cull off-screen
       if(he.wy > camY + H + 120) { humanEnemies.splice(hi, 1); }
@@ -2621,7 +2818,7 @@
           revive2Used=true; pvy=effectiveJVY()*0.7; py-=60;
           popups.push({wx:px, wy:py, life:1.8, text:'REVIVE 2!', col:'#C020E0'}); continue;
         }
-        spawnParticles(px, sy(py), 'death'); playDeathSFX(); dead=true; return;
+        if(armorActive){ armorActive=false; localStorage.setItem(MKT_ITEMS.armor.key,0); spawnParticles(px,sy(py),'hurt'); popups.push({wx:px,wy:py-20,life:1.5,text:'🛡️ ARMOR BROKEN!',col:'#60A8FF'}); continue; } spawnParticles(px, sy(py), 'death'); playDeathSFX(); dead=true; return;
       }
     }
 
@@ -2672,6 +2869,7 @@
           if(ghostTimer>0) continue;
           if(shieldActive>0){shieldActive--;meteors.splice(mi2,1);continue;}
           if(mktSafe('revive')&&!reviveUsed){reviveUsed=true;pvy=effectiveJVY()*0.7;py-=60;popups.push({wx:px,wy:py,life:1.8,text:'REVIVE!',col:'#D64832'});continue;}
+          if(armorActive){ armorActive=false; localStorage.setItem(MKT_ITEMS.armor.key,0); spawnParticles(px,sy(py),'hurt'); popups.push({wx:px,wy:py-20,life:1.5,text:'🛡️ ARMOR BROKEN!',col:'#60A8FF'}); continue; }
           spawnParticles(px,sy(py),'death'); playDeathSFX(); dead=true; return;
         }
       }
@@ -2707,6 +2905,7 @@
       } else if(mktSafe('revive2') && !revive2Used) {
         revive2Used=true; py=camY+H-60; pvy=effectiveJVY()*0.8;
         popups.push({wx:px, wy:py, life:1.8, text:'REVIVE 2!', col:'#C020E0'});
+      } else if(armorActive) { armorActive=false; localStorage.setItem(MKT_ITEMS.armor.key,0); spawnParticles(px,sy(py),'hurt'); popups.push({wx:px,wy:py-20,life:1.5,text:'🛡️ ARMOR BROKEN!',col:'#60A8FF'}); py=camY+H-80; pvy=effectiveJVY()*0.5;
       } else { playDeathSFX(); dead=true; }
     }
 
@@ -3073,6 +3272,34 @@
     sLine(x-8,shldrY+4,x-8,hipY-2,0.15);
     sLine(x+8,shldrY+4,x+8,hipY-2,0.15);
 
+    // ── armor plate overlay (when active) ────────────────────────
+    if(armorActive && !dead) {
+      var apY = shldrY+2, apH = hipY - shldrY - 4;
+      // glow halo
+      var ag2 = ctx.createRadialGradient(x, apY+apH*0.5, 0, x, apY+apH*0.5, 18);
+      ag2.addColorStop(0,'rgba(80,160,255,0.28)'); ag2.addColorStop(1,'rgba(80,160,255,0)');
+      ctx.fillStyle=ag2; ctx.fillRect(x-20,apY-4,40,apH+8);
+      // plate body
+      ctx.fillStyle='rgba(60,120,200,0.55)'; ctx.strokeStyle='rgba(120,190,255,0.9)'; ctx.lineWidth=1.4;
+      ctx.beginPath();
+      ctx.moveTo(x-9, apY); ctx.lineTo(x+9, apY);
+      ctx.lineTo(x+8, apY+apH); ctx.lineTo(x-8, apY+apH);
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+      // highlight ridge down center
+      ctx.strokeStyle='rgba(180,220,255,0.55)'; ctx.lineWidth=1;
+      sLine(x, apY+2, x, apY+apH-2, 0.2);
+      // horizontal ribbing
+      for(var ri=1;ri<=2;ri++){
+        var ry=apY+apH*ri/3;
+        ctx.strokeStyle='rgba(100,170,255,0.35)'; ctx.lineWidth=0.8;
+        sLine(x-7,ry,x+7,ry,0.15);
+      }
+      // pulsing edge glow
+      var pg2 = 0.5 + 0.5*Math.sin(frame*0.12);
+      ctx.strokeStyle='rgba(140,200,255,'+(0.5+pg2*0.4).toFixed(2)+')'; ctx.lineWidth=1.6;
+      sCirc(x, apY+apH*0.5, 11);
+    }
+
     // ── utility belt ──────────────────────────────────────────────
     if(!dead) {
       ctx.fillStyle='#16160E'; ctx.strokeStyle=outlineCol; ctx.lineWidth=1.1;
@@ -3090,6 +3317,22 @@
       // left mag pouch
       ctx.fillStyle='#0E0C08'; ctx.strokeStyle=outlineCol; ctx.lineWidth=0.85;
       ctx.fillRect(x-15,hipY+2,5,8); ctx.strokeRect(x-15,hipY+2,5,8);
+    }
+
+    // ── rocket launcher on back (space zone) ─────────────────────
+    if(mktSafe('rocket') && spaceMix > 0.15 && !dead) {
+      var rlDir = pvx >= 0 ? 1 : -1;
+      ctx.save();
+      ctx.translate(x - rlDir*6, shldrY+2);
+      ctx.scale(-rlDir, 1); // draw tube facing away from player front
+      ctx.fillStyle='#2A3830'; ctx.strokeStyle='#050504'; ctx.lineWidth=1.1;
+      ctx.beginPath(); ctx.rect(-4,-4,28,8); ctx.fill(); ctx.stroke();
+      ctx.fillStyle='#1A2820';
+      ctx.beginPath(); ctx.rect(22,-5,7,10); ctx.fill(); ctx.stroke();
+      ctx.fillStyle='rgba(200,80,20,0.9)'; ctx.fillRect(20,-4,4,8);
+      ctx.fillStyle='#3A4840'; ctx.strokeStyle='#050504'; ctx.lineWidth=0.7;
+      ctx.fillRect(2,-7,10,3); ctx.strokeRect(2,-7,10,3);
+      ctx.restore();
     }
 
     // UK flag patch (left arm)
@@ -3666,6 +3909,72 @@
     ctx.restore();
   }
 
+  function drawPlasmas() {
+    if(!plasmas.length) return;
+    ctx.save();
+    for(var i = 0; i < plasmas.length; i++) {
+      var pl4 = plasmas[i];
+      var psx = pl4.wx, psy2 = sy(pl4.wy);
+      if(psy2 < -30 || psy2 > H+30) continue;
+      var lifeF = pl4.life / 55;
+      // outer glow
+      ctx.globalAlpha = lifeF * 0.5;
+      var pg3 = ctx.createRadialGradient(psx, psy2, 0, psx, psy2, 12);
+      pg3.addColorStop(0, '#C080FF'); pg3.addColorStop(1, 'rgba(100,0,200,0)');
+      ctx.fillStyle = pg3;
+      ctx.beginPath(); ctx.arc(psx, psy2, 12, 0, Math.PI*2); ctx.fill();
+      // core bolt
+      ctx.globalAlpha = lifeF;
+      ctx.shadowColor = '#A020FF'; ctx.shadowBlur = 10;
+      ctx.fillStyle = '#E8B0FF';
+      ctx.beginPath(); ctx.ellipse(psx, psy2, 7, 3, Math.atan2(pl4.vy, pl4.vx), 0, Math.PI*2); ctx.fill();
+      // bright center
+      ctx.fillStyle = '#FFFFFF';
+      ctx.beginPath(); ctx.ellipse(psx, psy2, 3, 1.5, Math.atan2(pl4.vy, pl4.vx), 0, Math.PI*2); ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  }
+
+  function drawRockets() {
+    if(!rockets.length) return;
+    ctx.save();
+    for(var i = 0; i < rockets.length; i++) {
+      var rkt = rockets[i];
+      var rsx = rkt.wx, rsy = sy(rkt.wy);
+      if(rsy < -40 || rsy > H+40) continue;
+      var ang = Math.atan2(rkt.vy, rkt.vx);
+      ctx.save();
+      ctx.translate(rsx, rsy);
+      ctx.rotate(ang);
+      // body
+      ctx.fillStyle='#C84020'; ctx.strokeStyle='#050504'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.ellipse(0, 0, 10, 4, 0, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+      // nose cone
+      ctx.fillStyle='#E05030';
+      ctx.beginPath(); ctx.moveTo(10,0); ctx.lineTo(16,-3); ctx.lineTo(16,3); ctx.closePath(); ctx.fill();
+      // fins
+      ctx.fillStyle='#802010';
+      ctx.beginPath(); ctx.moveTo(-8,0); ctx.lineTo(-14,-6); ctx.lineTo(-10,0); ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(-8,0); ctx.lineTo(-14,6); ctx.lineTo(-10,0); ctx.closePath(); ctx.fill();
+      // exhaust flame
+      ctx.globalAlpha=0.8;
+      var fg = ctx.createRadialGradient(-12,0,0,-12,0,7);
+      fg.addColorStop(0,'#FFFF80'); fg.addColorStop(0.4,'#FF8020'); fg.addColorStop(1,'rgba(255,60,0,0)');
+      ctx.fillStyle=fg;
+      ctx.beginPath(); ctx.ellipse(-13,0,7,3.5,0,0,Math.PI*2); ctx.fill();
+      ctx.globalAlpha=1;
+      ctx.restore();
+      // smoke trail dots
+      ctx.fillStyle='rgba(180,180,160,0.3)';
+      ctx.beginPath(); ctx.arc(rsx - Math.cos(ang)*18, rsy - Math.sin(ang)*18, 4, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle='rgba(180,180,160,0.15)';
+      ctx.beginPath(); ctx.arc(rsx - Math.cos(ang)*28, rsy - Math.sin(ang)*28, 6, 0, Math.PI*2); ctx.fill();
+    }
+    ctx.restore();
+  }
+
   function render() {
     drawBG();
     drawClouds();
@@ -3678,6 +3987,8 @@
     drawPowerUps();
     drawHumanEnemies();
     drawBullets();
+    drawPlasmas();
+    drawRockets();
     drawStars();
     drawFigure();
     drawP2Figure();
@@ -3752,6 +4063,11 @@
     sword:       { baseCost: 15, key: 'mkt_sword'      },
     gun:         { baseCost: 20, key: 'mkt_gun',        max: 1 },
     bomb:        { baseCost: 25, key: 'mkt_bomb'       },
+    shotgun:     { baseCost: 8,  key: 'mkt_shotgun',    max: 1 },
+    sniper:      { baseCost: 12, key: 'mkt_sniper',     max: 1 },
+    rocket:      { baseCost: 18, key: 'mkt_rocket',     max: 1 },
+    armor:       { baseCost: 5,  key: 'mkt_armor',      max: 1 },
+    plasma:      { baseCost: 22, key: 'mkt_plasma',     max: 1 },
   };
   function mktLevel(id) { return (MKT_ITEMS && MKT_ITEMS[id]) ? +localStorage.getItem(MKT_ITEMS[id].key) || 0 : 0; }
   function mktOwned(id) { return mktLevel(id) > 0; }
@@ -3787,6 +4103,7 @@
 
   // per-run state
   var shieldActive  = 0;
+  var armorActive   = false;
   var ghostTimer    = 0;
   var reviveUsed    = false;
   var revive2Used   = false;
@@ -3794,6 +4111,8 @@
   var swordKills    = 0;
   var bombUsed      = false;
   var bullets       = [];
+  var rockets       = [];
+  var plasmas       = [];
   var gunTimer      = 0;
   var humanEnemies  = [];
   var enemyBullets  = [];
@@ -3807,6 +4126,7 @@
   respawn = function() {
     origRespawn();
     shieldActive = mktLevel('shield');
+    armorActive = mktOwned('armor');
     jLeft = maxJumps();
     ghostTimer = mktOwned('ghost') ? 240 : 0;
     reviveUsed = false;
@@ -3816,6 +4136,7 @@
     swordKills = mktLevel('sword') * 2;
     bombUsed = false;
     bullets = [];
+    rockets = []; plasmas = [];
     gunTimer = 0;
     humanEnemies = [];
     enemyBullets = [];
@@ -3833,6 +4154,7 @@
   };
   // also patch initial spawn
   shieldActive = mktLevel('shield');
+  armorActive = mktOwned('armor');
   jLeft = maxJumps();
   ghostTimer = mktOwned('ghost') ? 240 : 0;
   reviveUsed = false;
@@ -3914,6 +4236,7 @@
           localStorage.setItem(MKT_ITEMS[id].key, mktLevel(id) + 1);
           updateBankDisplay(); refreshMarket();
           if(id==='shield') shieldActive = mktLevel('shield');
+          if(id==='armor') armorActive = true;
         }
       }
       var sellBtn = e.target.closest('.mkt-sell[data-id]');
