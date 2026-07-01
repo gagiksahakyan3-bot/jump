@@ -140,16 +140,10 @@
     }
     .skin-card.active-skin { border-color: rgba(122,56,8,0.6); background: rgba(122,56,8,0.08); }
     .skin-preview {
-      width: 36px; height: 44px; border-radius: 8px;
+      width: 36px; height: 48px; border-radius: 8px;
       position: relative; flex-shrink: 0;
       overflow: hidden;
       border: 1px solid rgba(0,0,0,0.25);
-      display: flex; align-items: flex-end; justify-content: center;
-    }
-    .skin-face {
-      width: 20px; height: 24px; border-radius: 50% 50% 40% 40%;
-      margin-bottom: 2px;
-      border: 1px solid rgba(0,0,0,0.2);
     }
     .skin-info { flex: 1; }
     .skin-name { font-size: 14px; font-weight: bold; color: #1C1915; }
@@ -806,6 +800,114 @@
       helmet:'#2A0848',mask:'#C8A070',socket:'#140424',vest:'#240840',scarf:'#1C0638',rifle:'#200840',pant:'#1A0836',boot:'#100420',stripes:'rgba(200,150,255,0.90)',cheek:'#9A7848',beretCol:'#2A0848',faceCol:'#C8A070',mustCol:'#281408'},
     alejandro_legend:   {name:'Alejandro',subname:'Legend',      icon:'🦅',cost:12,headType:'beret',
       helmet:'#705810',mask:'#C8A070',socket:'#382C08',vest:'#604A08',scarf:'#503808',rifle:'#584408',pant:'#4C3808',boot:'#302808',stripes:'rgba(255,215,0,0.96)',cheek:'#9A7848',beretCol:'#705810',faceCol:'#C8A070',mustCol:'#281408'},
+
+    // ── Roach (Task Force 141) — 8 variants ───────────────────────────
+    roach:              {name:'Roach',subname:'Default',          icon:'🪲',cost:10, headType:'skull',
+      helmet:'#1A2418',mask:'#B8C4A8',socket:'#0A0E08',vest:'#1C2818',scarf:'#141C10',rifle:'#182010',pant:'#141C10',boot:'#0C1008',stripes:'rgba(160,200,120,0.88)',cheek:'#7A8868'},
+    roach_shadow:       {name:'Roach',subname:'Shadow',           icon:'🪲',cost:6,  headType:'skull',
+      helmet:'#0C0C0C',mask:'#989898',socket:'#060606',vest:'#101010',scarf:'#0C0C0C',rifle:'#0E0E0E',pant:'#0C0C0C',boot:'#080808',stripes:'rgba(70,70,70,0.85)',cheek:'#606060'},
+    roach_desert:       {name:'Roach',subname:'Desert',           icon:'🪲',cost:6,  headType:'skull',
+      helmet:'#B89860',mask:'#D8C898',socket:'#3A2C10',vest:'#A88850',scarf:'#907840',rifle:'#887038',pant:'#907848',boot:'#604A28',stripes:'rgba(210,175,90,0.88)',cheek:'#A08858'},
+    roach_arctic:       {name:'Roach',subname:'Arctic',           icon:'🪲',cost:7,  headType:'skull',
+      helmet:'#C8CDD4',mask:'#E4E8EE',socket:'#1C2028',vest:'#B8BDC4',scarf:'#A8ADB4',rifle:'#B0B5BC',pant:'#B8BDC4',boot:'#888D94',stripes:'rgba(190,215,255,0.90)',cheek:'#9098A8'},
+    roach_crimson:      {name:'Roach',subname:'Crimson',          icon:'🪲',cost:7,  headType:'skull',
+      helmet:'#280808',mask:'#C8B8B0',socket:'#140404',vest:'#300A0A',scarf:'#280808',rifle:'#300A0A',pant:'#240808',boot:'#180404',stripes:'rgba(215,25,15,0.90)',cheek:'#8A5050'},
+    roach_orbital:      {name:'Roach',subname:'Orbital',          icon:'🪲',cost:8,  headType:'skull',
+      helmet:'#0C1428',mask:'#B8C8E0',socket:'#060A14',vest:'#101828',scarf:'#0C1220',rifle:'#101828',pant:'#0C1220',boot:'#080C18',stripes:'rgba(70,150,240,0.90)',cheek:'#6888B0'},
+    roach_inferno:      {name:'Roach',subname:'Inferno',          icon:'🪲',cost:9,  headType:'skull',
+      helmet:'#1C0808',mask:'#E0B898',socket:'#0C0404',vest:'#220A08',scarf:'#1A0808',rifle:'#220A08',pant:'#180808',boot:'#0E0404',stripes:'rgba(250,85,15,0.92)',cheek:'#A06040'},
+    roach_gold:         {name:'Roach',subname:'Gold',             icon:'🪲',cost:12, headType:'skull',
+      helmet:'#7A6010',mask:'#E8D890',socket:'#3A2E08',vest:'#887010',scarf:'#785E08',rifle:'#886808',pant:'#705808',boot:'#4A3808',stripes:'rgba(255,205,25,0.96)',cheek:'#C0A850'},
+
+    // ── Gaz (Task Force 141 / SAS) — 8 variants ───────────────────────
+    gaz:                {name:'Gaz',subname:'Default',            icon:'🎖️',cost:10, headType:'cap',
+      helmet:'#202838',mask:'#B8906A',socket:'#080C14',vest:'#283040',scarf:'#202838',rifle:'#202838',pant:'#1C2430',boot:'#101420',stripes:'rgba(70,120,200,0.88)',cheek:'#8870A0',capCol:'#182060',faceCol:'#B8906A',eyeCol:'rgba(60,40,20,0.55)',stubbleCol:'rgba(50,30,10,0.28)'},
+    gaz_urban:          {name:'Gaz',subname:'Urban',              icon:'🎖️',cost:6,  headType:'cap',
+      helmet:'#202020',mask:'#B8906A',socket:'#101010',vest:'#1A1A1A',scarf:'#181818',rifle:'#181818',pant:'#161616',boot:'#0E0E0E',stripes:'rgba(80,80,80,0.78)',cheek:'#404040',capCol:'#202020',faceCol:'#B8906A',eyeCol:'rgba(40,30,20,0.5)',stubbleCol:'rgba(50,35,15,0.26)'},
+    gaz_multicam:       {name:'Gaz',subname:'Multicam',           icon:'🎖️',cost:6,  headType:'cap',
+      helmet:'#384028',mask:'#B8906A',socket:'#181C10',vest:'#303820',scarf:'#282E18',rifle:'#283018',pant:'#282E18',boot:'#181C10',stripes:'rgba(105,130,60,0.82)',cheek:'#507038',capCol:'#2C3820',faceCol:'#B8906A',eyeCol:'rgba(50,35,15,0.5)',stubbleCol:'rgba(50,35,15,0.26)'},
+    gaz_desert:         {name:'Gaz',subname:'Desert',             icon:'🎖️',cost:7,  headType:'cap',
+      helmet:'#B89458',mask:'#B8906A',socket:'#382C10',vest:'#A88448',scarf:'#907438',rifle:'#886C38',pant:'#8A7040',boot:'#5C4828',stripes:'rgba(205,172,85,0.85)',cheek:'#9A7840',capCol:'#A07838',faceCol:'#B8906A',eyeCol:'rgba(55,40,15,0.5)',stubbleCol:'rgba(50,35,15,0.26)'},
+    gaz_arctic:         {name:'Gaz',subname:'Arctic',             icon:'🎖️',cost:7,  headType:'cap',
+      helmet:'#CCD0D4',mask:'#B8906A',socket:'#181C20',vest:'#C0C4C8',scarf:'#B8BCC0',rifle:'#B0B4B8',pant:'#B8BCC0',boot:'#888C90',stripes:'rgba(175,205,255,0.88)',cheek:'#8890A0',capCol:'#C0C8D8',faceCol:'#B8906A',eyeCol:'rgba(50,40,30,0.5)',stubbleCol:'rgba(50,35,15,0.26)'},
+    gaz_navy:           {name:'Gaz',subname:'Navy',               icon:'🎖️',cost:7,  headType:'cap',
+      helmet:'#081228',mask:'#B8906A',socket:'#04090C',vest:'#0A1020',scarf:'#080E1C',rifle:'#0A1020',pant:'#080E1C',boot:'#04080E',stripes:'rgba(95,140,225,0.85)',cheek:'#384868',capCol:'#081228',faceCol:'#B8906A',eyeCol:'rgba(50,40,25,0.5)',stubbleCol:'rgba(50,35,15,0.26)'},
+    gaz_woodland:       {name:'Gaz',subname:'Woodland',           icon:'🎖️',cost:8,  headType:'cap',
+      helmet:'#243418',mask:'#B8906A',socket:'#0E1808',vest:'#1C2C10',scarf:'#182408',rifle:'#1C2C10',pant:'#182408',boot:'#0E1804',stripes:'rgba(85,140,55,0.84)',cheek:'#4A7030',capCol:'#1C2C10',faceCol:'#B8906A',eyeCol:'rgba(50,35,15,0.5)',stubbleCol:'rgba(50,35,15,0.26)'},
+    gaz_gold:           {name:'Gaz',subname:'Gold',               icon:'🎖️',cost:12, headType:'cap',
+      helmet:'#6A5010',mask:'#B8906A',socket:'#302408',vest:'#5A4408',scarf:'#4C3808',rifle:'#544008',pant:'#4A3808',boot:'#302808',stripes:'rgba(255,210,30,0.96)',cheek:'#907840',capCol:'#5A4808',faceCol:'#B8906A',eyeCol:'rgba(55,40,15,0.5)',stubbleCol:'rgba(50,35,15,0.26)'},
+
+    // ── Nikto (KorTac) — 7 variants ───────────────────────────────────
+    nikto:              {name:'Nikto',subname:'Operator',         icon:'☠️',cost:12, headType:'hood',
+      helmet:'#100808',mask:'#100808',socket:'#070404',vest:'#180A0A',scarf:'#120808',rifle:'#180A0A',pant:'#120808',boot:'#090404',stripes:'rgba(180,20,15,0.90)',cheek:'#602020',hoodCol:'#100808',eyeSlitCol:'#1C1010'},
+    nikto_shadow:       {name:'Nikto',subname:'Shadow',           icon:'☠️',cost:6,  headType:'hood',
+      helmet:'#060606',mask:'#060606',socket:'#030303',vest:'#080808',scarf:'#060606',rifle:'#080808',pant:'#060606',boot:'#040404',stripes:'rgba(40,40,40,0.72)',cheek:'#202020',hoodCol:'#080808',eyeSlitCol:'#101010'},
+    nikto_arctic:       {name:'Nikto',subname:'Arctic',           icon:'☠️',cost:7,  headType:'hood',
+      helmet:'#C0C8D0',mask:'#C0C8D0',socket:'#181C20',vest:'#B8C0C8',scarf:'#B0B8C0',rifle:'#A8B0B8',pant:'#B0B8C0',boot:'#888890',stripes:'rgba(180,200,240,0.88)',cheek:'#8090A0',hoodCol:'#C0C8D0',eyeSlitCol:'#D0D8E0'},
+    nikto_inferno:      {name:'Nikto',subname:'Inferno',          icon:'☠️',cost:8,  headType:'hood',
+      helmet:'#1C0808',mask:'#1C0808',socket:'#0C0404',vest:'#220808',scarf:'#1A0606',rifle:'#220808',pant:'#180606',boot:'#0E0404',stripes:'rgba(245,70,10,0.92)',cheek:'#802020',hoodCol:'#200808',eyeSlitCol:'#301010'},
+    nikto_urban:        {name:'Nikto',subname:'Urban',            icon:'☠️',cost:6,  headType:'hood',
+      helmet:'#282828',mask:'#282828',socket:'#101010',vest:'#222222',scarf:'#1C1C1C',rifle:'#202020',pant:'#1A1A1A',boot:'#101010',stripes:'rgba(75,75,75,0.75)',cheek:'#404040',hoodCol:'#282828',eyeSlitCol:'#383838'},
+    nikto_chemical:     {name:'Nikto',subname:'Chemical',         icon:'☠️',cost:8,  headType:'hood',
+      helmet:'#183008',mask:'#183008',socket:'#0C1804',vest:'#142808',scarf:'#102008',rifle:'#142808',pant:'#102008',boot:'#081804',stripes:'rgba(75,215,25,0.90)',cheek:'#307820',hoodCol:'#183008',eyeSlitCol:'#285010'},
+    nikto_gold:         {name:'Nikto',subname:'Gold',             icon:'☠️',cost:12, headType:'hood',
+      helmet:'#604808',mask:'#604808',socket:'#2C2004',vest:'#5A4008',scarf:'#4A3408',rifle:'#503A08',pant:'#443208',boot:'#2C2204',stripes:'rgba(255,205,20,0.96)',cheek:'#907030',hoodCol:'#604808',eyeSlitCol:'#806010'},
+
+    // ── Farah (Urzikstan Liberation Force) — 7 variants ───────────────
+    farah:              {name:'Farah',subname:'Urzikstan',         icon:'🌿',cost:12, headType:'beret',
+      helmet:'#484030',mask:'#C8A878',socket:'#281E10',vest:'#504838',scarf:'#A8B888',rifle:'#403828',pant:'#3A3428',boot:'#201C14',stripes:'rgba(140,175,100,0.88)',cheek:'#9A7A50',beretCol:'#484030',faceCol:'#C8A878',mustCol:'#281408'},
+    farah_shadow:       {name:'Farah',subname:'Shadow',            icon:'🌿',cost:6,  headType:'beret',
+      helmet:'#0A0A0A',mask:'#B89868',socket:'#050505',vest:'#0E0E0E',scarf:'#0A0A0A',rifle:'#0C0C0C',pant:'#0A0A0A',boot:'#060606',stripes:'rgba(55,55,55,0.78)',cheek:'#8A7050',beretCol:'#0A0A0A',faceCol:'#C0A070',mustCol:'#281408'},
+    farah_desert:       {name:'Farah',subname:'Desert',            icon:'🌿',cost:6,  headType:'beret',
+      helmet:'#C0A060',mask:'#D0A870',socket:'#402A10',vest:'#B09050',scarf:'#907840',rifle:'#887038',pant:'#907848',boot:'#604A28',stripes:'rgba(215,178,90,0.88)',cheek:'#9A7850',beretCol:'#B89050',faceCol:'#D0A870',mustCol:'#281408'},
+    farah_woodland:     {name:'Farah',subname:'Woodland',          icon:'🌿',cost:7,  headType:'beret',
+      helmet:'#2A3818',mask:'#C8A878',socket:'#141C0C',vest:'#283418',scarf:'#202C10',rifle:'#243010',pant:'#202C10',boot:'#141C0A',stripes:'rgba(80,135,45,0.84)',cheek:'#9A7A50',beretCol:'#2A3818',faceCol:'#C8A878',mustCol:'#281408'},
+    farah_arctic:       {name:'Farah',subname:'Arctic',            icon:'🌿',cost:7,  headType:'beret',
+      helmet:'#D8DCE0',mask:'#C8A878',socket:'#181C20',vest:'#D0D4D8',scarf:'#C8CCD0',rifle:'#C0C4C8',pant:'#C8CCD0',boot:'#909498',stripes:'rgba(195,218,255,0.90)',cheek:'#9A7A50',beretCol:'#D0D4D8',faceCol:'#C8A878',mustCol:'#281408'},
+    farah_crimson:      {name:'Farah',subname:'Crimson',           icon:'🌿',cost:8,  headType:'beret',
+      helmet:'#480A0A',mask:'#C8A878',socket:'#240404',vest:'#400808',scarf:'#380606',rifle:'#3E0808',pant:'#340606',boot:'#220404',stripes:'rgba(240,215,200,0.90)',cheek:'#9A7A50',beretCol:'#480A0A',faceCol:'#C8A878',mustCol:'#281408'},
+    farah_gold:         {name:'Farah',subname:'Gold',              icon:'🌿',cost:12, headType:'beret',
+      helmet:'#685010',mask:'#C8A878',socket:'#302808',vest:'#5A4408',scarf:'#4C3808',rifle:'#503C08',pant:'#483608',boot:'#2E2408',stripes:'rgba(255,210,30,0.96)',cheek:'#9A7A50',beretCol:'#685010',faceCol:'#C8A878',mustCol:'#281408'},
+
+    // ── Soap MacTavish — unmasked face (MW2 reveal) — 7 variants ─────
+    soap_unmasked:      {name:'Soap',subname:'Unmasked',          icon:'🪒',cost:14, headType:'bare',
+      helmet:'#202838',mask:'#C89868',socket:'#0A1018',vest:'#202838',scarf:'#182030',rifle:'#182030',pant:'#1A2030',boot:'#101420',stripes:'rgba(80,140,200,0.80)',cheek:'#7A6040',hairCol:'#8A6E40',faceCol:'#C89868',eyeCol:'rgba(70,100,160,0.65)',stubbleCol:'rgba(80,60,35,0.30)',streakCol:'#D8CCA0'},
+    soap_unmasked_shadow:{name:'Soap',subname:'Shadow Face',      icon:'🪒',cost:7,  headType:'bare',
+      helmet:'#0C0C0C',mask:'#A07850',socket:'#080808',vest:'#0C0C0C',scarf:'#0A0A0A',rifle:'#0A0A0A',pant:'#080808',boot:'#060606',stripes:'rgba(40,40,40,0.70)',cheek:'#604830',hairCol:'#0C0C0C',faceCol:'#A07850',eyeCol:'rgba(30,30,30,0.6)',stubbleCol:'rgba(30,20,10,0.30)',streakCol:null},
+    soap_unmasked_desert:{name:'Soap',subname:'Desert Face',      icon:'🪒',cost:7,  headType:'bare',
+      helmet:'#786040',mask:'#C89868',socket:'#3A2810',vest:'#706040',scarf:'#585038',rifle:'#605840',pant:'#585040',boot:'#382C18',stripes:'rgba(200,165,80,0.84)',cheek:'#887048',hairCol:'#7A5E30',faceCol:'#C89868',eyeCol:'rgba(70,90,50,0.60)',stubbleCol:'rgba(80,58,30,0.30)',streakCol:'#C0A870'},
+    soap_unmasked_arctic:{name:'Soap',subname:'Arctic Face',      icon:'🪒',cost:8,  headType:'bare',
+      helmet:'#C0C8D0',mask:'#D0B890',socket:'#1C2028',vest:'#B8C0C8',scarf:'#B0B8C0',rifle:'#A8B0B8',pant:'#B0B8C0',boot:'#888D94',stripes:'rgba(190,215,255,0.90)',cheek:'#908070',hairCol:'#D0C8A0',faceCol:'#D0B890',eyeCol:'rgba(80,110,160,0.70)',stubbleCol:'rgba(70,52,30,0.25)',streakCol:'#F0ECDC'},
+    soap_unmasked_orbital:{name:'Soap',subname:'Orbital Face',    icon:'🪒',cost:8,  headType:'bare',
+      helmet:'#101830',mask:'#C0C8E0',socket:'#080C18',vest:'#101830',scarf:'#0C1428',rifle:'#101830',pant:'#0C1428',boot:'#080C18',stripes:'rgba(80,160,255,0.88)',cheek:'#8090A8',hairCol:'#101830',faceCol:'#C0C8E0',eyeCol:'rgba(90,140,220,0.70)',stubbleCol:'rgba(40,50,80,0.28)',streakCol:'#8090C0'},
+    soap_unmasked_crimson:{name:'Soap',subname:'Crimson Face',    icon:'🪒',cost:9,  headType:'bare',
+      helmet:'#280808',mask:'#C89868',socket:'#100404',vest:'#300A0A',scarf:'#280808',rifle:'#300A0A',pant:'#240808',boot:'#180404',stripes:'rgba(220,20,20,0.88)',cheek:'#7A6040',hairCol:'#380A0A',faceCol:'#C89868',eyeCol:'rgba(140,20,20,0.60)',stubbleCol:'rgba(80,30,30,0.30)',streakCol:'#C04040'},
+    soap_unmasked_gold:  {name:'Soap',subname:'Gold Face',        icon:'🪒',cost:12, headType:'bare',
+      helmet:'#7A6010',mask:'#C89868',socket:'#3A2E08',vest:'#887010',scarf:'#786008',rifle:'#886808',pant:'#705808',boot:'#4A3808',stripes:'rgba(255,205,25,0.96)',cheek:'#7A6040',hairCol:'#9A7820',faceCol:'#C89868',eyeCol:'rgba(90,70,20,0.60)',stubbleCol:'rgba(80,58,20,0.30)',streakCol:'#F0C840'},
+
+    // ── Ghost MP-O (all-black tactical) ───────────────────────────────
+    ghost_mpo:          {name:'Ghost',subname:'MP-O',             icon:'💀',cost:15, headType:'skull',
+      helmet:'#060606',mask:'#141414',socket:'#020202',vest:'#080808',scarf:'#060606',rifle:'#080808',pant:'#060606',boot:'#040404',stripes:'rgba(30,30,30,0.95)',cheek:'#202020'},
+
+    // ── Farah Keffiyeh (MW2019 signature look) ────────────────────────
+    farah_keffiyeh:     {name:'Farah',subname:'Keffiyeh',         icon:'🌿',cost:10, headType:'beret',
+      helmet:'#E8E0C8',mask:'#C8A878',socket:'#281E10',vest:'#483C28',scarf:'#D0C8A0',rifle:'#404030',pant:'#383020',boot:'#201C10',stripes:'rgba(210,200,160,0.90)',cheek:'#9A7A50',beretCol:'#D8D0A8',faceCol:'#C8A878',mustCol:'#281408'},
+
+    // ── Horangi (KorTac) — 7 variants ─────────────────────────────────
+    horangi:            {name:'Horangi',subname:'Tiger',           icon:'🐯',cost:12, headType:'hood',
+      helmet:'#281808',mask:'#281808',socket:'#140C04',vest:'#301E0A',scarf:'#281808',rifle:'#301E0A',pant:'#281808',boot:'#180E04',stripes:'rgba(220,120,20,0.90)',cheek:'#804020',hoodCol:'#301808',eyeSlitCol:'#3C2010'},
+    horangi_shadow:     {name:'Horangi',subname:'Shadow',          icon:'🐯',cost:6,  headType:'hood',
+      helmet:'#080808',mask:'#080808',socket:'#040404',vest:'#0C0C0C',scarf:'#0A0A0A',rifle:'#0C0C0C',pant:'#0A0A0A',boot:'#060606',stripes:'rgba(45,45,45,0.72)',cheek:'#282828',hoodCol:'#0A0A0A',eyeSlitCol:'#161616'},
+    horangi_arctic:     {name:'Horangi',subname:'Arctic',          icon:'🐯',cost:7,  headType:'hood',
+      helmet:'#C4C8CC',mask:'#C4C8CC',socket:'#181C20',vest:'#B8BCC0',scarf:'#B0B4B8',rifle:'#A8ACB0',pant:'#B0B4B8',boot:'#888C90',stripes:'rgba(185,210,255,0.88)',cheek:'#808890',hoodCol:'#C4C8CC',eyeSlitCol:'#D4D8DC'},
+    horangi_urban:      {name:'Horangi',subname:'Urban',           icon:'🐯',cost:6,  headType:'hood',
+      helmet:'#1E1E1E',mask:'#1E1E1E',socket:'#0E0E0E',vest:'#181818',scarf:'#141414',rifle:'#181818',pant:'#141414',boot:'#0C0C0C',stripes:'rgba(72,72,72,0.76)',cheek:'#383838',hoodCol:'#1E1E1E',eyeSlitCol:'#2C2C2C'},
+    horangi_inferno:    {name:'Horangi',subname:'Inferno',         icon:'🐯',cost:8,  headType:'hood',
+      helmet:'#200808',mask:'#200808',socket:'#100404',vest:'#280A0A',scarf:'#200808',rifle:'#280A0A',pant:'#1C0808',boot:'#100404',stripes:'rgba(250,80,15,0.92)',cheek:'#802020',hoodCol:'#240808',eyeSlitCol:'#341010'},
+    horangi_jungle:     {name:'Horangi',subname:'Jungle',          icon:'🐯',cost:8,  headType:'hood',
+      helmet:'#1C3010',mask:'#1C3010',socket:'#0E1808',vest:'#182808',scarf:'#142008',rifle:'#182808',pant:'#142008',boot:'#0C1804',stripes:'rgba(65,165,45,0.86)',cheek:'#3A7028',hoodCol:'#1C3010',eyeSlitCol:'#2C4818'},
+    horangi_gold:       {name:'Horangi',subname:'Gold',            icon:'🐯',cost:12, headType:'hood',
+      helmet:'#5A4008',mask:'#5A4008',socket:'#2A1E04',vest:'#503808',scarf:'#443008',rifle:'#4A3408',pant:'#3E2E08',boot:'#281E04',stripes:'rgba(255,205,20,0.96)',cheek:'#806020',hoodCol:'#5A4008',eyeSlitCol:'#7A5810'},
   };
 
   var SKIN_GROUPS = [
@@ -815,6 +917,13 @@
     {label:'🪒 Soap',      ids:['soap','soap_urban','soap_highland','soap_blackout','soap_orbital','soap_crimson','soap_ghost_honor','soap_jungle','soap_neon_strike','soap_coyote']},
     {label:'⚔️ Graves',    ids:['graves','graves_shadow','graves_executive','graves_inferno','graves_mercury','graves_charcoal','graves_arctic_wolf','graves_vanguard','graves_phantom','graves_titan']},
     {label:'🦅 Alejandro', ids:['alejandro','alejandro_shadow','alejandro_arctic','alejandro_crimson','alejandro_navy','alejandro_jungle','alejandro_violet','alejandro_legend']},
+    {label:'🪲 Roach',     ids:['roach','roach_shadow','roach_desert','roach_arctic','roach_crimson','roach_orbital','roach_inferno','roach_gold']},
+    {label:'🎖️ Gaz',       ids:['gaz','gaz_urban','gaz_multicam','gaz_desert','gaz_arctic','gaz_navy','gaz_woodland','gaz_gold']},
+    {label:'☠️ Nikto',     ids:['nikto','nikto_shadow','nikto_arctic','nikto_inferno','nikto_urban','nikto_chemical','nikto_gold']},
+    {label:'🌿 Farah',     ids:['farah','farah_shadow','farah_desert','farah_woodland','farah_arctic','farah_crimson','farah_gold','farah_keffiyeh']},
+    {label:'🐯 Horangi',   ids:['horangi','horangi_shadow','horangi_arctic','horangi_urban','horangi_inferno','horangi_jungle','horangi_gold']},
+    {label:'🪒 Soap Face', ids:['soap_unmasked','soap_unmasked_shadow','soap_unmasked_desert','soap_unmasked_arctic','soap_unmasked_orbital','soap_unmasked_crimson','soap_unmasked_gold']},
+    {label:'💀 Ghost MP-O',ids:['ghost_mpo']},
   ];
 
   var currentSkin = localStorage.getItem('current_skin') || 'ghost';
@@ -3547,6 +3656,87 @@
         sLine(x-6+eyeDir,headY+10,x+6+eyeDir,headY+10,0.1);
       }
 
+    } else if(sk.headType==='bare') {
+      // ── bare face operator (Alex / Soap unmasked) ─────────────────
+      ctx.fillStyle=dead?'#7A6040':sk.faceCol; ctx.strokeStyle=outlineCol; ctx.lineWidth=1.4;
+      ctx.beginPath(); ctx.ellipse(x,headY+2,9.5,11.5,0,0,Math.PI*2); ctx.fill(); ctx.stroke();
+      // short hair (top half)
+      ctx.fillStyle=dead?'#2A2010':sk.hairCol; ctx.strokeStyle=outlineCol; ctx.lineWidth=1.2;
+      ctx.beginPath(); ctx.ellipse(x,headY-6,9.5,7,0,Math.PI,0); ctx.fill(); ctx.stroke();
+      // side hair patches
+      ctx.fillStyle=dead?'#2A2010':sk.hairCol;
+      ctx.beginPath(); ctx.ellipse(x-8,headY-2,3,6,0,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(x+8,headY-2,3,6,0,0,Math.PI*2); ctx.fill();
+      // silver streak highlight
+      if(!dead && sk.streakCol) {
+        ctx.fillStyle=sk.streakCol;
+        ctx.beginPath(); ctx.ellipse(x-3,headY-11,1.5,5,0.2,0,Math.PI*2); ctx.fill();
+      }
+      if(dead){
+        ctx.strokeStyle='rgba(80,60,30,0.7)'; ctx.lineWidth=2.0;
+        sLine(x-5,headY+1,x-1,headY+5,0.2); sLine(x-5,headY+5,x-1,headY+1,0.2);
+        sLine(x+1,headY+1,x+5,headY+5,0.2); sLine(x+1,headY+5,x+5,headY+1,0.2);
+      } else {
+        // eyes
+        ctx.fillStyle='#1A1208';
+        ctx.beginPath(); ctx.ellipse(x-3+eyeDir,headY,2.5,2.2,0,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(x+3+eyeDir,headY,2.5,2.2,0,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle=sk.eyeCol||'rgba(80,110,160,0.6)';
+        ctx.beginPath(); ctx.arc(x-3+eyeDir,headY-0.3,1.0,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(x+3+eyeDir,headY-0.3,1.0,0,Math.PI*2); ctx.fill();
+        // nose
+        ctx.fillStyle='rgba(0,0,0,0.15)';
+        ctx.beginPath(); ctx.moveTo(x+eyeDir,headY+4); ctx.lineTo(x-2+eyeDir,headY+6); ctx.lineTo(x+2+eyeDir,headY+6); ctx.closePath(); ctx.fill();
+        // stubble
+        ctx.fillStyle=sk.stubbleCol||'rgba(80,60,40,0.28)';
+        ctx.beginPath(); ctx.ellipse(x,headY+8,7,4,0,0,Math.PI*2); ctx.fill();
+        // cheek scar
+        ctx.strokeStyle='rgba(160,100,80,0.55)'; ctx.lineWidth=1.0;
+        sLine(x+4,headY-1,x+7,headY+4,0.15);
+      }
+
+    } else if(sk.headType==='cap') {
+      // ── Gaz: baseball cap + visible face ─────────────────────────
+      // face
+      ctx.fillStyle=dead?'#7A6040':sk.faceCol; ctx.strokeStyle=outlineCol; ctx.lineWidth=1.4;
+      ctx.beginPath(); ctx.ellipse(x,headY+2,9.5,11.5,0,0,Math.PI*2); ctx.fill(); ctx.stroke();
+      // cap body
+      ctx.fillStyle=dead?'#2A2820':sk.capCol; ctx.strokeStyle=outlineCol; ctx.lineWidth=1.6;
+      ctx.beginPath(); ctx.ellipse(x,headY-7,12,7,0,Math.PI,0); ctx.fill(); ctx.stroke();
+      // cap brim (angled forward)
+      ctx.beginPath();
+      ctx.moveTo(x-13,headY-1); ctx.lineTo(x+16,headY-1);
+      ctx.quadraticCurveTo(x+18,headY+1,x+15,headY+3);
+      ctx.lineTo(x-13,headY+3);
+      ctx.quadraticCurveTo(x-14,headY+1,x-13,headY-1);
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+      // UK flag on cap front
+      if(!dead){
+        ctx.fillStyle='#0A1A7A'; ctx.strokeStyle=outlineCol; ctx.lineWidth=0.6;
+        ctx.fillRect(x-8,headY-12,11,7); ctx.strokeRect(x-8,headY-12,11,7);
+        ctx.strokeStyle='#CC0000'; ctx.lineWidth=0.8;
+        sLine(x-8,headY-12,x+3,headY-5,0.1); sLine(x-8,headY-5,x+3,headY-12,0.1);
+        ctx.strokeStyle='#EEEEEE'; ctx.lineWidth=0.7;
+        sLine(x-2.5,headY-12,x-2.5,headY-5,0.1); sLine(x-8,headY-8.5,x+3,headY-8.5,0.1);
+        // eyes
+        ctx.fillStyle='#1A1208';
+        ctx.beginPath(); ctx.ellipse(x-3+eyeDir,headY,2.5,2.2,0,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(x+3+eyeDir,headY,2.5,2.2,0,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle=sk.eyeCol||'rgba(70,50,30,0.5)';
+        ctx.beginPath(); ctx.arc(x-3+eyeDir,headY-0.3,0.9,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(x+3+eyeDir,headY-0.3,0.9,0,Math.PI*2); ctx.fill();
+        // nose
+        ctx.fillStyle='rgba(0,0,0,0.15)';
+        ctx.beginPath(); ctx.moveTo(x+eyeDir,headY+4); ctx.lineTo(x-2+eyeDir,headY+6); ctx.lineTo(x+2+eyeDir,headY+6); ctx.closePath(); ctx.fill();
+        // stubble
+        ctx.fillStyle=sk.stubbleCol||'rgba(50,35,15,0.25)';
+        ctx.beginPath(); ctx.ellipse(x,headY+8,7,4,0,0,Math.PI*2); ctx.fill();
+      } else {
+        ctx.strokeStyle='rgba(80,60,30,0.7)'; ctx.lineWidth=2.0;
+        sLine(x-5,headY+1,x-1,headY+5,0.2); sLine(x-5,headY+5,x-1,headY+1,0.2);
+        sLine(x+1,headY+1,x+5,headY+5,0.2); sLine(x+1,headY+5,x+5,headY+1,0.2);
+      }
+
     } else if(sk.headType==='mohawk') {
       // ── Soap: mohawk + blue face paint ───────────────────────────
       // head
@@ -4301,10 +4491,58 @@
       else if (owns)              { btnClass='skin-action equip';    btnText='Equip'; }
       else if (pennyBank>=s.cost) { btnClass='skin-action buy';      btnText=s.cost+'¢'; }
       else                        { btnClass='skin-action broke';    btnText=s.cost+'¢'; }
-      var previewMask = s.headType==='hood' ? s.hoodCol||s.helmet : s.mask;
+
+      var headHTML;
+      if (s.headType === 'bare') {
+        // short hair top, face below, stubble at chin
+        headHTML =
+          '<div style="position:absolute;inset:0;background:'+s.faceCol+';border-radius:8px 8px 0 0"></div>' +
+          '<div style="position:absolute;top:0;left:0;right:0;height:40%;background:'+s.hairCol+';border-radius:8px 8px 40% 40%"></div>' +
+          (s.streakCol ? '<div style="position:absolute;top:2px;left:28%;width:5px;height:45%;background:'+s.streakCol+';border-radius:3px;opacity:0.85"></div>' : '') +
+          '<div style="position:absolute;top:32%;left:20%;width:7px;height:5px;background:'+(s.eyeCol||'rgba(60,90,150,0.7)')+';border-radius:50%"></div>' +
+          '<div style="position:absolute;top:32%;right:20%;width:7px;height:5px;background:'+(s.eyeCol||'rgba(60,90,150,0.7)')+';border-radius:50%"></div>' +
+          '<div style="position:absolute;bottom:12%;left:20%;right:20%;height:3px;background:'+(s.stubbleCol||'rgba(80,60,40,0.35)')+';border-radius:2px"></div>';
+      } else if (s.headType === 'cap') {
+        // baseball cap top, face below
+        headHTML =
+          '<div style="position:absolute;inset:0;background:'+s.faceCol+';border-radius:8px 8px 0 0"></div>' +
+          '<div style="position:absolute;top:0;left:0;right:0;height:48%;background:'+s.capCol+';border-radius:8px 8px 0 0"></div>' +
+          '<div style="position:absolute;top:42%;left:-3px;right:-3px;height:6px;background:'+s.capCol+';border-radius:2px"></div>' +
+          '<div style="position:absolute;top:5%;left:8%;width:14px;height:9px;background:#0A1A7A;border-radius:1px"></div>' +
+          '<div style="position:absolute;top:32%;left:18%;width:7px;height:5px;background:'+(s.eyeCol||'rgba(60,40,20,0.7)')+';border-radius:50%"></div>' +
+          '<div style="position:absolute;top:32%;right:18%;width:7px;height:5px;background:'+(s.eyeCol||'rgba(60,40,20,0.7)')+';border-radius:50%"></div>';
+      } else if (s.headType === 'hood') {
+        // full balaclava — eye slit across center
+        headHTML =
+          '<div style="position:absolute;inset:0;background:'+s.hoodCol+';border-radius:8px 8px 0 0"></div>' +
+          '<div style="position:absolute;top:50%;left:15%;right:15%;height:4px;margin-top:-2px;background:'+s.eyeSlitCol+';border-radius:2px"></div>';
+      } else if (s.headType === 'skull') {
+        // skull balaclava — mask color oval, two dark eye sockets
+        headHTML =
+          '<div style="position:absolute;inset:0;background:'+s.helmet+';border-radius:8px 8px 0 0"></div>' +
+          '<div style="position:absolute;top:20%;left:12%;right:12%;bottom:15%;background:'+s.mask+';border-radius:50% 50% 40% 40%"></div>' +
+          '<div style="position:absolute;top:32%;left:22%;width:7px;height:5px;background:'+s.socket+';border-radius:50%"></div>' +
+          '<div style="position:absolute;top:32%;right:22%;width:7px;height:5px;background:'+s.socket+';border-radius:50%"></div>';
+      } else if (s.headType === 'beret') {
+        // beret on top, face below
+        headHTML =
+          '<div style="position:absolute;top:0;left:0;right:0;height:45%;background:'+s.beretCol+';border-radius:8px 8px 0 0"></div>' +
+          '<div style="position:absolute;top:30%;left:12%;right:12%;bottom:10%;background:'+(s.faceCol||s.mask)+';border-radius:40% 40% 45% 45%"></div>' +
+          '<div style="position:absolute;bottom:18%;left:22%;right:22%;height:3px;background:'+s.mustCol+';border-radius:2px;opacity:0.7"></div>';
+      } else if (s.headType === 'mohawk') {
+        // face with mohawk strip on top
+        headHTML =
+          '<div style="position:absolute;top:20%;left:12%;right:12%;bottom:10%;background:'+(s.faceCol||s.mask)+';border-radius:40% 40% 45% 45%"></div>' +
+          '<div style="position:absolute;top:0;left:42%;right:42%;height:40%;background:'+s.hairCol+';border-radius:3px 3px 0 0"></div>';
+      } else {
+        headHTML = '<div style="position:absolute;inset:0;background:'+s.helmet+'"></div>';
+      }
+
       return '<div class="skin-card' + (isEq?' active-skin':'') + '">' +
-        '<div class="skin-preview" style="background:'+s.helmet+'">' +
-          '<div class="skin-face" style="background:'+previewMask+'"></div>' +
+        '<div class="skin-preview" style="background:'+s.vest+'">' +
+          '<div style="position:absolute;inset:0;bottom:40%">' + headHTML + '</div>' +
+          '<div style="position:absolute;bottom:0;left:0;right:0;height:42%;background:'+s.vest+';border-radius:0 0 8px 8px;border-top:2px solid rgba(0,0,0,0.18)"></div>' +
+          '<div style="position:absolute;bottom:0;left:0;right:0;height:18%;background:'+s.pant+';border-radius:0 0 8px 8px"></div>' +
         '</div>' +
         '<div class="skin-info">' +
           '<div class="skin-name">'+s.name+' — '+s.subname+'</div>' +
