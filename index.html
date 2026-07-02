@@ -369,6 +369,26 @@
     }
     #enemybtn.active { background: rgba(180,40,20,0.85); border-color: rgba(255,120,60,0.9); }
     #enemybtn:active { transform: scale(0.93); }
+    #moneybtn {
+      position: fixed;
+      top: 322px; left: 10px;
+      transform: none;
+      width: min(15vw,72px); height: min(15vw,72px);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(180,150,20,0.55);
+      border: 2.5px solid rgba(230,195,50,0.65);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.28);
+      backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+      font: bold min(5.5vw,24px) 'Chalkboard SE','Comic Sans MS',cursive;
+      color: #FFF8F0;
+      cursor: pointer;
+      user-select: none; -webkit-user-select: none;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      z-index: 10;
+    }
+    #moneybtn:active { transform: scale(0.93); }
   </style>
 </head>
 <body>
@@ -663,6 +683,7 @@
   </div>
   <button id="p2btn" title="Add AI player">🤖</button>
   <button id="enemybtn" title="Toggle enemies">👤</button>
+  <button id="moneybtn" title="Test: unlimited money">💰</button>
   <div id="jumpctrl">
     <span>↑</span>
     <button class="jbtn" id="bjdn">−</button>
@@ -1051,7 +1072,7 @@
   var meteors = [], topMeteorWY = 0;
   // ── sputniks: enterable satellite, one every 1000m climbed ─────────
   var sputniks = [], topSputnikWY = 0;
-  var SPUTNIK_REPEAT_PX = 8000; // 1000 meters (8px/m)
+  var SPUTNIK_REPEAT_PX = 4000; // 500 meters (8px/m)
   var nearSputnik = null; // sputnik currently in range — player enters by pressing E
   // ── zone system ───────────────────────────────────────────────────
   var ZONES = [
@@ -2743,6 +2764,11 @@
     this.textContent = enemiesEnabled ? '👤' : '🚫';
     if(!enemiesEnabled) { humanEnemies=[]; enemyBullets=[]; }
   });
+  document.getElementById('moneybtn').addEventListener('click', function(){
+    pennyBank += 999999;
+    localStorage.setItem('penny_bank', pennyBank);
+    updateBankDisplay();
+  });
   document.getElementById('bjump').addEventListener('mousedown',  function(e){e.preventDefault(); doJump();});
   document.getElementById('bjump').addEventListener('touchstart', function(e){e.preventDefault(); doJump();},{passive:false});
 
@@ -2804,6 +2830,10 @@
     if(mktSafe('glide') && !onG && pvy > 0 && (K[' '] || K['ArrowUp'] || K['w'] || K['W'])) {
       grav *= 0.30;
       pvy = Math.min(pvy, 2.5);
+    }
+    // fast-fall: hold S/ArrowDown while airborne to drop faster
+    if(!onG && (K['s'] || K['S'] || K['ArrowDown'])) {
+      grav *= 2.2;
     }
     pvy += grav;
     py  += pvy;
