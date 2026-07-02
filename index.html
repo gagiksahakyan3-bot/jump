@@ -703,12 +703,14 @@
                  (navigator.maxTouchPoints > 1 && window.innerWidth < 900);
   // render at half resolution on mobile to cut GPU fill-rate in half
   var SCALE = isMobile ? 0.5 : 1.0;
-  // on mobile show a smaller centered game window (82% of viewport)
-  var MOBILE_SHRINK = 0.60;
+  // mobile game window now fills the whole viewport (fullscreen, no letterboxing)
+  var MOBILE_SHRINK = 1.0;
+  // show more of the world on mobile — camera pulled further away
+  var MOBILE_ZOOM_OUT = 1.5;
   function gameDisplayW() { return isMobile ? Math.round(window.innerWidth  * MOBILE_SHRINK) : window.innerWidth; }
   function gameDisplayH() { return isMobile ? Math.round(window.innerHeight * MOBILE_SHRINK) : window.innerHeight; }
-  var W = Math.round(gameDisplayW() * SCALE);
-  var H = Math.round(gameDisplayH() * SCALE);
+  var W = Math.round(gameDisplayW() * SCALE * (isMobile ? MOBILE_ZOOM_OUT : 1));
+  var H = Math.round(gameDisplayH() * SCALE * (isMobile ? MOBILE_ZOOM_OUT : 1));
   cvs.width  = W; cvs.height = H;
   cvs.style.width  = gameDisplayW() + 'px';
   cvs.style.height = gameDisplayH() + 'px';
@@ -1038,7 +1040,8 @@
   buildGrain();
 
   window.addEventListener('resize', function(){
-    W = Math.round(gameDisplayW() * SCALE); H = Math.round(gameDisplayH() * SCALE);
+    W = Math.round(gameDisplayW() * SCALE * (isMobile ? MOBILE_ZOOM_OUT : 1));
+    H = Math.round(gameDisplayH() * SCALE * (isMobile ? MOBILE_ZOOM_OUT : 1));
     cvs.width = W; cvs.height = H;
     cvs.style.width = gameDisplayW() + 'px'; cvs.style.height = gameDisplayH() + 'px';
     if(isMobile) {
