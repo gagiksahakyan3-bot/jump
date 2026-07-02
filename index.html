@@ -701,12 +701,12 @@
   // ── mobile detection & quality tier ──────────────────────────────
   var isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) ||
                  (navigator.maxTouchPoints > 1 && window.innerWidth < 900);
-  // render at half resolution on mobile to cut GPU fill-rate in half
-  var SCALE = isMobile ? 0.5 : 1.0;
+  // render at reduced resolution on mobile to cut GPU fill-rate (raised for clarity)
+  var SCALE = isMobile ? 0.75 : 1.0;
   // mobile game window now fills the whole viewport (fullscreen, no letterboxing)
   var MOBILE_SHRINK = 1.0;
   // show more of the world on mobile — camera pulled further away
-  var MOBILE_ZOOM_OUT = 1.5;
+  var MOBILE_ZOOM_OUT = 2.0;
   function gameDisplayW() { return isMobile ? Math.round(window.innerWidth  * MOBILE_SHRINK) : window.innerWidth; }
   function gameDisplayH() { return isMobile ? Math.round(window.innerHeight * MOBILE_SHRINK) : window.innerHeight; }
   var W = Math.round(gameDisplayW() * SCALE * (isMobile ? MOBILE_ZOOM_OUT : 1));
