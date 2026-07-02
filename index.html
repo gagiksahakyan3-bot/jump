@@ -1153,7 +1153,7 @@
 
   function genClouds(toWY) {
     while(topCloudWY > toWY) {
-      topCloudWY -= 90 + Math.random()*130;
+      topCloudWY -= (isMobile ? 70 : 55) + Math.random()*100;
       var layer = Math.random() < 0.6 ? 0 : 1;
       clouds.push({
         wx: -60 + Math.random()*(W+120),
@@ -1730,15 +1730,23 @@
   function drawClouds() {
     ctx.save();
     ctx.lineCap = 'round';
+    var cDayness = Math.max(0, Math.cos(dayTime * Math.PI * 2));
+    var cNightMix = Math.max(0, Math.min(1, (1-cDayness)*1.5));
+    // warm sunset/dawn tint peaks when the sun is near the horizon (dayness mid-range)
+    var cSunsetMix = Math.max(0, 1 - Math.abs(cDayness-0.35)/0.55) * (1-cNightMix*0.7);
+    // base cloud body color shifts: bright white by day, cool blue-grey by night, warm peach at sunset
+    var baseR = Math.round(248*(1-cNightMix) + 96*cNightMix + 30*cSunsetMix);
+    var baseG = Math.round(245*(1-cNightMix) + 104*cNightMix + 8*cSunsetMix);
+    var baseB = Math.round(240*(1-cNightMix) + 128*cNightMix - 20*cSunsetMix);
     for(var i=0;i<clouds.length;i++){
       var c = clouds[i];
       var pf = c.layer===0 ? 0.52 : 0.78;
       var cx2 = c.wx;
       var cy2 = c.wy - camY*pf;
       var sz = c.size;
-      if(cy2 < -sz*3 || cy2 > H+sz*2) continue;
+      if(cy2 < -sz*3.5 || cy2 > H+sz*2.5) continue;
       var alpha = c.layer===0 ? 0.5 : 0.72;
-      // puffs: main blob + several offset blobs for a denser, fluffier shape
+      // puffs: dense cluster of offset blobs (large + medium + small) for a fluffier, more detailed shape
       var puffs = [
         [0,0,sz],
         [sz*.58,-sz*.16,sz*.68],
@@ -1748,32 +1756,57 @@
         [sz*.86,sz*.1,sz*.36],
         [-sz*.82,-sz*.06,sz*.34],
         [sz*.1,-sz*.4,sz*.3],
-        [sz*.42,sz*.34,sz*.32]
+        [sz*.42,sz*.34,sz*.32],
+        [sz*1.08,-sz*.02,sz*.24],
+        [-sz*1.05,sz*.18,sz*.22],
+        [sz*.02,sz*.42,sz*.26],
+        [sz*.66,sz*.38,sz*.2],
+        [-sz*.38,sz*.36,sz*.22],
+        [sz*.3,-sz*.55,sz*.2],
+        [-sz*.62,-sz*.4,sz*.18]
       ];
-      ctx.fillStyle = 'rgba(248,245,240,'+alpha+')';
+      ctx.fillStyle = 'rgba('+baseR+','+baseG+','+baseB+','+alpha+')';
       for(var j=0;j<puffs.length;j++){
         ctx.beginPath();
         ctx.arc(cx2+puffs[j][0], cy2+puffs[j][1], puffs[j][2], 0, Math.PI*2);
         ctx.fill();
       }
-      // soft shading: subtle shadow underside + highlight on top for volume
-      ctx.fillStyle = 'rgba(190,185,178,'+(alpha*0.28)+')';
+      // soft shading: subtle shadow underside for volume
+      var shR = Math.round(baseR*0.72), shG = Math.round(baseG*0.70), shB = Math.round(baseB*0.68);
+      ctx.fillStyle = 'rgba('+shR+','+shG+','+shB+','+(alpha*0.32)+')';
       for(var j=0;j<puffs.length;j++){
         ctx.beginPath();
         ctx.arc(cx2+puffs[j][0], cy2+puffs[j][1]+puffs[j][2]*.32, puffs[j][2]*.78, 0, Math.PI*2);
         ctx.fill();
       }
-      ctx.fillStyle = 'rgba(255,255,255,'+(alpha*0.35)+')';
+      // deeper crevice shadow between puffs for extra depth
+      ctx.fillStyle = 'rgba('+shR+','+shG+','+shB+','+(alpha*0.2)+')';
+      for(var j=0;j<puffs.length;j++){
+        if(puffs[j][2] < sz*.3) continue;
+        ctx.beginPath();
+        ctx.arc(cx2+puffs[j][0]+puffs[j][2]*.22, cy2+puffs[j][1]+puffs[j][2]*.1, puffs[j][2]*.5, 0, Math.PI*2);
+        ctx.fill();
+      }
+      // bright highlight on top-left, sun-facing side
+      ctx.fillStyle = 'rgba(255,255,255,'+(alpha*(0.35+cSunsetMix*0.15))+')';
       for(var j=0;j<puffs.length;j++){
         ctx.beginPath();
         ctx.arc(cx2+puffs[j][0]-puffs[j][2]*.18, cy2+puffs[j][1]-puffs[j][2]*.28, puffs[j][2]*.42, 0, Math.PI*2);
         ctx.fill();
       }
+      // tiny crisp highlight specks for extra texture on the larger puffs
+      ctx.fillStyle = 'rgba(255,255,255,'+(alpha*0.5)+')';
+      for(var j=0;j<puffs.length;j++){
+        if(puffs[j][2] < sz*.4) continue;
+        ctx.beginPath();
+        ctx.arc(cx2+puffs[j][0]-puffs[j][2]*.32, cy2+puffs[j][1]-puffs[j][2]*.4, puffs[j][2]*.14, 0, Math.PI*2);
+        ctx.fill();
+      }
       // sketchy outlines on the larger puffs for a hand-drawn, detailed edge
-      ctx.strokeStyle = 'rgba(168,158,148,'+(c.layer===0?0.2:0.3)+')';
+      ctx.strokeStyle = 'rgba('+shR+','+shG+','+shB+','+(c.layer===0?0.25:0.35)+')';
       ctx.lineWidth = 1;
       for(var j=0;j<puffs.length;j++){
-        if(puffs[j][2] < sz*.45) continue;
+        if(puffs[j][2] < sz*.4) continue;
         sCirc(cx2+puffs[j][0], cy2+puffs[j][1], puffs[j][2]);
       }
     }
@@ -2701,15 +2734,12 @@
   respawn();
   buildSkyStars();
 
-  // ── click-to-shoot ────────────────────────────────────────────────
-  cvs.addEventListener('click', function(e) {
+  // ── shoot toward a screen point (shared by mouse-click and touch aim) ──
+  function fireAt(mx, my) {
     if(dead) return;
     var hasWeapon = mktSafe('gun') || mktSafe('sword') || mktSafe('bomb') ||
                     mktSafe('shotgun') || mktSafe('sniper') || mktSafe('rocket') || mktSafe('plasma');
     if(!hasWeapon) return;
-    var rect = cvs.getBoundingClientRect();
-    var mx = (e.clientX - rect.left) * (W / rect.width);
-    var my = (e.clientY - rect.top)  * (H / rect.height);
     var bx = px, by = py - 20;
     var dx = mx - bx, dy = my - sy(by);
     var len = Math.sqrt(dx*dx + dy*dy);
@@ -2734,7 +2764,50 @@
     } else if(mktSafe('gun')) {
       bullets.push({wx: bx, wy: by, vx: ndx*16, vy: ndy*16});
     }
+  }
+
+  function screenToWorld(clientX, clientY) {
+    var rect = cvs.getBoundingClientRect();
+    return {
+      x: (clientX - rect.left) * (W / rect.width),
+      y: (clientY - rect.top)  * (H / rect.height)
+    };
+  }
+
+  // ── click-to-shoot (desktop mouse) ──────────────────────────────────
+  cvs.addEventListener('click', function(e) {
+    var p = screenToWorld(e.clientX, e.clientY);
+    fireAt(p.x, p.y);
   });
+
+  // ── drag-to-aim, release-to-fire (touch) — smoother than tap-to-shoot:
+  // no synthetic-click delay, and you can re-aim by dragging before letting go ──
+  var aimTouchId = null, aimTouchPos = null;
+  cvs.addEventListener('touchstart', function(e) {
+    if(aimTouchId !== null) return;
+    var t = e.changedTouches[0];
+    aimTouchId = t.identifier;
+    aimTouchPos = screenToWorld(t.clientX, t.clientY);
+    e.preventDefault();
+  }, {passive:false});
+  cvs.addEventListener('touchmove', function(e) {
+    for(var i=0; i<e.changedTouches.length; i++) {
+      var t = e.changedTouches[i];
+      if(t.identifier === aimTouchId) { aimTouchPos = screenToWorld(t.clientX, t.clientY); break; }
+    }
+    e.preventDefault();
+  }, {passive:false});
+  cvs.addEventListener('touchend', function(e) {
+    for(var i=0; i<e.changedTouches.length; i++) {
+      if(e.changedTouches[i].identifier === aimTouchId) {
+        if(aimTouchPos) fireAt(aimTouchPos.x, aimTouchPos.y);
+        aimTouchId = null; aimTouchPos = null;
+        e.preventDefault();
+        break;
+      }
+    }
+  }, {passive:false});
+  cvs.addEventListener('touchcancel', function(e) { aimTouchId = null; aimTouchPos = null; });
 
   // ── button controls ───────────────────────────────────────────────
   var lHeld=false, rHeld=false;
@@ -4493,6 +4566,20 @@
     ctx.restore();
   }
 
+  function drawAimLine() {
+    if(!aimTouchPos || dead) return;
+    var bx = px, by = sy(py - 20);
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255,220,80,0.55)';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4,5]);
+    ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(aimTouchPos.x, aimTouchPos.y); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = 'rgba(255,220,80,0.75)';
+    ctx.beginPath(); ctx.arc(aimTouchPos.x, aimTouchPos.y, 5, 0, Math.PI*2); ctx.fill();
+    ctx.restore();
+  }
+
   function render() {
     drawBG();
     drawClouds();
@@ -4510,6 +4597,7 @@
     drawRockets();
     drawStars();
     drawFigure();
+    drawAimLine();
     drawBots();
     drawPopups();
     if(dead) drawDead();
