@@ -348,6 +348,27 @@
     }
     #p2btn.active { background: rgba(180,40,20,0.85); border-color: rgba(255,120,60,0.9); }
     #p2btn:active { transform: scale(0.93); }
+    #enemybtn {
+      position: fixed;
+      top: 242px; left: 10px;
+      transform: none;
+      width: min(15vw,72px); height: min(15vw,72px);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(40,120,60,0.55);
+      border: 2.5px solid rgba(80,180,100,0.65);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.28);
+      backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+      font: bold min(5.5vw,24px) 'Chalkboard SE','Comic Sans MS',cursive;
+      color: #FFF8F0;
+      cursor: pointer;
+      user-select: none; -webkit-user-select: none;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      z-index: 10;
+    }
+    #enemybtn.active { background: rgba(180,40,20,0.85); border-color: rgba(255,120,60,0.9); }
+    #enemybtn:active { transform: scale(0.93); }
   </style>
 </head>
 <body>
@@ -641,6 +662,7 @@
     </div>
   </div>
   <button id="p2btn" title="Add AI player">🤖</button>
+  <button id="enemybtn" title="Toggle enemies">👤</button>
   <div id="jumpctrl">
     <span>↑</span>
     <button class="jbtn" id="bjdn">−</button>
@@ -1030,6 +1052,7 @@
   // ── sputniks: enterable satellite, one every 1000m climbed ─────────
   var sputniks = [], topSputnikWY = 0;
   var SPUTNIK_REPEAT_PX = 8000; // 1000 meters (8px/m)
+  var nearSputnik = null; // sputnik currently in range — player enters by pressing E
   // ── zone system ───────────────────────────────────────────────────
   var ZONES = [
     {min:0,   max:200,  name:'Street',  col:'#8A7858'},
@@ -1044,6 +1067,7 @@
   var MILESTONES = [200, 500, 1000, 2000, 5000];
 
   // ── AI second player ──────────────────────────────────────────────
+  var enemiesEnabled=true;
   var p2active=false, p2x=0, p2y=0, p2vx=0, p2vy=0;
   var p2onG=false, p2jLeft=2, p2dead=false;
   var p2frame=0, p2score=0, p2dir=0;
@@ -2163,7 +2187,7 @@
       }
 
       // human enemies: spawn alongside blobs when gun owned
-      if(mktSafe('gun') && topWY < GND - 400 && Math.random() < 0.28) {
+      if(enemiesEnabled && mktSafe('gun') && topWY < GND - 400 && Math.random() < 0.28) {
         var hdir = Math.random() < 0.5 ? 1 : -1;
         var newPlat = plats[plats.length - 1];
         var epx1 = newPlat ? newPlat.x1 : 0, epx2 = newPlat ? newPlat.x2 : W;
@@ -2231,6 +2255,32 @@
         phase: Math.random()*Math.PI*2
       });
     }
+  }
+
+  function applyPowerUpEffect(type, wx, wy) {
+    if(type==='shield_orb') {
+      shieldActive++; popups.push({wx:wx,wy:wy,life:1.5,text:'🛡️ SHIELD!',col:'#4090FF'});
+    } else if(type==='speed_orb') {
+      ghostTimer=Math.max(ghostTimer,0)+60; popups.push({wx:wx,wy:wy,life:1.5,text:'💨 SPEED!',col:'#40D0FF'});
+    } else if(type==='invincible_orb') {
+      ghostTimer=Math.max(ghostTimer,0)+180; popups.push({wx:wx,wy:wy,life:1.5,text:'👻 GHOST!',col:'#80FF80'});
+    } else if(type==='coinburst_orb') {
+      coinCount+=5; popups.push({wx:wx,wy:wy,life:1.5,text:'💰 +5 COINS!',col:'#FFD020'});
+    } else if(type==='jump_orb') {
+      jLeft=Math.min(jLeft+1, maxJumps()+1); popups.push({wx:wx,wy:wy,life:1.5,text:'⬆️ JUMP!',col:'#FF80FF'});
+    }
+  }
+
+  function enterSputnik() {
+    if(!nearSputnik || !nearSputnik.alive) return;
+    var sp = nearSputnik;
+    sp.alive = false;
+    nearSputnik = null;
+    spawnParticles(sp.wx, sy(sp.wy), 'powerup');
+    playCoinSFX();
+    popups.push({wx:sp.wx,wy:sp.wy,life:1.5,text:'🛰️ SPUTNIK!',col:'#C0D0E0'});
+    var sputnikPuTypes=['shield_orb','speed_orb','invincible_orb','coinburst_orb','jump_orb'];
+    applyPowerUpEffect(sputnikPuTypes[Math.floor(Math.random()*sputnikPuTypes.length)], sp.wx, sp.wy-24);
   }
 
   function genSputniks(toWY) {
@@ -2687,6 +2737,12 @@
     this.textContent = botModeActive ? '✕🤖' : '🤖';
     if(botModeActive) spawnBots();
   });
+  document.getElementById('enemybtn').addEventListener('click', function(){
+    enemiesEnabled = !enemiesEnabled;
+    this.classList.toggle('active', !enemiesEnabled);
+    this.textContent = enemiesEnabled ? '👤' : '🚫';
+    if(!enemiesEnabled) { humanEnemies=[]; enemyBullets=[]; }
+  });
   document.getElementById('bjump').addEventListener('mousedown',  function(e){e.preventDefault(); doJump();});
   document.getElementById('bjump').addEventListener('touchstart', function(e){e.preventDefault(); doJump();},{passive:false});
 
@@ -2711,6 +2767,7 @@
     if(e.key==='r'||e.key==='R') respawn();
     if(e.key==='ArrowLeft' ||e.key==='a'||e.key==='A') tryDash(-1);
     if(e.key==='ArrowRight'||e.key==='d'||e.key==='D') tryDash(1);
+    if(e.key==='e'||e.key==='E') enterSputnik();
   });
   document.addEventListener('keyup',function(e){K[e.key]=false;});
 
@@ -2862,19 +2919,18 @@
         pu.alive=false;
         spawnParticles(pu.wx, sy(pu.wy), 'powerup');
         playCoinSFX();
-        if(pu.type==='shield_orb') {
-          shieldActive++; popups.push({wx:pu.wx,wy:pu.wy,life:1.5,text:'🛡️ SHIELD!',col:'#4090FF'});
-        } else if(pu.type==='speed_orb') {
-          ghostTimer=Math.max(ghostTimer,0)+60; popups.push({wx:pu.wx,wy:pu.wy,life:1.5,text:'💨 SPEED!',col:'#40D0FF'});
-        } else if(pu.type==='invincible_orb') {
-          ghostTimer=Math.max(ghostTimer,0)+180; popups.push({wx:pu.wx,wy:pu.wy,life:1.5,text:'👻 GHOST!',col:'#80FF80'});
-        } else if(pu.type==='coinburst_orb') {
-          coinCount+=5; popups.push({wx:pu.wx,wy:pu.wy,life:1.5,text:'💰 +5 COINS!',col:'#FFD020'});
-        } else if(pu.type==='jump_orb') {
-          jLeft=Math.min(jLeft+1, maxJumps()+1); popups.push({wx:pu.wx,wy:pu.wy,life:1.5,text:'⬆️ JUMP!',col:'#FF80FF'});
-        }
+        applyPowerUpEffect(pu.type, pu.wx, pu.wy);
         powerUps.splice(j,1);
       }
+    }
+
+    // Sputnik proximity — one every 1000m; player enters by pressing E
+    nearSputnik = null;
+    for(var j=sputniks.length-1; j>=0; j--) {
+      var sp = sputniks[j];
+      if(!sp.alive) { sputniks.splice(j,1); continue; }
+      var spdx=px-sp.wx, spdy=py-sp.wy;
+      if(spdx*spdx+spdy*spdy < 85*85) nearSputnik = sp;
     }
 
     // Popup floaters
@@ -3338,6 +3394,49 @@
         ctx.restore();
       }
     }
+  }
+
+  function drawSputniks() {
+    ctx.save();
+    for(var j=0;j<sputniks.length;j++){
+      var sp=sputniks[j];
+      if(!sp.alive) continue;
+      var spx=sp.wx, spy=sy(sp.wy);
+      if(spy < -100 || spy > H+100) continue;
+      var bob = Math.sin(frame*0.03+sp.phase)*9;
+      var spin = frame*0.02+sp.phase;
+      spy += bob;
+      // glow aura marking it as enterable
+      var ag = ctx.createRadialGradient(spx,spy,0,spx,spy,74);
+      ag.addColorStop(0,'rgba(210,225,240,0.35)');
+      ag.addColorStop(1,'rgba(210,225,240,0)');
+      ctx.fillStyle=ag; ctx.beginPath(); ctx.arc(spx,spy,74,0,Math.PI*2); ctx.fill();
+      ctx.save();
+      ctx.translate(spx,spy); ctx.rotate(spin*0.3);
+      // antenna legs
+      ctx.strokeStyle='#B8BEC4'; ctx.lineWidth=2.4; ctx.lineCap='round';
+      for(var la=0; la<4; la++){
+        var lang = la*Math.PI/2 + Math.PI/4;
+        sLine(0,0, Math.cos(lang)*46, Math.sin(lang)*46, 0.3);
+      }
+      // whip antennas
+      ctx.strokeStyle='#D8DCE0'; ctx.lineWidth=1.7;
+      sLine(0,-18, 36, -46, 0.2); sLine(0,-18, -36, -46, 0.2);
+      // sphere body
+      var bg=ctx.createRadialGradient(-7,-7,0,0,0,27);
+      bg.addColorStop(0,'#F0F2F4'); bg.addColorStop(0.55,'#B8BEC6'); bg.addColorStop(1,'#787E86');
+      ctx.fillStyle=bg; ctx.beginPath(); ctx.arc(0,0,27,0,Math.PI*2); ctx.fill();
+      ctx.strokeStyle='#4A4E54'; ctx.lineWidth=2.1; sCirc(0,0,27);
+      // porthole
+      ctx.fillStyle='rgba(60,90,120,0.65)'; ctx.beginPath(); ctx.arc(0,0,9,0,Math.PI*2); ctx.fill();
+      ctx.strokeStyle='#D8DCE0'; ctx.lineWidth=1.4; sCirc(0,0,9);
+      ctx.restore();
+      // "ENTER" label
+      ctx.fillStyle='rgba(200,215,235,0.9)'; ctx.textAlign='center'; ctx.textBaseline='bottom';
+      ctx.font='bold 14px "Chalkboard SE","Comic Sans MS",cursive';
+      ctx.fillText('🛰️ ENTER', spx, spy-56);
+    }
+    ctx.restore();
   }
 
   function drawPowerUps() {
@@ -4371,6 +4470,7 @@
     drawCoins();
     drawPennies();
     drawPowerUps();
+    drawSputniks();
     drawHumanEnemies();
     drawBullets();
     drawPlasmas();
