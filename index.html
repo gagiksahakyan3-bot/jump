@@ -1027,6 +1027,9 @@
   var powerUps = [];
   // ── space meteors ─────────────────────────────────────────────────
   var meteors = [], topMeteorWY = 0;
+  // ── sputniks: enterable satellite, one every 1000m climbed ─────────
+  var sputniks = [], topSputnikWY = 0;
+  var SPUTNIK_REPEAT_PX = 8000; // 1000 meters (8px/m)
   // ── zone system ───────────────────────────────────────────────────
   var ZONES = [
     {min:0,   max:200,  name:'Street',  col:'#8A7858'},
@@ -1044,7 +1047,14 @@
   var p2active=false, p2x=0, p2y=0, p2vx=0, p2vy=0;
   var p2onG=false, p2jLeft=2, p2dead=false;
   var p2frame=0, p2score=0, p2dir=0;
-  var p2stuckTimer=0, p2respawnTimer=0, p2aiTick=0, p2aiShootTimer=0;
+  var p2stuckTimer=0, p2respawnTimer=0, p2aiTick=0, p2aiShootTimer=0, p2skin='ghost';
+  // ── bot mode: 3 AI bots, each with a distinct skin ─────────────────
+  var BOT_SKINS = ['ghost', 'price', 'soap'];
+  var bots = [
+    {active:false, x:0,y:0,vx:0,vy:0, onG:false, jLeft:2, dead:false, frame:0, score:0, dir:0, stuckTimer:0, respawnTimer:0, aiTick:0, aiShootTimer:0, skin:BOT_SKINS[0]},
+    {active:false, x:0,y:0,vx:0,vy:0, onG:false, jLeft:2, dead:false, frame:0, score:0, dir:0, stuckTimer:0, respawnTimer:0, aiTick:0, aiShootTimer:0, skin:BOT_SKINS[1]},
+    {active:false, x:0,y:0,vx:0,vy:0, onG:false, jLeft:2, dead:false, frame:0, score:0, dir:0, stuckTimer:0, respawnTimer:0, aiTick:0, aiShootTimer:0, skin:BOT_SKINS[2]}
+  ];
 
   // ── day / night ───────────────────────────────────────────────────
   var dayTime   = 0.0;   // 0=noon  0.25=sunset  0.5=midnight  0.75=dawn
@@ -1211,9 +1221,9 @@
     // index: 0=noon  1=sunset  2=midnight  3=dawn  (4=noon wrap)
     var PALS = [
       [[86,158,220],  [185,220,236], [178,208,148]],  // noon
-      [[38,20,90],    [230,84,34],   [124,80,40]],     // sunset
+      [[38,20,90],    [230,84,34],   [110,140,90]],    // sunset
       [[5,8,30],      [10,15,48],    [15,19,13]],      // midnight
-      [[46,22,84],    [208,98,60],   [105,76,50]],     // dawn
+      [[46,22,84],    [208,98,60],   [100,132,86]],    // dawn
       [[86,158,220],  [185,220,236], [178,208,148]],   // noon (wrap)
     ];
     var ph  = dayTime * 4;
@@ -1507,7 +1517,9 @@
       var mBaseY2 = H * 0.88 - climbH * 0.14;
 
       // fade both layers out as space takes over
-      var mAlpha = Math.max(0, 1 - spaceMix * 2.2);
+      // and fade them IN as the player climbs — invisible at 0m, full by ~50m (400px @ 8px/m)
+      var mFadeIn = Math.min(1, climbH / 400);
+      var mAlpha = Math.max(0, 1 - spaceMix * 2.2) * mFadeIn;
 
       if(mAlpha > 0.01 && mBaseY > -H * 0.7) {
         // ── parallax mountains layer 1 (far, barely moves, tall) ─────
@@ -2221,6 +2233,18 @@
     }
   }
 
+  function genSputniks(toWY) {
+    while(topSputnikWY > toWY) {
+      topSputnikWY -= SPUTNIK_REPEAT_PX;
+      sputniks.push({
+        wx: W*0.5 + (Math.random()-0.5)*W*0.5,
+        wy: topSputnikWY,
+        alive: true,
+        phase: Math.random()*Math.PI*2
+      });
+    }
+  }
+
   function updateBankDisplay() {
     var el=document.getElementById('bankdisp');
     if(el) el.textContent=pennyBank;
@@ -2228,12 +2252,13 @@
 
   function buildWorld() {
     plats=[]; stars=[]; coins=[]; pennies=[]; humanEnemies=[]; enemyBullets=[]; topWY=GND;
-    powerUps=[]; meteors=[]; topMeteorWY=GND;
+    powerUps=[]; meteors=[]; topMeteorWY=GND; sputniks=[]; topSputnikWY=GND;
     plats.push({x1:-10, x2:W+10, wy:GND, tilt:0, type:'normal', crumbleTimer:0, crumbling:false, mvDir:1, mvSpd:0, mvRange:0, mvX1:-10, mvX2:W+10});
     genPlats(GND - H*2.8);
     topCloudWY=GND; clouds=[];
     genClouds(GND - H*3);
     genCityBuildings();
+    genSputniks(GND - H*2.8);
   }
 
   function respawn() {
@@ -2247,6 +2272,15 @@
     buildWorld();
     spawnPY = GND;
     camY = GND - H + 60;
+  }
+
+  function spawnBot(bot, offsetX) {
+    bot.x=px+offsetX; bot.y=py; bot.vx=0; bot.vy=0;
+    bot.onG=true; bot.jLeft=2; bot.dead=false;
+    bot.frame=0; bot.score=0; bot.dir=0; bot.stuckTimer=0; bot.respawnTimer=0; bot.aiShootTimer=0;
+  }
+  function spawnBots() {
+    for(var bi=0; bi<bots.length; bi++) spawnBot(bots[bi], 60 + bi*60);
   }
 
   function spawnP2() {
@@ -2375,6 +2409,34 @@
     p2score=Math.max(p2score,Math.floor(h2/8));
   }
 
+  // ── multi-bot wrappers: run the single-bot AI/draw logic once per bot,
+  // swapping its state into the p2* scratch vars before/after each call ──
+  function updateBots() {
+    for(var bi=0; bi<bots.length; bi++) {
+      var bot = bots[bi];
+      p2active=bot.active; p2x=bot.x; p2y=bot.y; p2vx=bot.vx; p2vy=bot.vy;
+      p2onG=bot.onG; p2jLeft=bot.jLeft; p2dead=bot.dead;
+      p2frame=bot.frame; p2score=bot.score; p2dir=bot.dir;
+      p2stuckTimer=bot.stuckTimer; p2respawnTimer=bot.respawnTimer;
+      p2aiTick=bot.aiTick; p2aiShootTimer=bot.aiShootTimer;
+      updateP2();
+      bot.x=p2x; bot.y=p2y; bot.vx=p2vx; bot.vy=p2vy;
+      bot.onG=p2onG; bot.jLeft=p2jLeft; bot.dead=p2dead;
+      bot.frame=p2frame; bot.score=p2score; bot.dir=p2dir;
+      bot.stuckTimer=p2stuckTimer; bot.respawnTimer=p2respawnTimer;
+      bot.aiTick=p2aiTick; bot.aiShootTimer=p2aiShootTimer;
+    }
+  }
+  function drawBots() {
+    for(var bi=0; bi<bots.length; bi++) {
+      var bot = bots[bi];
+      p2active=bot.active; p2x=bot.x; p2y=bot.y; p2vx=bot.vx; p2vy=bot.vy;
+      p2onG=bot.onG; p2dead=bot.dead; p2frame=bot.frame; p2score=bot.score;
+      p2aiShootTimer=bot.aiShootTimer; p2skin=bot.skin;
+      drawP2Figure();
+    }
+  }
+
   function drawP2Figure() {
     if(!p2active||p2dead) return;
     var x=p2x, gy=sy(p2y);
@@ -2382,8 +2444,10 @@
     ctx.save();
     ctx.lineCap='round'; ctx.lineJoin='round';
 
-    var hoodC='#111110', bodyC='#0F0F0E', pantC='#0E0E0C', bootC='#0A0806';
-    var faceC='#BFBCB0', eyeC='rgba(110,105,88,0.3)', outC='#050504';
+    var sk2 = SKINS[p2skin] || SKINS.ghost;
+    var hoodC=sk2.helmet, bodyC=sk2.vest, pantC=sk2.pant, bootC=sk2.boot;
+    var faceC=sk2.mask, eyeC='rgba(110,105,88,0.3)', outC='#050504';
+    var stripeC=sk2.stripes||'rgba(225,222,210,0.90)', cheekC=sk2.cheek||'#7A7868';
 
     var ph2=Math.floor(p2frame/7)%2;
     var fast2=Math.abs(p2vx)>0.6;
@@ -2513,8 +2577,8 @@
     ctx.fillStyle='#0C0C0A'; ctx.strokeStyle=outC; ctx.lineWidth=1.2;
     ctx.beginPath(); ctx.ellipse(x+19,headY+1,5,6,0,0,Math.PI*2); ctx.fill(); ctx.stroke();
     ctx.fillStyle='#1A1A18'; ctx.beginPath(); ctx.ellipse(x+19,headY+1,3,4,0,0,Math.PI*2); ctx.fill();
-    // Ghost two white stripes
-    ctx.strokeStyle='rgba(225,222,210,0.90)'; ctx.lineWidth=1.8; ctx.lineCap='round';
+    // skin-colored stripes
+    ctx.strokeStyle=stripeC; ctx.lineWidth=1.8; ctx.lineCap='round';
     sLine(x-3,headY-14,x-3,headY-5,0.2);
     sLine(x+3,headY-14,x+3,headY-5,0.2);
 
@@ -2522,7 +2586,7 @@
     ctx.fillStyle=faceC; ctx.strokeStyle=outC; ctx.lineWidth=1.4;
     ctx.beginPath(); ctx.ellipse(x,headY+5,10,12,0,0,Math.PI*2); ctx.fill(); ctx.stroke();
     // cheekbones
-    ctx.strokeStyle='#7A7868'; ctx.lineWidth=1.0;
+    ctx.strokeStyle=cheekC; ctx.lineWidth=1.0;
     sLine(x-9,headY+2,x-5,headY+6,0.2); sLine(x+9,headY+2,x+5,headY+6,0.2);
     sLine(x-8,headY-2,x+8,headY-2,0.15);
     // eye sockets
@@ -2617,10 +2681,11 @@
   setJumpLvl(jumpLvl); // initialise dots
 
   document.getElementById('p2btn').addEventListener('click', function(){
-    p2active = !p2active;
-    this.classList.toggle('active', p2active);
-    this.textContent = p2active ? '✕🤖' : '🤖';
-    if(p2active) spawnP2();
+    var botModeActive = !bots[0].active;
+    for(var bi=0; bi<bots.length; bi++) bots[bi].active = botModeActive;
+    this.classList.toggle('active', botModeActive);
+    this.textContent = botModeActive ? '✕🤖' : '🤖';
+    if(botModeActive) spawnBots();
   });
   document.getElementById('bjump').addEventListener('mousedown',  function(e){e.preventDefault(); doJump();});
   document.getElementById('bjump').addEventListener('touchstart', function(e){e.preventDefault(); doJump();},{passive:false});
@@ -2754,10 +2819,6 @@
       combo++;
       comboTimer = 90;
       if(combo > comboBest) comboBest = combo;
-      if(combo >= 3) {
-        var txt = combo >= 10 ? '🔥 x'+combo+'!' : combo >= 5 ? '⚡ x'+combo : 'x'+combo;
-        popups.push({wx:px, wy:py-30, life:1.0, text:txt, col: combo>=10?'#FF4010':combo>=5?'#FF9020':'#60B820'});
-      }
     }
     if(comboTimer > 0) { comboTimer--; } else { combo = 0; }
 
@@ -3148,7 +3209,7 @@
     }
 
     updateParticles();
-    updateP2();
+    updateBots();
   }
 
   // ── draw ──────────────────────────────────────────────────────────
@@ -4315,7 +4376,7 @@
     drawRockets();
     drawStars();
     drawFigure();
-    drawP2Figure();
+    drawBots();
     drawPopups();
     if(dead) drawDead();
     else     drawHUD();
