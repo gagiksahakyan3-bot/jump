@@ -3155,6 +3155,7 @@
     genPlats(camY - H*0.4);
     genClouds(camY - H*0.6);
     if(spaceMix > 0.2) genMeteors(camY - H*0.5);
+    genSputniks(camY - H*0.5);
 
     // Update meteors (move diagonally, check collision)
     for(var mi2=meteors.length-1; mi2>=0; mi2--) {
@@ -4535,6 +4536,7 @@
       score = Math.floor(startWY / 8);
       genPlats(camY - H);
       genClouds(camY - H);
+      genSputniks(camY - H);
     }
   };
   // also patch initial spawn
